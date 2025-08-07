@@ -1,17 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Static Website</title>
+    <title>Repo File Explorer</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 40px; }
-        h1 { color: #333; }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { color: #24292e; }
+        ul { list-style: none; padding: 0; }
+        li { margin: 8px 0; }
+        a { color: #0366d6; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .folder { font-weight: bold; color: #586069; }
     </style>
 </head>
 <body>
-    <h1>Welcome to My Website!</h1>
-    <p>This is a static site hosted on GitHub Pages.</p>
-    <p>Edit this file to add your content.</p>
+    <h1>📁 Repository Files</h1>
+    <div id="file-list">Loading...</div>
+
+    <script>
+        // Replace with your GitHub username and repo name
+        const repo = 'borovkads/potential-octo-telegram';
+        
+        fetch(`https://api.github.com/repos/${repo}/contents/`)
+            .then(response => response.json())
+            .then(data => {
+                let html = '<ul>';
+                data.forEach(item => {
+                    const icon = item.type === 'dir' ? '📁' : '📄';
+                    const className = item.type === 'dir' ? 'class="folder"' : '';
+                    html += `
+                        <li>
+                            ${icon} <a ${className} href="${item.html_url}" target="_blank">${item.name}</a>
+                            ${item.type === 'file' ? 
+                                ` | <a href="https://borovkads.github.io/potential-octo-telegram/${item.name}" target="_blank">View Live</a>` : ''}
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+                document.getElementById('file-list').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('file-list').innerHTML = 
+                    '<p>⚠️ Error loading files. Ensure the repo is public.</p>';
+            });
+    </script>
 </body>
 </html>

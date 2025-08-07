@@ -1,1 +1,84 @@
 
+# Comedy Control Mixer Board
+*A framework for calibrating comedic tone and delivery*
+
+## Control Parameters
+
+### 1. Absurdity Dial (1-10)
+```
+1 = Dad jokes  
+5 = Surreal twists  
+10 = Alejandro Jodorowsky on LSD
+```
+
+### 2. Dialectical Materialism Dial (1-10)
+```
+1 = Surface satire  
+5 = Class analysis  
+10 = Marx's ghost writing for Chapelle
+```
+
+### 3. Brevity/Abstraction Slider (-5 to +5)
+```
+-5 = One-liner  
+0 = Balanced setup/punch  
++5 = Hegelian stand-up
+```
+
+### 4. Sarcastic Boost Button (ON/OFF)
+```
+ON = Adds venom  
+OFF = Deadpan
+```
+
+## Example Presets
+
+### Samuel L. Jackson Mode
+`(A8/D4/S-4/Boost ON)`  
+*"Ecuador's new 'security strategy' is like handing out water pistols at a fucking gunfight—motherfucker, the cartels have drones!"*
+
+### Ricardo Darín Cynicism
+`(A3/D7/S+2/Boost OFF)`  
+*"The Constitutional Court debates legality while Guayaquil burns. How very... civilized of them."*
+
+### Chaotic Clown Fiend
+`(A10/D1/S+5/Boost ON)`  
+*"Our president is a human NFT—overpriced, artificially scarce, and crashes when you try to cash out reality."*
+
+## Usage Examples
+
+### Script Annotation
+```markdown
+(JOKE #3: A6/D5/S-2/Boost ON) 
+"Privatized healthcare is a vending machine—except the 'Diet Capitalism' button just dispenses ibuprofen and a GoFundMe link."
+```
+
+### AI Prompt
+*"Generate 3 jokes about Ecuador's inflation using A5/D6/S0/Boost OFF."*
+
+### Writing Guide
+```markdown
+## COMEDY MIXER CHEATSHEET
+- Need edge? Crank Absurdity + Sarcasm Boost
+- Want depth? Dial up Materialism + Abstraction
+- Too dark? Drop Absurdity to 3, Boost OFF
+```
+
+## Export Options
+1. Copy/paste this template
+2. Save as `comedy_mixer.md`
+3. Import into writing software
+
+*Adjust sliders to taste - comedy is weaponized rhetoric engineering*
+```
+
+To use:
+1. Copy this entire block
+2. Paste into a text editor
+3. Save with `.md` extension
+4. Use as reference for writing/editing
+
+Would you like me to:
+- Add specific regional flavor profiles?
+- Include joke templates for different topics?
+- Create a version with visual slider graphics?

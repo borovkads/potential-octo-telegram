@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MF-ING COMEDY MIXER 9000 (SAMUEL L. MODE)</title>
+    <style>
+        body {
+            font-family: 'Impact', sans-serif;
+            background: #000;
+            color: #ff0000;
+            text-align: center;
+            padding: 20px;
+        }
+        .mixer {
+            background: #111;
+            border: 3px solid #d00000;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #fff;
+            text-shadow: 0 0 10px #ff0000;
+            margin-bottom: 30px;
+        }
+        .slider-container {
+            margin: 20px 0;
+        }
+        .slider {
+            width: 100%;
+            height: 25px;
+            background: #333;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            background: #ff0000;
+            cursor: pointer;
+        }
+        #pmfSlider::-webkit-slider-thumb {
+            background: #d00000;
+        }
+        #rantOutput {
+            background: #000;
+            border: 2px solid #ff0000;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 18px;
+            min-height: 100px;
+        }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        button {
+            background: #d00000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Impact';
+        }
+        button:hover {
+            background: #ff0000;
+        }
+        #voiceButton {
+            background: #000;
+            border: 2px solid #ff0000;
+        }
+        #voiceButton.active {
+            background: #ff0000;
+            animation: pulse 1.5s infinite;
+        }
+        #stopButton {
+            display: none;
+            background: #000;
+            border: 2px solid #fff;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 5px #ff0000; }
+            50% { box-shadow: 0 0 20px #ff0000; }
+            100% { box-shadow: 0 0 5px #ff0000; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mixer">
+        <h1>🔥 COMEDY MIXER 9000 (SAMUEL L. MODE) 🔥</h1>
+        
+        <div class="slider-container">
+            <div class="slider-label">
+                <span>ABSURDITY: <span id="absurdityValue">10</span>/10</span>
+                <span>乁(◔益◔)ㄏ︵┻━┻</span>
+            </div>
+            <input type="range" min="1" max="10" value="10" class="slider" id="absurditySlider">
+        </div>
+        
+        <div class="slider-container">
+            <div class="slider-label">
+                <span>MATERIALISM: <span id="materialismValue">9</span>/10</span>
+                <span>(╬ಠ益ಠ)︵📉🔥📊</span>
+            </div>
+            <input type="range" min="1" max="10" value="9" class="slider" id="materialismSlider">
+        </div>
+        
+        <div class="slider-container">
+            <div class="slider-label">
+                <span>BREVITY: <span id="brevityValue">0</span>/5</span>
+                <span>🐦 → 📜</span>
+            </div>
+            <input type="range" min="-5" max="5" value="0" class="slider" id="brevitySlider">
+        </div>
+        
+        <div class="slider-container">
+            <div class="slider-label">
+                <span>PMF GRADIENT: <span id="pmfValue">10</span>/10</span>
+                <span>(╯°□°)╯︵ 彡 MF</span>
+            </div>
+            <input type="range" min="1" max="10" value="10" class="slider" id="pmfSlider">
+        </div>
+        
+        <div>
+            <button id="sarcasmButton">SARCASTIC BOOST: <span id="sarcasmState">OVERDRIVE</span></button>
+        </div>
+        
+        <div id="rantOutput">
+            "LISTEN HERE YOU TARIFF-HUMPING, SUPPLY-SIDE JESTER—YOUR 'ECONOMIC POLICY' IS WHAT HAPPENS WHEN A MONKEY WITH A CHALKBOARD FUCKS A BLOOMBERG TERMINAL!"
+        </div>
+        
+        <button id="voiceButton">🔊 ENABLE SAMUEL L. MODE (TTS)</button>
+        <button id="stopButton">✋ STOP VOICE</button>
+    </div>
+
+    <script>
+        // DOM elements
+        const absurditySlider = document.getElementById("absurditySlider");
+        const materialismSlider = document.getElementById("materialismSlider");
+        const brevitySlider = document.getElementById("brevitySlider");
+        const pmfSlider = document.getElementById("pmfSlider");
+        const sarcasmButton = document.getElementById("sarcasmButton");
+        const voiceButton = document.getElementById("voiceButton");
+        const stopButton = document.getElementById("stopButton");
+        const absurdityValue = document.getElementById("absurdityValue");
+        const materialismValue = document.getElementById("materialismValue");
+        const brevityValue = document.getElementById("brevityValue");
+        const pmfValue = document.getElementById("pmfValue");
+        const sarcasmState = document.getElementById("sarcasmState");
+        const rantOutput = document.getElementById("rantOutput");
+
+        // State
+        let sarcasmBoost = true;
+        let voiceEnabled = false;
+        let isSpeaking = false;
+        let voicesLoaded = false;
+
+        // Load voices (Chrome requires this)
+        function loadVoices() {
+            return new Promise(resolve => {
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    voicesLoaded = true;
+                    resolve();
+                } else {
+                    window.speechSynthesis.onvoiceschanged = () => {
+                        voicesLoaded = true;
+                        resolve();
+                    };
+                }
+            });
+        }
+
+        // Samuel L. Jackson-style TTS
+        function speakLikeSamuel(text) {
+            if (!voiceEnabled || isSpeaking) return;
+            
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance();
+            const pmf = parseInt(pmfSlider.value);
+            
+            // Add dramatic pauses
+            const words = text.replace(/"/g, "").split(" ");
+            let modifiedText = "";
+            words.forEach((word, i) => {
+                modifiedText += word + " ";
+                if (i > 0 && (i % Math.floor(Math.random() * 5 + 3) === 0) {
+                    modifiedText += "... ";
+                }
+            });
+            
+            utterance.text = modifiedText;
+            utterance.rate = 0.9 + (pmf * 0.05);
+            utterance.pitch = 0.85 - (pmf * 0.01);
+            utterance.volume = 1.2;
+            
+            // Select deepest available voice
+            if (voicesLoaded) {
+                const voices = window.speechSynthesis.getVoices();
+                const deepVoice = voices.find(v => 
+                    v.name.includes("Male") || 
+                    v.name.includes("Deep") || 
+                    v.lang.includes("en-US")
+                );
+                if (deepVoice) utterance.voice = deepVoice;
+            }
+            
+            // Emphasize ALL-CAPS words
+            utterance.onboundary = (event) => {
+                if (event.name === "word") {
+                    const word = utterance.text.substring(event.charIndex, event.charIndex + event.charLength);
+                    if (word === word.toUpperCase() && word.length > 3) {
+                        utterance.rate = 0.8;
+                        utterance.volume = 1.5;
+                    }
+                }
+            };
+            
+            utterance.onstart = () => {
+                isSpeaking = true;
+                voiceButton.classList.add("active");
+                stopButton.style.display = "inline-block";
+            };
+            
+            utterance.onend = () => {
+                isSpeaking = false;
+                voiceButton.classList.remove("active");
+                stopButton.style.display = "none";
+            };
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Generate rant based on slider values
+        function generateRant(absurdity, materialism, brevity, pmf, sarcasm) {
+            let opener, insult, critique, closer;
+            
+            // PMF gradient affects opener
+            if (pmf >= 8) opener = `"LISTEN HERE YOU `;
+            else if (pmf >= 5) opener = `"Let's be clear: `;
+            else opener = `"One might observe that `;
+            
+            // Absurdity affects insult
+            if (absurdity >= 8) insult = `TARIFF-HUMPING, SUPPLY-SIDE JESTER—YOUR 'ECONOMIC POLICY' IS WHAT HAPPENS WHEN A MONKEY WITH A CHALKBOARD FUCKS A BLOOMBERG TERMINAL`;
+            else if (absurdity >= 5) insult = `so-called economist—your theories have all the rigor of a horoscope written by a lobotomized MBA`;
+            else insult = `protectionist—your policies lack coherent theoretical foundations`;
+            
+            // Materialism affects critique
+            if (materialism >= 8) critique = `EVEN MARX'S GHOST IS FACE-PALMING AT YOUR LABOR-VALUE DISREGARD`;
+            else if (materialism >= 5) critique = `the empirical data directly contradicts your assumptions`;
+            else critique = `this seems suboptimal`;
+            
+            // Brevity affects length
+            if (brevity <= -3) closer = `!"`;
+            else if (brevity <= 0) closer = `! ${critique}!"`;
+            else closer = `! ${critique}! LET ME EXPLAIN IN 20 VOLUMES OF DIALECTICAL MATERIALISM!"`;
+            
+            // Sarcasm toggles ALL-CAPS
+            if (sarcasm) {
+                opener = opener.toUpperCase();
+                insult = insult.toUpperCase();
+                critique = critique.toUpperCase();
+            }
+            
+            return opener + insult + closer;
+        }
+
+        // Update rant when sliders change
+        function updateRant() {
+            const absurdity = absurditySlider.value;
+            const materialism = materialismSlider.value;
+            const brevity = brevitySlider.value;
+            const pmf = pmfSlider.value;
+            
+            absurdityValue.textContent = absurdity;
+            materialismValue.textContent = materialism;
+            brevityValue.textContent = brevity;
+            pmfValue.textContent = pmf;
+            
+            rantOutput.innerHTML = generateRant(absurdity, materialism, brevity, pmf, sarcasmBoost);
+        }
+
+        // Initialize
+        loadVoices().then(() => {
+            // Event listeners
+            absurditySlider.addEventListener("input", updateRant);
+            materialismSlider.addEventListener("input", updateRant);
+            brevitySlider.addEventListener("input", updateRant);
+            pmfSlider.addEventListener("input", updateRant);
+            
+            sarcasmButton.addEventListener("click", () => {
+                sarcasmBoost = !sarcasmBoost;
+                sarcasmState.textContent = sarcasmBoost ? "OVERDRIVE" : "OFF";
+                updateRant();
+            });
+            
+            voiceButton.addEventListener("click", () => {
+                voiceEnabled = !voiceEnabled;
+                voiceButton.textContent = voiceEnabled ? 
+                    "🔊 SAMUEL L. MODE ACTIVE" : 
+                    "🔊 ENABLE SAMUEL L. MODE (TTS)";
+                
+                if (voiceEnabled) speakLikeSamuel(rantOutput.textContent);
+            });
+            
+            stopButton.addEventListener("click", () => {
+                window.speechSynthesis.cancel();
+                isSpeaking = false;
+                voiceButton.classList.remove("active");
+                stopButton.style.display = "none";
+            });
+            
+            updateRant();
+        });
+    </script>
+</body>
+</html>

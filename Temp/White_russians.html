@@ -50,37 +50,6 @@
             background: #333;
             align-self: center;
         }
-        .description-box {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border: 2px solid #333;
-            border-radius: 5px;
-            z-index: 100;
-            max-width: 400px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-        .close-btn {
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 99;
-        }
     </style>
 </head>
 <body>
@@ -88,105 +57,54 @@
     <div class="flowchart">
         <!-- Row 1 -->
         <div class="row">
-            <div class="node org" onclick="openInfo('White_émigré')">White Émigré Networks</div>
+            <div class="node org" onclick="window.open('https://en.wikipedia.org/wiki/White_émigré', '_blank')">White Émigré Networks</div>
         </div>
         <div class="connector"></div>
         
         <!-- Row 2 -->
         <div class="row">
-            <div class="node org" onclick="openInfo('Aufbau_Organization')">Aufbau Vereinigung</div>
+            <div class="node org" onclick="window.open('https://en.wikipedia.org/wiki/Aufbau_Organization', '_blank')">Aufbau Vereinigung</div>
         </div>
         <div class="connector"></div>
         
         <!-- Row 3 -->
         <div class="row">
-            <div class="node" onclick="openInfo('Max_Erwin_von_Scheubner-Richter')">Scheubner-Richter</div>
+            <div class="node" onclick="window.open('https://en.wikipedia.org/wiki/Max_Erwin_von_Scheubner-Richter', '_blank')">Scheubner-Richter</div>
             <div class="horizontal-connector"></div>
-            <div class="node" onclick="openInfo('Vasily_Biskupsky')">Biskupsky</div>
+            <div class="node" onclick="window.open('https://en.wikipedia.org/wiki/Vasily_Biskupsky', '_blank')">Biskupsky</div>
             <div class="horizontal-connector"></div>
-            <div class="node" onclick="openInfo('Pyotr_Shabelsky-Bork')">Shabelsky-Bork</div>
+            <div class="node" onclick="window.open('https://en.wikipedia.org/wiki/Pyotr_Shabelsky-Bork', '_blank')">Shabelsky-Bork</div>
         </div>
         <div class="connector"></div>
         
         <!-- Row 4 -->
         <div class="row">
-            <div class="node" onclick="openInfo('Alfred_Rosenberg')">Rosenberg</div>
+            <div class="node" onclick="window.open('https://en.wikipedia.org/wiki/Alfred_Rosenberg', '_blank')">Rosenberg</div>
             <div class="horizontal-connector"></div>
-            <div class="node org" onclick="openInfo('Nazi_Party')">Nazi Party</div>
+            <div class="node org" onclick="window.open('https://en.wikipedia.org/wiki/Nazi_Party', '_blank')">Nazi Party</div>
             <div class="horizontal-connector"></div>
-            <div class="node" onclick="openInfo('Fyodor_Vinberg')">Vinberg</div>
+            <div class="node" onclick="window.open('https://en.wikipedia.org/wiki/Fyodor_Vinberg', '_blank')">Vinberg</div>
         </div>
         <div class="connector"></div>
         
         <!-- Row 5 -->
         <div class="row">
-            <div class="node" onclick="openInfo('Adolf_Hitler')">Hitler</div>
+            <div class="node" onclick="window.open('https://en.wikipedia.org/wiki/Adolf_Hitler', '_blank')">Hitler</div>
         </div>
         
         <!-- Row 6 -->
         <div class="row">
-            <div class="node" onclick="openInfo('Pavel_Bermondt-Avalov')">Bermondt-Avalov</div>
+            <div class="node" onclick="window.open('https://en.wikipedia.org/wiki/Pavel_Bermondt-Avalov', '_blank')">Bermondt-Avalov</div>
             <div class="horizontal-connector"></div>
-            <div class="node" onclick="openInfo('Sergei_Taboritsky')">Taboritsky</div>
+            <div class="node" onclick="window.open('https://en.wikipedia.org/wiki/Sergey_Taboritsky', '_blank')">Taboritsky</div>
         </div>
         
         <!-- Row 7 -->
         <div class="row">
-            <div class="node" onclick="openInfo('Ivan_Poltavets-Ostranitsa')">Poltavets-Ostranitsa</div>
+            <div class="node" onclick="window.open('https://en.wikipedia.org/wiki/Ukrainian_National_Free_Cossack_Society', '_blank')">Poltavets-Ostranitsa</div>
             <div class="horizontal-connector"></div>
-            <div class="node" onclick="openInfo('Nikolai_Markov')">Markov II</div>
+            <div class="node" onclick="window.open('https://en.wikipedia.org/wiki/Nikolai_Markov', '_blank')">Markov II</div>
         </div>
     </div>
-
-    <div class="overlay" id="overlay"></div>
-    <div class="description-box" id="descriptionBox">
-        <span class="close-btn" onclick="hideDescription()">×</span>
-        <h3 id="descTitle">Title</h3>
-        <p id="descContent">Content goes here...</p>
-    </div>
-
-    <script>
-        // Wikipedia pages (fallback to descriptions)
-        const infoMap = {
-            // Wikipedia entries
-            "White_émigré": { wiki: "White_émigré" },
-            "Aufbau_Organization": { wiki: "Aufbau_Organization" },
-            "Max_Erwin_von_Scheubner-Richter": { wiki: "Max_Erwin_von_Scheubner-Richter" },
-            "Vasily_Biskupsky": { wiki: "Vasily_Biskupsky" },
-            "Alfred_Rosenberg": { wiki: "Alfred_Rosenberg" },
-            "Nazi_Party": { wiki: "Nazi_Party" },
-            "Adolf_Hitler": { wiki: "Adolf_Hitler" },
-            "Pavel_Bermondt-Avalov": { wiki: "Pavel_Bermondt-Avalov" },
-            "Nikolai_Markov": { wiki: "Nikolai_Markov" },
-            "Pyotr_Shabelsky-Bork": { wiki:"Pyotr_Shabelsky-Bork"},
-            "Fyodor_Vinberg"": { wiki:"Fyodor_Vinberg"},
-            "Sergei_Taboritsky": { wiki: "Sergey_Taboritsky"},
-            "Ivan_Poltavets-Ostranitsa": { wiki: "Ukrainian_National_Free_Cossack_Society"}
-            
-        };
-
-        function openInfo(id) {
-            const item = infoMap[id];
-            
-            if (item.wiki) {
-                // Open Wikipedia in a new tab
-                window.open(`https://en.wikipedia.org/wiki/${item.wiki}`, '_blank');
-            } else if (item.desc) {
-                // Show fallback description
-                document.getElementById('descTitle').textContent = id.replace(/_/g, ' ');
-                document.getElementById('descContent').textContent = item.desc;
-                document.getElementById('descriptionBox').style.display = 'block';
-                document.getElementById('overlay').style.display = 'block';
-            }
-        }
-        
-        function hideDescription() {
-            document.getElementById('descriptionBox').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
-        }
-        
-        // Close when clicking outside
-        document.getElementById('overlay').addEventListener('click', hideDescription);
-    </script>
 </body>
 </html>

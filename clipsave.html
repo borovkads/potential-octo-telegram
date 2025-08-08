@@ -53,36 +53,38 @@
             margin-right: 10px;
             margin-bottom: 10px;
         }
-        button:hover {
-            background-color: #3367d6;
-        }
         #directoryInfo {
             margin: 20px 0;
             padding: 15px;
-            background-color: #e8f0fe;
+            background-color: #f0f0f0;
             border-radius: 6px;
             font-size: 1.1rem;
         }
         .button-group {
-            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <h1>Clipboard Content</h1>
-    <div id="clipboardContent">Reading clipboard...</div>
-    
-    <div id="directoryInfo">No directory selected</div>
     
     <div class="button-group">
         <button id="directoryBtn">Select Directory</button>
-        <button id="saveFileBtn" disabled>Save File</button>
-        <button onclick="window.location.reload()">Refresh</button>
+        <button id="saveBtn" disabled>Save File</button>
     </div>
+    
+    <div id="directoryInfo">
+        No directory selected. Files will be saved to default download location.
+    </div>
+    
+    <div id="clipboardContent">Reading clipboard...</div>
 
     <script>
-        // Global variable to store directory handle
-        let directoryHandle = null;
+        let selectedDirectoryHandle = null;
+        let clipboardContent = '';
         
         document.addEventListener('DOMContentLoaded', async () => {
             try {
@@ -90,68 +92,87 @@
                     throw new Error('Clipboard API not supported in this browser');
                 }
 
-                const clipboardText = await navigator.clipboard.readText();
-                const lines = clipboardText.split('\n').slice(0, 4);
-                const firstFourLines = lines.join('\n');
-
+                clipboardContent = await navigator.clipboard.readText();
+                const lines = clipboardContent.split('\n').slice(0, 4);
                 document.getElementById('clipboardContent').textContent = 
-                    firstFourLines || 'Clipboard is empty or contains no text';
+                    lines.join('\n') || 'Clipboard is empty or contains no text';
+                    
             } catch (err) {
                 showError(err);
             }
             
             // Set up button event listeners
             document.getElementById('directoryBtn').addEventListener('click', selectDirectory);
-            document.getElementById('saveFileBtn').addEventListener('click', saveToFile);
+            document.getElementById('saveBtn').addEventListener('click', saveToFile);
         });
 
         async function selectDirectory() {
             try {
-                // Request directory access
-                directoryHandle = await window.showDirectoryPicker();
-                
-                // Verify permission
-                if (await directoryHandle.queryPermission({ mode: 'readwrite' }) !== 'granted') {
-                    const permission = await directoryHandle.requestPermission({ mode: 'readwrite' });
-                    if (permission !== 'granted') {
-                        throw new Error('Directory access denied');
-                    }
+                // Feature detection
+                if (!window.showDirectoryPicker) {
+                    throw new Error('Directory selection not supported in this browser');
                 }
                 
-                // Update UI
+                selectedDirectoryHandle = await window.showDirectoryPicker();
+                const directoryPath = await getDirectoryPath(selectedDirectoryHandle);
+                
                 document.getElementById('directoryInfo').textContent = 
-                    `Selected directory: ${directoryHandle.name}`;
-                document.getElementById('saveFileBtn').disabled = false;
+                    `Selected directory: ${directoryPath}`;
+                document.getElementById('saveBtn').disabled = false;
+                
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    showError(err);
+                }
+            }
+        }
+
+        async function getDirectoryPath(directoryHandle) {
+            // This is a simplified path representation
+            // Note: Browsers don't expose full filesystem paths for security
+            if (directoryHandle.name) {
+                return directoryHandle.name;
+            }
+            return 'Selected folder';
+        }
+
+        async function saveToFile() {
+            try {
+                if (!clipboardContent) {
+                    throw new Error('No clipboard content to save');
+                }
+                
+                let fileHandle;
+                
+                if (selectedDirectoryHandle) {
+                    fileHandle = await selectedDirectoryHandle.getFileHandle('cliptemp.txt', { create: true });
+                } else {
+                    // Fallback to download if directory not selected
+                    downloadFile(clipboardContent);
+                    return;
+                }
+                
+                const writable = await fileHandle.createWritable();
+                await writable.write(clipboardContent);
+                await writable.close();
+                
+                alert('File saved successfully!');
                 
             } catch (err) {
                 showError(err);
             }
         }
 
-        async function saveToFile() {
-            if (!directoryHandle) {
-                showError(new Error('Please select a directory first'));
-                return;
-            }
-
-            try {
-                // Get clipboard contents
-                const clipboardText = await navigator.clipboard.readText();
-                
-                // Create or get file handle
-                const fileHandle = await directoryHandle.getFileHandle('cliptemp.txt', { create: true });
-                
-                // Create writable stream
-                const writable = await fileHandle.createWritable();
-                
-                // Write contents
-                await writable.write(clipboardText);
-                await writable.close();
-                
-                alert('File saved successfully as cliptemp.txt');
-            } catch (err) {
-                showError(err);
-            }
+        function downloadFile(content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cliptemp.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function showError(err) {
@@ -166,9 +187,10 @@
             document.body.appendChild(textarea);
             
             textarea.addEventListener('paste', (e) => {
-                const pastedText = e.clipboardData.getData('text');
-                const lines = pastedText.split('\n').slice(0, 4);
+                clipboardContent = e.clipboardData.getData('text');
+                const lines = clipboardContent.split('\n').slice(0, 4);
                 document.getElementById('clipboardContent').textContent = lines.join('\n');
+                document.getElementById('saveBtn').disabled = false;
                 textarea.remove();
             });
         }

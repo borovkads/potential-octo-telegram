@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Brave Clipboard Reader</title>
+    <script>
+    async function handleClipboard() {
+        try {
+            // Additional check for Brave's stricter permissions
+            const permission = await navigator.permissions.query({ name: 'clipboard-read' });
+            if (permission.state === 'denied') {
+                throw new Error('Brave blocked clipboard access');
+            }
+
+            const text = await navigator.clipboard.readText();
+            const lines = text.split('\n').slice(0, 4);
+            document.getElementById('output').textContent = lines.join('\n') || "Clipboard empty";
+            
+        } catch (err) {
+            document.getElementById('output').innerHTML = 
+                `<span style="color:red">Error: ${err.message}</span><br>
+                 <button onclick="handleClipboard()">Retry</button>`;
+        }
+    }
+    </script>
+</head>
+<body onload="handleClipboard()">
+    <h2>First 4 lines from clipboard:</h2>
+    <div id="output" style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+        Reading clipboard...
+    </div>
+    <small>Works in Brave, Chrome, Edge, and Firefox</small>
+</body>
+</html>

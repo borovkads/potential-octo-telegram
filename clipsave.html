@@ -26,14 +26,9 @@
             border-left: 5px solid #4285f4;
             font-size: 1.3rem;
             line-height: 1.8;
-            height: 120px; /* Shows exactly 5 lines */
+            height: 120px;
             overflow-y: auto;
             margin-bottom: 30px;
-        }
-        #fullContent {
-            display: none;
-            white-space: pre-wrap;
-            margin-top: 10px;
         }
         .error {
             color: #d32f2f;
@@ -48,49 +43,71 @@
             border-radius: 6px;
             cursor: pointer;
             margin-right: 10px;
+            margin-bottom: 10px;
         }
-        .toggle-full {
-            color: #666;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            display: inline-block;
+        #manualPaste {
+            display: none;
+            width: 100%;
+            min-height: 150px;
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 1.2rem;
+        }
+        .button-group {
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Hidden Text Extractor</h1>
-    <div id="contentDisplay">Reading clipboard...</div>
-    <div id="fullContent"></div>
-    <span id="toggleText" class="toggle-full">▼ Show full content</span>
+    <h1>Clipboard Content</h1>
+    
+    <div class="button-group">
+        <button id="readClipboard">Read Clipboard</button>
+    </div>
+    
+    <div id="contentDisplay">Click "Read Clipboard" to start</div>
+    
+    <textarea id="manualPaste" placeholder="Or paste manually here..."></textarea>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('readClipboard').addEventListener('click', async () => {
             try {
-                if (!navigator.clipboard || !navigator.clipboard.readText) {
-                    throw new Error('Clipboard API not supported');
-                }
-
-                const clipboardText = await navigator.clipboard.readText();
-                let extractedText = extractHiddenText(clipboardText);
+                // Focus the document first
+                window.focus();
                 
-                if (!extractedText) {
-                    extractedText = "No hidden comments found in Mermaid diagram\n\nOriginal content:\n" + 
-                                  clipboardText.split('\n').slice(0, 5).join('\n');
+                // Check clipboard permissions
+                if (!navigator.clipboard || !navigator.clipboard.readText) {
+                    throw new Error('Clipboard API not supported in this browser');
                 }
-
-                // Display first 5 lines
-                const lines = extractedText.split('\n');
-                document.getElementById('contentDisplay').textContent = lines.slice(0, 5).join('\n');
-                document.getElementById('fullContent').textContent = extractedText;
-
+                
+                // Read clipboard with user gesture
+                const clipboardText = await navigator.clipboard.readText();
+                processContent(clipboardText);
+                
             } catch (err) {
                 showError(err);
             }
         });
 
+        function processContent(text) {
+            try {
+                let extractedText = extractHiddenText(text);
+                
+                if (!extractedText) {
+                    extractedText = "No hidden comments found\n\n" + 
+                                   text.split('\n').slice(0, 5).join('\n');
+                }
+                
+                document.getElementById('contentDisplay').textContent = 
+                    extractedText.split('\n').slice(0, 5).join('\n');
+                document.getElementById('contentDisplay').className = '';
+                
+            } catch (err) {
+                showError(err);
+            }
+        }
+
         function extractHiddenText(mermaidCode) {
-            // Extract all comments from Mermaid code
             const commentRegex = /%%\s*(.*?)\s*(?=\n|$)/g;
             let match;
             let extracted = [];
@@ -103,23 +120,17 @@
         }
 
         function showError(err) {
-            document.getElementById('contentDisplay').className = 'error';
-            document.getElementById('contentDisplay').textContent = `Error: ${err.message}`;
-        }
-
-        // Toggle full content visibility
-        document.getElementById('toggleText').addEventListener('click', function() {
-            const fullContent = document.getElementById('fullContent');
-            const toggleText = document.getElementById('toggleText');
+            const display = document.getElementById('contentDisplay');
+            display.className = 'error';
+            display.textContent = `Error: ${err.message}`;
             
-            if (fullContent.style.display === 'none') {
-                fullContent.style.display = 'block';
-                toggleText.textContent = '▲ Hide full content';
-            } else {
-                fullContent.style.display = 'none';
-                toggleText.textContent = '▼ Show full content';
-            }
-        });
+            // Show manual paste option
+            document.getElementById('manualPaste').style.display = 'block';
+            document.getElementById('manualPaste').addEventListener('paste', (e) => {
+                processContent(e.clipboardData.getData('text'));
+                e.preventDefault();
+            });
+        }
     </script>
 </body>
 </html>

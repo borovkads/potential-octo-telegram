@@ -46,7 +46,6 @@
             border-radius: 5px;
             cursor: pointer;
             margin-right: 10px;
-            margin-bottom: 10px;
         }
         button:hover {
             background-color: #2980b9;
@@ -60,20 +59,6 @@
             color: #e74c3c;
             font-size: 16px;
         }
-        #directoryPath {
-            font-family: monospace;
-            background-color: #eee;
-            padding: 8px;
-            border-radius: 4px;
-            margin: 10px 0;
-            word-break: break-all;
-        }
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
     </style>
 </head>
 <body>
@@ -82,17 +67,8 @@
     <p><strong>Paste your text here:</strong></p>
     <textarea id="pasteArea" placeholder="Paste your text content here..."></textarea>
     
-    <div class="button-group">
-        <button onclick="processText()">Split Text</button>
-        <button onclick="clearAll()">Clear</button>
-        <button onclick="selectDirectory()">Directory</button>
-        <button onclick="saveToFile()">Save File</button>
-    </div>
-    
-    <div id="directoryInfo" style="display:none;">
-        <strong>Current directory:</strong>
-        <div id="directoryPath">No directory selected</div>
-    </div>
+    <button onclick="processText()">Split Text</button>
+    <button onclick="clearAll()">Clear</button>
     
     <div id="output">Your text fragments will appear here...</div>
     
@@ -102,49 +78,6 @@
     </div>
 
     <script>
-        let currentDirectoryHandle = null;
-
-        async function selectDirectory() {
-            try {
-                // Feature detection
-                if (!window.showDirectoryPicker) {
-                    throw new Error('Directory Picker API not supported in this browser');
-                }
-                
-                const handle = await window.showDirectoryPicker();
-                currentDirectoryHandle = handle;
-                document.getElementById('directoryPath').textContent = handle.name;
-                document.getElementById('directoryInfo').style.display = 'block';
-            } catch (err) {
-                alert(`Error: ${err.message}`);
-            }
-        }
-
-        async function saveToFile() {
-            if (!currentDirectoryHandle) {
-                alert('Please select a directory first');
-                return;
-            }
-
-            try {
-                const text = document.getElementById('pasteArea').value || 
-                              document.getElementById('output').textContent;
-                
-                if (!text.trim()) {
-                    throw new Error('No text content to save');
-                }
-
-                const fileHandle = await currentDirectoryHandle.getFileHandle('cliptemp.txt', { create: true });
-                const writable = await fileHandle.createWritable();
-                await writable.write(text);
-                await writable.close();
-                
-                alert(`File saved successfully as cliptemp.txt in ${currentDirectoryHandle.name}`);
-            } catch (err) {
-                alert(`Error saving file: ${err.message}`);
-            }
-        }
-
         function processText() {
             const text = document.getElementById('pasteArea').value;
             if (!text.trim()) {
@@ -153,9 +86,14 @@
                 return;
             }
 
+            // Simple splitting by paragraphs (double newlines)
             const fragments = text.split(/\n\s*\n/);
+            
+            // Display first fragment
             document.getElementById('output').className = '';
             document.getElementById('output').textContent = fragments[0];
+            
+            // Update fragment info
             document.getElementById('fragmentCount').textContent = `${fragments.length} fragments`;
             document.getElementById('currentFragment').textContent = 'Fragment 1';
         }
@@ -166,18 +104,6 @@
             document.getElementById('fragmentCount').textContent = '0 fragments';
             document.getElementById('currentFragment').textContent = 'Fragment 1';
         }
-
-        // Try to read clipboard on page load
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const text = await navigator.clipboard.readText();
-                if (text.trim()) {
-                    document.getElementById('pasteArea').value = text;
-                }
-            } catch (err) {
-                console.log('Clipboard access not allowed:', err);
-            }
-        });
     </script>
 </body>
 </html>

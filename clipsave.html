@@ -56,6 +56,19 @@
         .button-group {
             margin-bottom: 20px;
         }
+        #directoryInfo {
+            margin: 15px 0;
+            padding: 12px;
+            background-color: #f0f0f0;
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+        #saveBtn {
+            background-color: #34a853;
+        }
+        #directoryBtn {
+            background-color: #ea4335;
+        }
     </style>
 </head>
 <body>
@@ -63,13 +76,20 @@
     
     <div class="button-group">
         <button id="readClipboard">Read Clipboard</button>
+        <button id="directoryBtn">Select Directory</button>
+        <button id="saveBtn" disabled>Save File</button>
     </div>
+    
+    <div id="directoryInfo">No directory selected. Files will be saved to default download location.</div>
     
     <div id="contentDisplay">Click "Read Clipboard" to start</div>
     
     <textarea id="manualPaste" placeholder="Or paste manually here..."></textarea>
 
     <script>
+        let selectedDirectoryHandle = null;
+        let clipboardContent = '';
+        
         document.getElementById('readClipboard').addEventListener('click', async () => {
             try {
                 window.focus();
@@ -78,11 +98,53 @@
                     throw new Error('Clipboard API not supported in this browser');
                 }
                 
-                const clipboardText = await navigator.clipboard.readText();
-                processContent(clipboardText);
+                clipboardContent = await navigator.clipboard.readText();
+                processContent(clipboardContent);
                 
             } catch (err) {
                 showError(err);
+            }
+        });
+
+        document.getElementById('directoryBtn').addEventListener('click', async () => {
+            try {
+                if (!window.showDirectoryPicker) {
+                    throw new Error('Directory selection not supported');
+                }
+                
+                selectedDirectoryHandle = await window.showDirectoryPicker();
+                document.getElementById('directoryInfo').textContent = 
+                    `Selected directory: ${selectedDirectoryHandle.name}`;
+                document.getElementById('saveBtn').disabled = false;
+                
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    document.getElementById('directoryInfo').textContent = 
+                        `Error: ${err.message}. Using default download location.`;
+                }
+            }
+        });
+
+        document.getElementById('saveBtn').addEventListener('click', async () => {
+            try {
+                if (!clipboardContent) {
+                    throw new Error('No content to save');
+                }
+                
+                if (selectedDirectoryHandle) {
+                    // Try to save using File System Access API
+                    const fileHandle = await selectedDirectoryHandle.getFileHandle('cliptemp.txt', { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(clipboardContent);
+                    await writable.close();
+                    alert('File saved successfully!');
+                } else {
+                    // Fallback to download method
+                    downloadFile(clipboardContent);
+                }
+                
+            } catch (err) {
+                alert(`Error saving file: ${err.message}`);
             }
         });
 
@@ -124,9 +186,23 @@
             
             document.getElementById('manualPaste').style.display = 'block';
             document.getElementById('manualPaste').addEventListener('paste', (e) => {
-                processContent(e.clipboardData.getData('text'));
+                clipboardContent = e.clipboardData.getData('text');
+                processContent(clipboardContent);
+                document.getElementById('saveBtn').disabled = false;
                 e.preventDefault();
             });
+        }
+
+        function downloadFile(content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cliptemp.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
     </script>
 </body>

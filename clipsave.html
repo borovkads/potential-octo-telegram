@@ -37,7 +37,6 @@
         button {
             font-size: 1.1rem;
             padding: 12px 24px;
-            background-color: #4285f4;
             color: white;
             border: none;
             border-radius: 6px;
@@ -45,6 +44,9 @@
             margin-right: 10px;
             margin-bottom: 10px;
         }
+        #readClipboard { background-color: #4285f4; }
+        #directoryBtn { background-color: #ea4335; }
+        #saveBtn { background-color: #34a853; }
         #manualPaste {
             display: none;
             width: 100%;
@@ -62,12 +64,12 @@
             background-color: #f0f0f0;
             border-radius: 6px;
             font-size: 1.1rem;
+            word-break: break-all;
         }
-        #saveBtn {
-            background-color: #34a853;
-        }
-        #directoryBtn {
-            background-color: #ea4335;
+        .path {
+            font-family: monospace;
+            color: #0d47a1;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -89,6 +91,7 @@
     <script>
         let selectedDirectoryHandle = null;
         let clipboardContent = '';
+        let fullDirectoryPath = '';
         
         document.getElementById('readClipboard').addEventListener('click', async () => {
             try {
@@ -113,8 +116,10 @@
                 }
                 
                 selectedDirectoryHandle = await window.showDirectoryPicker();
-                document.getElementById('directoryInfo').textContent = 
-                    `Selected directory: ${selectedDirectoryHandle.name}`;
+                fullDirectoryPath = await getDirectoryPath(selectedDirectoryHandle);
+                
+                document.getElementById('directoryInfo').innerHTML = 
+                    `Selected directory: <span class="path">${fullDirectoryPath}</span>`;
                 document.getElementById('saveBtn').disabled = false;
                 
             } catch (err) {
@@ -125,6 +130,33 @@
             }
         });
 
+        async function getDirectoryPath(directoryHandle) {
+            // Try to get the full path (works in Electron or special environments)
+            if (directoryHandle.getPath) {
+                try {
+                    return await directoryHandle.getPath();
+                } catch (e) {
+                    console.log("Couldn't get full path:", e);
+                }
+            }
+            
+            // Fallback for web browsers (build path from name)
+            let path = directoryHandle.name;
+            let currentHandle = directoryHandle;
+            
+            try {
+                while (currentHandle && currentHandle.parent) {
+                    currentHandle = await currentHandle.parent;
+                    if (currentHandle.name) {
+                        path = `${currentHandle.name}/${path}`;
+                    }
+                }
+                return path || "Selected folder";
+            } catch (e) {
+                return directoryHandle.name || "Selected folder";
+            }
+        }
+
         document.getElementById('saveBtn').addEventListener('click', async () => {
             try {
                 if (!clipboardContent) {
@@ -132,14 +164,12 @@
                 }
                 
                 if (selectedDirectoryHandle) {
-                    // Try to save using File System Access API
                     const fileHandle = await selectedDirectoryHandle.getFileHandle('cliptemp.txt', { create: true });
                     const writable = await fileHandle.createWritable();
                     await writable.write(clipboardContent);
                     await writable.close();
-                    alert('File saved successfully!');
+                    alert(`File saved to:\n${fullDirectoryPath}/cliptemp.txt`);
                 } else {
-                    // Fallback to download method
                     downloadFile(clipboardContent);
                 }
                 

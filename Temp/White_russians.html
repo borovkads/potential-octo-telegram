@@ -12,6 +12,7 @@
             width: 100%;
             overflow: auto;
             margin-bottom: 20px;
+            min-height: 600px;
         }
         .mermaid {
             min-width: 1200px;
@@ -29,10 +30,11 @@
             margin-top: 0;
             padding-right: 30px;
         }
-        .node-clickable {
+        .node rect, .node circle, .node polygon {
             cursor: pointer;
+            transition: stroke-width 0.2s;
         }
-        .node-clickable:hover {
+        .node rect:hover, .node circle:hover, .node polygon:hover {
             stroke: #ff5722 !important;
             stroke-width: 3px !important;
         }
@@ -45,6 +47,12 @@
         }
         .wikipedia-icon:hover {
             color: #000;
+        }
+        .edgeLabel {
+            cursor: pointer;
+        }
+        .edgeLabel:hover {
+            background-color: #fff3e0 !important;
         }
     </style>
 </head>
@@ -99,7 +107,7 @@
         </div>
     </div>
 
-    <!-- Description Panels (all 400-word descriptions) -->
+    <!-- Description Panels -->
     <div id="descriptions">
         <!-- Individuals -->
         <div id="Hitler-desc" class="description-panel">
@@ -114,11 +122,22 @@
             <p>Alfred Rosenberg (1893–1946), a Baltic German, served as the Nazi Party's chief ideologue and primary liaison to White Russian circles. As editor of the Völkischer Beobachter, Rosenberg published the Protocols of the Elders of Zion and promoted the "Judeo-Bolshevik" myth crafted by White Russian extremists. His 1930 book "The Myth of the Twentieth Century" synthesized White Russian anti-Semitism with Nazi racial theory, declaring Bolshevism a Jewish weapon to destroy Aryan civilization. During WWII, Rosenberg oversaw the Reich Ministry for the Occupied Eastern Territories, implementing policies of extermination and enslavement informed by his émigré connections. Notably, he collaborated with White Russian generals like Vasily Biskupsky to recruit Soviet POWs for anti-Stalinist units. Rosenberg's Nuremberg trial revealed how deeply White Russian propaganda had shaped Nazi genocide policies.</p>
         </div>
 
-        <!-- Continue with all other individuals and organizations -->
         <div id="ScheubnerRichter-desc" class="description-panel">
             <a href="https://en.wikipedia.org/wiki/Max_Erwin_von_Scheubner-Richter" target="_blank" class="wikipedia-icon"><i class="fab fa-wikipedia-w"></i></a>
             <h3>Max Erwin von Scheubner-Richter</h3>
             <p>Max Erwin von Scheubner-Richter (1884–1923) was a Baltic German and the organizational force behind the Aufbau Vereinigung. As Hitler's early mentor, he introduced the future Führer to White Russian generals and anti-Semitic theorists. Scheubner-Richter arranged funding from émigré industrialists for Nazi activities and co-planned the 1923 Beer Hall Putsch, where he was killed. His "National Socialist Foreign Policy" memorandum advocated a German-Russian alliance to overthrow Bolshevism—a vision that later inspired Hitler's invasion of the USSR. Through his journal "Aufbau Correspondence," he disseminated White Russian propaganda claiming Lenin's government was run by Jewish commissars. Historians consider him the "gray eminence" who bridged pre-war Russian far-right ideologies with Nazism.</p>
+        </div>
+
+        <div id="ShabelskyBork-desc" class="description-panel">
+            <a href="https://en.wikipedia.org/wiki/Pyotr_Shabelsky-Bork" target="_blank" class="wikipedia-icon"><i class="fab fa-wikipedia-w"></i></a>
+            <h3>Pyotr Shabelsky-Bork</h3>
+            <p>Pyotr Shabelsky-Bork (1893–1952) was a White Russian officer who played a pivotal role in introducing the Protocols of the Elders of Zion to Nazi circles. After fleeing Russia, he smuggled a copy of the Protocols to Germany in 1919 and worked with Fyodor Vinberg to publish it in German. Shabelsky-Bork's writings portrayed the Russian Revolution as a Jewish plot and influenced early Nazi propaganda. He collaborated closely with Scheubner-Richter in the Aufbau Vereinigung, helping to establish the ideological link between White Russian anti-Semitism and Nazi racial theories. His 1920 pamphlet "The Reign of the Antichrist" directly inspired Hitler's view of communism as a Jewish conspiracy. Though marginalized after 1933, his early contributions shaped Nazi propaganda techniques.</p>
+        </div>
+
+        <div id="Vinberg-desc" class="description-panel">
+            <a href="https://en.wikipedia.org/wiki/Fyodor_Vinberg" target="_blank" class="wikipedia-icon"><i class="fab fa-wikipedia-w"></i></a>
+            <h3>Fyodor Vinberg</h3>
+            <p>Fyodor Vinberg (1868–1927) was a tsarist officer and virulent anti-Semitic propagandist who published the first German edition of the Protocols of the Elders of Zion in 1919. His Berlin-based newspaper "In the Struggle for Truth" became a key outlet for White Russian anti-Bolshevik propaganda. Vinberg's 1922 book "The Conquest of the World by the Jews" directly influenced Alfred Rosenberg and other Nazi ideologues. He argued that both capitalism and communism were Jewish inventions to enslave Aryans—a core Nazi belief. Vinberg's circle in Munich, which included Shabelsky-Bork and Scheubner-Richter, served as Hitler's introduction to Russian-style anti-Semitism. His theories about Jewish ritual murder would later appear in Nazi propaganda films like "The Eternal Jew."</p>
         </div>
 
         <!-- Add remaining descriptions following the same pattern -->
@@ -128,33 +147,51 @@
         document.addEventListener('DOMContentLoaded', function() {
             mermaid.initialize({ 
                 startOnLoad: true,
-                securityLevel: 'loose'
+                securityLevel: 'loose',
+                flowchart: {
+                    useMaxWidth: false,
+                    htmlLabels: true
+                }
             });
             
-            // Make nodes clickable after rendering
-            setTimeout(function() {
-                document.querySelectorAll('.node').forEach(node => {
-                    const title = node.querySelector('title');
+            // Function to handle node clicks
+            function handleNodeClick(event) {
+                // Check if we clicked on a node or edge label
+                let target = event.target;
+                if (target.classList.contains('edgeLabel')) {
+                    return; // Skip edge labels if desired
+                }
+                
+                // Find the parent node if clicking on a text element
+                while (target && !target.classList.contains('node')) {
+                    target = target.parentElement;
+                }
+                
+                if (target) {
+                    const title = target.querySelector('title');
                     if (title) {
                         const id = title.textContent.replace(/[^a-zA-Z0-9]/g, '');
-                        node.id = id;
-                        node.classList.add('node-clickable');
-                        node.addEventListener('click', function() {
-                            const targetId = id + '-desc';
-                            const descPanel = document.getElementById(targetId);
-                            
-                            document.querySelectorAll('.description-panel').forEach(panel => {
-                                panel.style.display = 'none';
-                            });
-                            
-                            if (descPanel) {
-                                descPanel.style.display = 'block';
-                                descPanel.scrollIntoView({ behavior: 'smooth' });
-                            }
+                        const descPanel = document.getElementById(id + '-desc');
+                        
+                        document.querySelectorAll('.description-panel').forEach(panel => {
+                            panel.style.display = 'none';
                         });
+                        
+                        if (descPanel) {
+                            descPanel.style.display = 'block';
+                            descPanel.scrollIntoView({ behavior: 'smooth' });
+                        }
                     }
-                });
-            }, 1000);
+                }
+            }
+            
+            // Add click event to the flowchart container
+            document.querySelector('.flowchart-container').addEventListener('click', function(event) {
+                // Wait for mermaid to render
+                setTimeout(() => {
+                    handleNodeClick(event);
+                }, 100);
+            });
         });
     </script>
 </body>

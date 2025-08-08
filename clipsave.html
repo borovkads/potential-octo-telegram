@@ -3,66 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Display</title>
+    <title>Clipboard Reader</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
-            line-height: 1.5;
+            padding: 30px;
+            line-height: 1.6;
+            color: #333;
         }
-        
         h1 {
-            font-size: 28px;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #222;
         }
-        
-        #textDisplay {
-            font-size: 20px;
+        #clipboardContent {
             white-space: pre-wrap;
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
             padding: 25px;
             border-radius: 8px;
-            border: 1px solid #ddd;
+            border-left: 5px solid #4285f4;
+            font-size: 1.3rem;
+            line-height: 1.8;
             min-height: 200px;
             margin-bottom: 30px;
         }
-        
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
+        .error {
+            color: #d32f2f;
+            font-size: 1.2rem;
         }
-        
+        textarea {
+            font-size: 1.2rem;
+            padding: 15px;
+            width: 100%;
+            min-height: 150px;
+            margin-top: 20px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+        }
         button {
-            padding: 10px 20px;
-            font-size: 16px;
+            font-size: 1.1rem;
+            padding: 12px 24px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 6px;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h1>Text Fragment Viewer</h1>
-    
-    <div id="textDisplay">Paste your text here:</div>
-    
-    <div class="controls">
-        <button onclick="clearText()">Clear</button>
-    </div>
+    <h1>Clipboard Content</h1>
+    <div id="clipboardContent">Reading clipboard...</div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('textDisplay').addEventListener('paste', function(e) {
-                e.preventDefault();
-                const pastedText = e.clipboardData.getData('text/plain');
-                this.textContent = pastedText;
-            });
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                if (!navigator.clipboard || !navigator.clipboard.readText) {
+                    throw new Error('Clipboard API not supported in this browser');
+                }
+
+                const clipboardText = await navigator.clipboard.readText();
+                const lines = clipboardText.split('\n').slice(0, 4);
+                const firstFourLines = lines.join('\n');
+
+                document.getElementById('clipboardContent').textContent = 
+                    firstFourLines || 'Clipboard is empty or contains no text';
+            } catch (err) {
+                document.getElementById('clipboardContent').className = 'error';
+                document.getElementById('clipboardContent').innerHTML = 
+                    `<strong>Error:</strong> ${err.message}<br><br>
+                    <button onclick="window.location.reload()">Try Again</button>
+                    <p>Or paste manually below:</p>`;
+                
+                const textarea = document.createElement('textarea');
+                textarea.placeholder = 'Paste your content here...';
+                document.body.appendChild(textarea);
+                
+                textarea.addEventListener('paste', (e) => {
+                    const pastedText = e.clipboardData.getData('text');
+                    const lines = pastedText.split('\n').slice(0, 4);
+                    document.getElementById('clipboardContent').textContent = lines.join('\n');
+                    textarea.remove();
+                });
+            }
         });
-        
-        function clearText() {
-            document.getElementById('textDisplay').textContent = 'Paste your text here:';
-        }
     </script>
 </body>
 </html>

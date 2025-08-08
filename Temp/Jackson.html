@@ -1,257 +1,274 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MF-ING COMEDY MIXER 9000</title>
+    <title>Comedy Control Mixer Board</title>
     <style>
         body {
-            font-family: 'Impact', sans-serif;
-            background: #000;
-            color: #ff0000;
-            text-align: center;
-            padding: 20px;
-        }
-        .mixer {
-            background: #111;
-            border: 3px solid #d00000;
-            border-radius: 10px;
-            padding: 20px;
+            font-family: 'Courier New', monospace;
             max-width: 800px;
             margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
         }
-        h1 {
-            color: #fff;
-            text-shadow: 0 0 10px #ff0000;
+        .mixer-panel {
+            background: white;
+            border: 3px solid #ff6b6b;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #d32f2f;
         }
         .slider-container {
-            margin: 20px 0;
-        }
-        .slider {
-            width: 100%;
-            height: 25px;
-            background: #333;
-            outline: none;
-            -webkit-appearance: none;
-        }
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 25px;
-            height: 25px;
-            background: #ff0000;
-            cursor: pointer;
-        }
-        #pmfSlider::-webkit-slider-thumb {
-            background: #d00000;
-        }
-        #rantOutput {
-            background: #000;
-            border: 2px solid #ff0000;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 18px;
-            min-height: 100px;
+            margin: 15px 0;
         }
         .slider-label {
             display: flex;
             justify-content: space-between;
+            font-weight: bold;
             margin-bottom: 5px;
+            font-size: 18px;
         }
-        button {
-            background: #d00000;
+        input[type="range"] {
+            width: 100%;
+            height: 30px;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #ffd8d8, #ff6b6b);
+            border-radius: 15px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 30px;
+            height: 30px;
+            background: #d32f2f;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 30px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #ff6b6b;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        .output-panel {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff8e1;
+            border: 2px dashed #ffa000;
+            border-radius: 5px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .value-display {
+            font-weight: bold;
+            color: #d32f2f;
+        }
+        .preset-button {
+            background: #ff6b6b;
             color: white;
             border: none;
-            padding: 10px 20px;
-            margin: 10px;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 5px;
             cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background: #ff0000;
+            font-family: 'Courier New', monospace;
         }
     </style>
 </head>
 <body>
-    <div class="mixer">
-        <h1>🔥 COMEDY MIXER 9000 🔥</h1>
+    <div class="mixer-panel">
+        <h1>Comedy Control Mixer Board</h1>
+        <h2>Samuel Jackson Motherf***er Gradient™</h2>
         
         <div class="slider-container">
             <div class="slider-label">
-                <span>ABSURDITY: <span id="absurdityValue">10</span>/10</span>
-                <span>乁(◔益◔)ㄏ︵┻━┻</span>
+                <span>Absurdity Dial: <span id="absurdity-value" class="value-display">10</span>/10</span>
             </div>
-            <input type="range" min="1" max="10" value="10" class="slider" id="absurditySlider">
+            <input type="range" min="1" max="10" value="10" class="slider" id="absurdity-slider">
         </div>
         
         <div class="slider-container">
             <div class="slider-label">
-                <span>MATERIALISM: <span id="materialismValue">9</span>/10</span>
-                <span>(╬ಠ益ಠ)︵📉🔥📊</span>
+                <span>Materialism Dial: <span id="materialism-value" class="value-display">9</span>/10</span>
             </div>
-            <input type="range" min="1" max="10" value="9" class="slider" id="materialismSlider">
+            <input type="range" min="1" max="10" value="9" class="slider" id="materialism-slider">
         </div>
         
         <div class="slider-container">
             <div class="slider-label">
-                <span>BREVITY: <span id="brevityValue">0</span>/5</span>
-                <span>🐦 → 📜</span>
+                <span>Brevity Slider: <span id="brevity-value" class="value-display">0</span>/5</span>
             </div>
-            <input type="range" min="-5" max="5" value="0" class="slider" id="brevitySlider">
+            <input type="range" min="-5" max="5" value="0" class="slider" id="brevity-slider">
         </div>
         
         <div class="slider-container">
             <div class="slider-label">
-                <span>PMF GRADIENT: <span id="pmfValue">10</span>/10</span>
-                <span>(╯°□°)╯︵ 彡 MF</span>
+                <span>PMF Gradient: <span id="pmf-value" class="value-display">5</span>/10</span>
             </div>
-            <input type="range" min="1" max="10" value="10" class="slider" id="pmfSlider">
+            <input type="range" min="1" max="10" value="5" class="slider" id="pmf-slider">
+        </div>
+        
+        <div class="slider-container">
+            <div class="slider-label">
+                <span>Sarcasm Boost:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="sarcasm-toggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
         </div>
         
         <div>
-            <button id="sarcasmButton">SARCASTIC BOOST: <span id="sarcasmState">OVERDRIVE</span></button>
+            <h3>Presets:</h3>
+            <button class="preset-button" onclick="setPreset('samuel')">Samuel L. Jackson Mode</button>
+            <button class="preset-button" onclick="setPreset('lse')">LSE Academic</button>
+            <button class="preset-button" onclick="setPreset('pulp')">Pulp Fiction</button>
         </div>
         
-        <div id="rantOutput">
-            "LISTEN HERE YOU TARIFF-HUMPING, SUPPLY-SIDE JESTER—YOUR 'ECONOMIC POLICY' IS WHAT HAPPENS WHEN A MONKEY WITH A CHALKBOARD FUCKS A BLOOMBERG TERMINAL!"
+        <div class="output-panel" id="output">
+            <h3>Generated Rant:</h3>
+            <p id="rant-text">Adjust sliders to generate comedy gold</p>
         </div>
-        
-        <button id="voiceButton">🔊 ENABLE SAMUEL L. MODE (TTS)</button>
     </div>
 
     <script>
-        // Sliders
-        const absurditySlider = document.getElementById("absurditySlider");
-        const materialismSlider = document.getElementById("materialismSlider");
-        const brevitySlider = document.getElementById("brevitySlider");
-        const pmfSlider = document.getElementById("pmfSlider");
-        const sarcasmButton = document.getElementById("sarcasmButton");
-        const voiceButton = document.getElementById("voiceButton");
+        // Update displayed values when sliders move
+        document.getElementById('absurdity-slider').addEventListener('input', updateValues);
+        document.getElementById('materialism-slider').addEventListener('input', updateValues);
+        document.getElementById('brevity-slider').addEventListener('input', updateValues);
+        document.getElementById('pmf-slider').addEventListener('input', updateValues);
+        document.getElementById('sarcasm-toggle').addEventListener('change', updateValues);
         
-        // Values
-        const absurdityValue = document.getElementById("absurdityValue");
-        const materialismValue = document.getElementById("materialismValue");
-        const brevityValue = document.getElementById("brevityValue");
-        const pmfValue = document.getElementById("pmfValue");
-        const sarcasmState = document.getElementById("sarcasmState");
-        const rantOutput = document.getElementById("rantOutput");
-        
-        // States
-        let sarcasmBoost = true;
-        let voiceEnabled = false;
-        
-        // Update sliders
-        function updateRant() {
-            const absurdity = absurditySlider.value;
-            const materialism = materialismSlider.value;
-            const brevity = brevitySlider.value;
-            const pmf = pmfSlider.value;
+        function updateValues() {
+            // Update displayed numbers
+            document.getElementById('absurdity-value').textContent = document.getElementById('absurdity-slider').value;
+            document.getElementById('materialism-value').textContent = document.getElementById('materialism-slider').value;
+            document.getElementById('brevity-value').textContent = document.getElementById('brevity-slider').value;
+            document.getElementById('pmf-value').textContent = document.getElementById('pmf-slider').value;
             
-            absurdityValue.textContent = absurdity;
-            materialismValue.textContent = materialism;
-            brevityValue.textContent = brevity;
-            pmfValue.textContent = pmf;
-            
-            // Generate rant based on values
-            rantOutput.innerHTML = generateRant(absurdity, materialism, brevity, pmf, sarcasmBoost);
-            
-            // If voice enabled, speak it
-            if (voiceEnabled) {
-                speakRant(rantOutput.textContent);
-            }
+            // Generate new rant based on values
+            generateRant();
         }
         
-        // Rant generator
-        function generateRant(absurdity, materialism, brevity, pmf, sarcasm) {
-            // Base phrases
-            let opener = "";
-            let insult = "";
-            let critique = "";
-            let closer = "";
+        function setPreset(preset) {
+            switch(preset) {
+                case 'samuel':
+                    document.getElementById('absurdity-slider').value = 8;
+                    document.getElementById('materialism-slider').value = 4;
+                    document.getElementById('brevity-slider').value = -4;
+                    document.getElementById('pmf-slider').value = 7;
+                    document.getElementById('sarcasm-toggle').checked = true;
+                    break;
+                case 'lse':
+                    document.getElementById('absurdity-slider').value = 7;
+                    document.getElementById('materialism-slider').value = 9;
+                    document.getElementById('brevity-slider').value = 0;
+                    document.getElementById('pmf-slider').value = 5;
+                    document.getElementById('sarcasm-toggle').checked = true;
+                    break;
+                case 'pulp':
+                    document.getElementById('absurdity-slider').value = 10;
+                    document.getElementById('materialism-slider').value = 6;
+                    document.getElementById('brevity-slider').value = -5;
+                    document.getElementById('pmf-slider').value = 10;
+                    document.getElementById('sarcasm-toggle').checked = true;
+                    break;
+            }
+            updateValues();
+        }
+        
+        function generateRant() {
+            const absurdity = parseInt(document.getElementById('absurdity-slider').value);
+            const materialism = parseInt(document.getElementById('materialism-slider').value);
+            const brevity = parseInt(document.getElementById('brevity-slider').value);
+            const pmf = parseInt(document.getElementById('pmf-slider').value);
+            const sarcasm = document.getElementById('sarcasm-toggle').checked;
             
-            // PMF gradient affects opener intensity
+            // Base rant structure
+            let rant = "";
+            
+            // PMF level affects tone
             if (pmf >= 8) {
-                opener = `"LISTEN HERE YOU `;
+                rant += "Listen up, you motherf***ing ";
             } else if (pmf >= 5) {
-                opener = `"Let's be clear: `;
+                rant += "Let's be clear, you goddamn ";
             } else {
-                opener = `"One might observe that `;
+                rant += "One must observe that the ";
             }
             
-            // Absurdity affects insult creativity
+            // Absurdity affects insults
             if (absurdity >= 8) {
-                insult = `TARIFF-HUMPING, SUPPLY-SIDE JESTER—YOUR 'ECONOMIC POLICY' IS WHAT HAPPENS WHEN A MONKEY WITH A CHALKBOARD FUCKS A BLOOMBERG TERMINAL`;
+                rant += "tarriff-humping, supply-side jester—";
             } else if (absurdity >= 5) {
-                insult = `so-called economist—your theories have all the rigor of a horoscope written by a lobotomized MBA`;
+                rant += "economically illiterate ";
             } else {
-                insult = `protectionist—your policies lack coherent theoretical foundations`;
+                rant += "policy maker—";
             }
             
-            // Materialism affects critique depth
+            // Materialism affects content
             if (materialism >= 8) {
-                critique = `EVEN MARX'S GHOST IS FACE-PALMING AT YOUR LABOR-VALUE DISREGARD`;
+                rant += "your entire worldview constitutes a felony against dialectical materialism. ";
             } else if (materialism >= 5) {
-                critique = `the empirical data directly contradicts your assumptions`;
+                rant += "your understanding of trade policy has all the depth of a puddle. ";
             } else {
-                critique = `this seems suboptimal`;
+                rant += "your approach leaves much to be desired. ";
             }
             
             // Brevity affects length
             if (brevity <= -3) {
-                closer = `!"`;
-            } else if (brevity <= 0) {
-                closer = `! ${critique}!"`;
-            } else {
-                closer = `! ${critique}! LET ME EXPLAIN IN 20 VOLUMES OF DIALECTICAL MATERIALISM!"`;
+                rant += "\n\nYour steel tariffs? A $900,000 per job saved farce. ";
+                rant += "The soybean war? Just outsourced environmental destruction. ";
+                rant += "EV tariffs? An admission that US automakers can't compete. ";
             }
             
-            // Sarcasm adds venom
+            // Sarcasm adds punch
             if (sarcasm) {
-                opener = opener.toUpperCase();
-                insult = insult.toUpperCase();
-                critique = critique.toUpperCase();
+                if (pmf >= 7) {
+                    rant += "\n\nCongratulations—you played yourself so hard even Gordon Gekko is facepalming.";
+                } else {
+                    rant += "\n\nTruly a masterclass in unintended consequences.";
+                }
             }
             
-            return opener + insult + closer;
+            document.getElementById('rant-text').innerHTML = rant;
         }
-        
-        // Text-to-speech
-        function speakRant(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 0.9;
-                utterance.pitch = 0.8;
-                if (pmfSlider.value >= 8) {
-                    utterance.rate = 1.2;
-                    utterance.pitch = 1.1;
-                }
-                window.speechSynthesis.speak(utterance);
-            } else {
-                alert("Your browser doesn't support text-to-speech. Try Chrome or Edge.");
-            }
-        }
-        
-        // Event listeners
-        absurditySlider.addEventListener("input", updateRant);
-        materialismSlider.addEventListener("input", updateRant);
-        brevitySlider.addEventListener("input", updateRant);
-        pmfSlider.addEventListener("input", updateRant);
-        
-        sarcasmButton.addEventListener("click", function() {
-            sarcasmBoost = !sarcasmBoost;
-            sarcasmState.textContent = sarcasmBoost ? "OVERDRIVE" : "OFF";
-            updateRant();
-        });
-        
-        voiceButton.addEventListener("click", function() {
-            voiceEnabled = !voiceEnabled;
-            voiceButton.textContent = voiceEnabled ? 
-                "🔊 SAMUEL L. MODE ACTIVE" : 
-                "🔊 ENABLE SAMUEL L. MODE (TTS)";
-            if (voiceEnabled) {
-                speakRant(rantOutput.textContent);
-            }
-        });
         
         // Initialize
-        updateRant();
+        updateValues();
     </script>
 </body>
 </html>

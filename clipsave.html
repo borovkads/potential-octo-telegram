@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Fragment Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f8f8f8;
+        }
+        h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #pasteArea {
+            width: 100%;
+            height: 150px;
+            font-size: 18px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        #output {
+            white-space: pre-wrap;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+            font-size: 18px;
+            min-height: 100px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .fragment-info {
+            font-size: 16px;
+            color: #666;
+            margin-top: 20px;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 16px;
+        }
+        #directoryPath {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text Fragment Viewer</h1>
+    
+    <p><strong>Paste your text here:</strong></p>
+    <textarea id="pasteArea" placeholder="Paste your text content here..."></textarea>
+    
+    <div class="button-group">
+        <button onclick="processText()">Split Text</button>
+        <button onclick="clearAll()">Clear</button>
+        <button onclick="selectDirectory()">Directory</button>
+        <button onclick="saveToFile()">Save File</button>
+    </div>
+    
+    <div id="directoryInfo" style="display:none;">
+        <strong>Current directory:</strong>
+        <div id="directoryPath">No directory selected</div>
+    </div>
+    
+    <div id="output">Your text fragments will appear here...</div>
+    
+    <div class="fragment-info">
+        <div id="fragmentCount">0 fragments</div>
+        <div id="currentFragment">Fragment 1</div>
+    </div>
+
+    <script>
+        let currentDirectoryHandle = null;
+
+        async function selectDirectory() {
+            try {
+                // Feature detection
+                if (!window.showDirectoryPicker) {
+                    throw new Error('Directory Picker API not supported in this browser');
+                }
+                
+                const handle = await window.showDirectoryPicker();
+                currentDirectoryHandle = handle;
+                document.getElementById('directoryPath').textContent = handle.name;
+                document.getElementById('directoryInfo').style.display = 'block';
+            } catch (err) {
+                alert(`Error: ${err.message}`);
+            }
+        }
+
+        async function saveToFile() {
+            if (!currentDirectoryHandle) {
+                alert('Please select a directory first');
+                return;
+            }
+
+            try {
+                const text = document.getElementById('pasteArea').value || 
+                              document.getElementById('output').textContent;
+                
+                if (!text.trim()) {
+                    throw new Error('No text content to save');
+                }
+
+                const fileHandle = await currentDirectoryHandle.getFileHandle('cliptemp.txt', { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(text);
+                await writable.close();
+                
+                alert(`File saved successfully as cliptemp.txt in ${currentDirectoryHandle.name}`);
+            } catch (err) {
+                alert(`Error saving file: ${err.message}`);
+            }
+        }
+
+        function processText() {
+            const text = document.getElementById('pasteArea').value;
+            if (!text.trim()) {
+                document.getElementById('output').className = 'error';
+                document.getElementById('output').textContent = 'Please paste some text first';
+                return;
+            }
+
+            const fragments = text.split(/\n\s*\n/);
+            document.getElementById('output').className = '';
+            document.getElementById('output').textContent = fragments[0];
+            document.getElementById('fragmentCount').textContent = `${fragments.length} fragments`;
+            document.getElementById('currentFragment').textContent = 'Fragment 1';
+        }
+
+        function clearAll() {
+            document.getElementById('pasteArea').value = '';
+            document.getElementById('output').textContent = 'Your text fragments will appear here...';
+            document.getElementById('fragmentCount').textContent = '0 fragments';
+            document.getElementById('currentFragment').textContent = 'Fragment 1';
+        }
+
+        // Try to read clipboard on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text.trim()) {
+                    document.getElementById('pasteArea').value = text;
+                }
+            } catch (err) {
+                console.log('Clipboard access not allowed:', err);
+            }
+        });
+    </script>
+</body>
+</html>

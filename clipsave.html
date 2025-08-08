@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clipboard Reader</title>
+    <title>Clipboard Content Extractor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,7 +18,7 @@
             margin-bottom: 30px;
             color: #222;
         }
-        #clipboardContent {
+        #contentDisplay {
             white-space: pre-wrap;
             background-color: #f8f9fa;
             padding: 25px;
@@ -26,21 +26,18 @@
             border-left: 5px solid #4285f4;
             font-size: 1.3rem;
             line-height: 1.8;
-            min-height: 200px;
+            height: 120px; /* Shows exactly 5 lines */
+            overflow-y: auto;
             margin-bottom: 30px;
+        }
+        #fullContent {
+            display: none;
+            white-space: pre-wrap;
+            margin-top: 10px;
         }
         .error {
             color: #d32f2f;
             font-size: 1.2rem;
-        }
-        textarea {
-            font-size: 1.2rem;
-            padding: 15px;
-            width: 100%;
-            min-height: 150px;
-            margin-top: 20px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
         }
         button {
             font-size: 1.1rem;
@@ -51,149 +48,78 @@
             border-radius: 6px;
             cursor: pointer;
             margin-right: 10px;
-            margin-bottom: 10px;
         }
-        #directoryInfo {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f0f0f0;
-            border-radius: 6px;
-            font-size: 1.1rem;
-        }
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
+        .toggle-full {
+            color: #666;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
-    <h1>Clipboard Content</h1>
-    
-    <div class="button-group">
-        <button id="directoryBtn">Select Directory</button>
-        <button id="saveBtn" disabled>Save File</button>
-    </div>
-    
-    <div id="directoryInfo">
-        No directory selected. Files will be saved to default download location.
-    </div>
-    
-    <div id="clipboardContent">Reading clipboard...</div>
+    <h1>Hidden Text Extractor</h1>
+    <div id="contentDisplay">Reading clipboard...</div>
+    <div id="fullContent"></div>
+    <span id="toggleText" class="toggle-full">▼ Show full content</span>
 
     <script>
-        let selectedDirectoryHandle = null;
-        let clipboardContent = '';
-        
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                if (!navigator.clipboard || !navigator.clipboard.readText()) {
-                    throw new Error('Clipboard API not supported in this browser');
+                if (!navigator.clipboard || !navigator.clipboard.readText) {
+                    throw new Error('Clipboard API not supported');
                 }
 
-                clipboardContent = await navigator.clipboard.readText();
-                const lines = clipboardContent.split('\n').slice(0, 4);
-                document.getElementById('clipboardContent').textContent = 
-                    lines.join('\n') || 'Clipboard is empty or contains no text';
-                    
+                const clipboardText = await navigator.clipboard.readText();
+                let extractedText = extractHiddenText(clipboardText);
+                
+                if (!extractedText) {
+                    extractedText = "No hidden comments found in Mermaid diagram\n\nOriginal content:\n" + 
+                                  clipboardText.split('\n').slice(0, 5).join('\n');
+                }
+
+                // Display first 5 lines
+                const lines = extractedText.split('\n');
+                document.getElementById('contentDisplay').textContent = lines.slice(0, 5).join('\n');
+                document.getElementById('fullContent').textContent = extractedText;
+
             } catch (err) {
                 showError(err);
             }
-            
-            // Set up button event listeners
-            document.getElementById('directoryBtn').addEventListener('click', selectDirectory);
-            document.getElementById('saveBtn').addEventListener('click', saveToFile);
         });
 
-        async function selectDirectory() {
-            try {
-                // Feature detection
-                if (!window.showDirectoryPicker) {
-                    throw new Error('Directory selection not supported in this browser');
-                }
-                
-                selectedDirectoryHandle = await window.showDirectoryPicker();
-                const directoryPath = await getDirectoryPath(selectedDirectoryHandle);
-                
-                document.getElementById('directoryInfo').textContent = 
-                    `Selected directory: ${directoryPath}`;
-                document.getElementById('saveBtn').disabled = false;
-                
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    showError(err);
-                }
+        function extractHiddenText(mermaidCode) {
+            // Extract all comments from Mermaid code
+            const commentRegex = /%%\s*(.*?)\s*(?=\n|$)/g;
+            let match;
+            let extracted = [];
+            
+            while ((match = commentRegex.exec(mermaidCode)) !== null) {
+                extracted.push(match[1]);
             }
-        }
-
-        async function getDirectoryPath(directoryHandle) {
-            // This is a simplified path representation
-            // Note: Browsers don't expose full filesystem paths for security
-            if (directoryHandle.name) {
-                return directoryHandle.name;
-            }
-            return 'Selected folder';
-        }
-
-        async function saveToFile() {
-            try {
-                if (!clipboardContent) {
-                    throw new Error('No clipboard content to save');
-                }
-                
-                let fileHandle;
-                
-                if (selectedDirectoryHandle) {
-                    fileHandle = await selectedDirectoryHandle.getFileHandle('cliptemp.txt', { create: true });
-                } else {
-                    // Fallback to download if directory not selected
-                    downloadFile(clipboardContent);
-                    return;
-                }
-                
-                const writable = await fileHandle.createWritable();
-                await writable.write(clipboardContent);
-                await writable.close();
-                
-                alert('File saved successfully!');
-                
-            } catch (err) {
-                showError(err);
-            }
-        }
-
-        function downloadFile(content) {
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'cliptemp.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            
+            return extracted.length > 0 ? extracted.join('\n') : null;
         }
 
         function showError(err) {
-            document.getElementById('clipboardContent').className = 'error';
-            document.getElementById('clipboardContent').innerHTML = 
-                `<strong>Error:</strong> ${err.message}<br><br>
-                <button onclick="window.location.reload()">Try Again</button>
-                <p>Or paste manually below:</p>`;
-            
-            const textarea = document.createElement('textarea');
-            textarea.placeholder = 'Paste your content here...';
-            document.body.appendChild(textarea);
-            
-            textarea.addEventListener('paste', (e) => {
-                clipboardContent = e.clipboardData.getData('text');
-                const lines = clipboardContent.split('\n').slice(0, 4);
-                document.getElementById('clipboardContent').textContent = lines.join('\n');
-                document.getElementById('saveBtn').disabled = false;
-                textarea.remove();
-            });
+            document.getElementById('contentDisplay').className = 'error';
+            document.getElementById('contentDisplay').textContent = `Error: ${err.message}`;
         }
+
+        // Toggle full content visibility
+        document.getElementById('toggleText').addEventListener('click', function() {
+            const fullContent = document.getElementById('fullContent');
+            const toggleText = document.getElementById('toggleText');
+            
+            if (fullContent.style.display === 'none') {
+                fullContent.style.display = 'block';
+                toggleText.textContent = '▲ Hide full content';
+            } else {
+                fullContent.style.display = 'none';
+                toggleText.textContent = '▼ Show full content';
+            }
+        });
     </script>
 </body>
 </html>

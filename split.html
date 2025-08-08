@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Fragment Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 20px;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .slider {
+            flex-grow: 1;
+            margin: 0 10px;
+        }
+        .buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow: auto;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            line-height: 1.6;
+            font-size: 16px;
+            white-space: pre-wrap;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text Fragment Viewer</h1>
+    
+    <div class="controls">
+        <label for="textInput">Paste your text here:</label>
+        <textarea id="textInput" placeholder="Paste your text here..."></textarea>
+        
+        <div class="slider-container">
+            <span>1</span>
+            <input type="range" min="1" max="10" value="3" class="slider" id="fragmentSlider">
+            <span>10</span>
+            <span id="sliderValue">3 fragments</span>
+        </div>
+        
+        <button id="splitButton">Split Text</button>
+    </div>
+    
+    <div class="buttons-container" id="buttonsContainer">
+        <!-- Fragment buttons will appear here -->
+    </div>
+    
+    <!-- The Modal -->
+    <div id="textModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalText"></div>
+        </div>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const textInput = document.getElementById('textInput');
+        const fragmentSlider = document.getElementById('fragmentSlider');
+        const sliderValue = document.getElementById('sliderValue');
+        const splitButton = document.getElementById('splitButton');
+        const buttonsContainer = document.getElementById('buttonsContainer');
+        const modal = document.getElementById('textModal');
+        const modalText = document.getElementById('modalText');
+        const closeBtn = document.querySelector('.close');
+        
+        // Update slider value display
+        fragmentSlider.addEventListener('input', function() {
+            sliderValue.textContent = `${this.value} fragment${this.value > 1 ? 's' : ''}`;
+        });
+        
+        // Split text into fragments and create buttons
+        splitButton.addEventListener('click', function() {
+            const text = textInput.value.trim();
+            const fragmentCount = parseInt(fragmentSlider.value);
+            
+            if (!text) {
+                alert('Please paste some text first!');
+                return;
+            }
+            
+            // Clear previous buttons
+            buttonsContainer.innerHTML = '';
+            
+            // Split text into fragments
+            const fragmentLength = Math.ceil(text.length / fragmentCount);
+            const fragments = [];
+            
+            for (let i = 0; i < fragmentCount; i++) {
+                const start = i * fragmentLength;
+                const end = start + fragmentLength;
+                fragments.push(text.slice(start, end));
+            }
+            
+            // Create buttons for each fragment
+            fragments.forEach((fragment, index) => {
+                const button = document.createElement('button');
+                button.textContent = `Fragment ${index + 1}`;
+                button.dataset.fragment = fragment;
+                
+                button.addEventListener('click', function() {
+                    modalText.textContent = this.dataset.fragment;
+                    modal.style.display = 'block';
+                });
+                
+                buttonsContainer.appendChild(button);
+            });
+        });
+        
+        // Close modal when X is clicked
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+        
+        // Close modal when clicking outside content
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

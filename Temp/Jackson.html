@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MF-ING COMEDY MIXER 9000 (SAMUEL L. MODE)</title>
+    <title>MF-ING COMEDY MIXER 9000</title>
     <style>
         body {
             font-family: 'Impact', sans-serif;
@@ -21,7 +21,6 @@
         h1 {
             color: #fff;
             text-shadow: 0 0 10px #ff0000;
-            margin-bottom: 30px;
         }
         .slider-container {
             margin: 20px 0;
@@ -47,7 +46,7 @@
             background: #000;
             border: 2px solid #ff0000;
             padding: 15px;
-            margin: 20px 0;
+            margin-top: 20px;
             font-size: 18px;
             min-height: 100px;
         }
@@ -64,34 +63,15 @@
             margin: 10px;
             cursor: pointer;
             font-weight: bold;
-            font-family: 'Impact';
         }
         button:hover {
             background: #ff0000;
-        }
-        #voiceButton {
-            background: #000;
-            border: 2px solid #ff0000;
-        }
-        #voiceButton.active {
-            background: #ff0000;
-            animation: pulse 1.5s infinite;
-        }
-        #stopButton {
-            display: none;
-            background: #000;
-            border: 2px solid #fff;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 5px #ff0000; }
-            50% { box-shadow: 0 0 20px #ff0000; }
-            100% { box-shadow: 0 0 5px #ff0000; }
         }
     </style>
 </head>
 <body>
     <div class="mixer">
-        <h1>🔥 COMEDY MIXER 9000 (SAMUEL L. MODE) 🔥</h1>
+        <h1>🔥 COMEDY MIXER 9000 🔥</h1>
         
         <div class="slider-container">
             <div class="slider-label">
@@ -134,143 +114,30 @@
         </div>
         
         <button id="voiceButton">🔊 ENABLE SAMUEL L. MODE (TTS)</button>
-        <button id="stopButton">✋ STOP VOICE</button>
     </div>
 
     <script>
-        // DOM elements
+        // Sliders
         const absurditySlider = document.getElementById("absurditySlider");
         const materialismSlider = document.getElementById("materialismSlider");
         const brevitySlider = document.getElementById("brevitySlider");
         const pmfSlider = document.getElementById("pmfSlider");
         const sarcasmButton = document.getElementById("sarcasmButton");
         const voiceButton = document.getElementById("voiceButton");
-        const stopButton = document.getElementById("stopButton");
+        
+        // Values
         const absurdityValue = document.getElementById("absurdityValue");
         const materialismValue = document.getElementById("materialismValue");
         const brevityValue = document.getElementById("brevityValue");
         const pmfValue = document.getElementById("pmfValue");
         const sarcasmState = document.getElementById("sarcasmState");
         const rantOutput = document.getElementById("rantOutput");
-
-        // State
+        
+        // States
         let sarcasmBoost = true;
         let voiceEnabled = false;
-        let isSpeaking = false;
-        let voicesLoaded = false;
-
-        // Load voices (Chrome requires this)
-        function loadVoices() {
-            return new Promise(resolve => {
-                const voices = window.speechSynthesis.getVoices();
-                if (voices.length > 0) {
-                    voicesLoaded = true;
-                    resolve();
-                } else {
-                    window.speechSynthesis.onvoiceschanged = () => {
-                        voicesLoaded = true;
-                        resolve();
-                    };
-                }
-            });
-        }
-
-        // Samuel L. Jackson-style TTS
-        function speakLikeSamuel(text) {
-            if (!voiceEnabled || isSpeaking) return;
-            
-            window.speechSynthesis.cancel();
-            
-            const utterance = new SpeechSynthesisUtterance();
-            const pmf = parseInt(pmfSlider.value);
-            
-            // Add dramatic pauses
-            const words = text.replace(/"/g, "").split(" ");
-            let modifiedText = "";
-            words.forEach((word, i) => {
-                modifiedText += word + " ";
-                if (i > 0 && (i % Math.floor(Math.random() * 5 + 3) === 0) {
-                    modifiedText += "... ";
-                }
-            });
-            
-            utterance.text = modifiedText;
-            utterance.rate = 0.9 + (pmf * 0.05);
-            utterance.pitch = 0.85 - (pmf * 0.01);
-            utterance.volume = 1.2;
-            
-            // Select deepest available voice
-            if (voicesLoaded) {
-                const voices = window.speechSynthesis.getVoices();
-                const deepVoice = voices.find(v => 
-                    v.name.includes("Male") || 
-                    v.name.includes("Deep") || 
-                    v.lang.includes("en-US")
-                );
-                if (deepVoice) utterance.voice = deepVoice;
-            }
-            
-            // Emphasize ALL-CAPS words
-            utterance.onboundary = (event) => {
-                if (event.name === "word") {
-                    const word = utterance.text.substring(event.charIndex, event.charIndex + event.charLength);
-                    if (word === word.toUpperCase() && word.length > 3) {
-                        utterance.rate = 0.8;
-                        utterance.volume = 1.5;
-                    }
-                }
-            };
-            
-            utterance.onstart = () => {
-                isSpeaking = true;
-                voiceButton.classList.add("active");
-                stopButton.style.display = "inline-block";
-            };
-            
-            utterance.onend = () => {
-                isSpeaking = false;
-                voiceButton.classList.remove("active");
-                stopButton.style.display = "none";
-            };
-            
-            window.speechSynthesis.speak(utterance);
-        }
-
-        // Generate rant based on slider values
-        function generateRant(absurdity, materialism, brevity, pmf, sarcasm) {
-            let opener, insult, critique, closer;
-            
-            // PMF gradient affects opener
-            if (pmf >= 8) opener = `"LISTEN HERE YOU `;
-            else if (pmf >= 5) opener = `"Let's be clear: `;
-            else opener = `"One might observe that `;
-            
-            // Absurdity affects insult
-            if (absurdity >= 8) insult = `TARIFF-HUMPING, SUPPLY-SIDE JESTER—YOUR 'ECONOMIC POLICY' IS WHAT HAPPENS WHEN A MONKEY WITH A CHALKBOARD FUCKS A BLOOMBERG TERMINAL`;
-            else if (absurdity >= 5) insult = `so-called economist—your theories have all the rigor of a horoscope written by a lobotomized MBA`;
-            else insult = `protectionist—your policies lack coherent theoretical foundations`;
-            
-            // Materialism affects critique
-            if (materialism >= 8) critique = `EVEN MARX'S GHOST IS FACE-PALMING AT YOUR LABOR-VALUE DISREGARD`;
-            else if (materialism >= 5) critique = `the empirical data directly contradicts your assumptions`;
-            else critique = `this seems suboptimal`;
-            
-            // Brevity affects length
-            if (brevity <= -3) closer = `!"`;
-            else if (brevity <= 0) closer = `! ${critique}!"`;
-            else closer = `! ${critique}! LET ME EXPLAIN IN 20 VOLUMES OF DIALECTICAL MATERIALISM!"`;
-            
-            // Sarcasm toggles ALL-CAPS
-            if (sarcasm) {
-                opener = opener.toUpperCase();
-                insult = insult.toUpperCase();
-                critique = critique.toUpperCase();
-            }
-            
-            return opener + insult + closer;
-        }
-
-        // Update rant when sliders change
+        
+        // Update sliders
         function updateRant() {
             const absurdity = absurditySlider.value;
             const materialism = materialismSlider.value;
@@ -282,41 +149,109 @@
             brevityValue.textContent = brevity;
             pmfValue.textContent = pmf;
             
+            // Generate rant based on values
             rantOutput.innerHTML = generateRant(absurdity, materialism, brevity, pmf, sarcasmBoost);
+            
+            // If voice enabled, speak it
+            if (voiceEnabled) {
+                speakRant(rantOutput.textContent);
+            }
         }
-
-        // Initialize
-        loadVoices().then(() => {
-            // Event listeners
-            absurditySlider.addEventListener("input", updateRant);
-            materialismSlider.addEventListener("input", updateRant);
-            brevitySlider.addEventListener("input", updateRant);
-            pmfSlider.addEventListener("input", updateRant);
+        
+        // Rant generator
+        function generateRant(absurdity, materialism, brevity, pmf, sarcasm) {
+            // Base phrases
+            let opener = "";
+            let insult = "";
+            let critique = "";
+            let closer = "";
             
-            sarcasmButton.addEventListener("click", () => {
-                sarcasmBoost = !sarcasmBoost;
-                sarcasmState.textContent = sarcasmBoost ? "OVERDRIVE" : "OFF";
-                updateRant();
-            });
+            // PMF gradient affects opener intensity
+            if (pmf >= 8) {
+                opener = `"LISTEN HERE YOU `;
+            } else if (pmf >= 5) {
+                opener = `"Let's be clear: `;
+            } else {
+                opener = `"One might observe that `;
+            }
             
-            voiceButton.addEventListener("click", () => {
-                voiceEnabled = !voiceEnabled;
-                voiceButton.textContent = voiceEnabled ? 
-                    "🔊 SAMUEL L. MODE ACTIVE" : 
-                    "🔊 ENABLE SAMUEL L. MODE (TTS)";
-                
-                if (voiceEnabled) speakLikeSamuel(rantOutput.textContent);
-            });
+            // Absurdity affects insult creativity
+            if (absurdity >= 8) {
+                insult = `TARIFF-HUMPING, SUPPLY-SIDE JESTER—YOUR 'ECONOMIC POLICY' IS WHAT HAPPENS WHEN A MONKEY WITH A CHALKBOARD FUCKS A BLOOMBERG TERMINAL`;
+            } else if (absurdity >= 5) {
+                insult = `so-called economist—your theories have all the rigor of a horoscope written by a lobotomized MBA`;
+            } else {
+                insult = `protectionist—your policies lack coherent theoretical foundations`;
+            }
             
-            stopButton.addEventListener("click", () => {
-                window.speechSynthesis.cancel();
-                isSpeaking = false;
-                voiceButton.classList.remove("active");
-                stopButton.style.display = "none";
-            });
+            // Materialism affects critique depth
+            if (materialism >= 8) {
+                critique = `EVEN MARX'S GHOST IS FACE-PALMING AT YOUR LABOR-VALUE DISREGARD`;
+            } else if (materialism >= 5) {
+                critique = `the empirical data directly contradicts your assumptions`;
+            } else {
+                critique = `this seems suboptimal`;
+            }
             
+            // Brevity affects length
+            if (brevity <= -3) {
+                closer = `!"`;
+            } else if (brevity <= 0) {
+                closer = `! ${critique}!"`;
+            } else {
+                closer = `! ${critique}! LET ME EXPLAIN IN 20 VOLUMES OF DIALECTICAL MATERIALISM!"`;
+            }
+            
+            // Sarcasm adds venom
+            if (sarcasm) {
+                opener = opener.toUpperCase();
+                insult = insult.toUpperCase();
+                critique = critique.toUpperCase();
+            }
+            
+            return opener + insult + closer;
+        }
+        
+        // Text-to-speech
+        function speakRant(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 0.8;
+                if (pmfSlider.value >= 8) {
+                    utterance.rate = 1.2;
+                    utterance.pitch = 1.1;
+                }
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Your browser doesn't support text-to-speech. Try Chrome or Edge.");
+            }
+        }
+        
+        // Event listeners
+        absurditySlider.addEventListener("input", updateRant);
+        materialismSlider.addEventListener("input", updateRant);
+        brevitySlider.addEventListener("input", updateRant);
+        pmfSlider.addEventListener("input", updateRant);
+        
+        sarcasmButton.addEventListener("click", function() {
+            sarcasmBoost = !sarcasmBoost;
+            sarcasmState.textContent = sarcasmBoost ? "OVERDRIVE" : "OFF";
             updateRant();
         });
+        
+        voiceButton.addEventListener("click", function() {
+            voiceEnabled = !voiceEnabled;
+            voiceButton.textContent = voiceEnabled ? 
+                "🔊 SAMUEL L. MODE ACTIVE" : 
+                "🔊 ENABLE SAMUEL L. MODE (TTS)";
+            if (voiceEnabled) {
+                speakRant(rantOutput.textContent);
+            }
+        });
+        
+        // Initialize
+        updateRant();
     </script>
 </body>
 </html>

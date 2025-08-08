@@ -3,196 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>White Russians & Nazi Connections</title>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>White Russian Roots of Nazism Connections</title>
     <style>
-        .flowchart-container {
-            width: 100%;
-            overflow: auto;
-            margin-bottom: 20px;
-            min-height: 600px;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
         }
-        .mermaid {
-            min-width: 1200px;
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .description-panel {
+        .row {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .node {
+            padding: 10px 15px;
+            margin: 0 10px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            max-width: 200px;
+        }
+        .node:hover {
+            background: #f0f0f0;
+        }
+        .org {
+            border-style: dashed;
+            border-color: #666;
+        }
+        .connector {
+            width: 2px;
+            height: 30px;
+            background: #333;
+            margin: 0 auto;
+        }
+        .horizontal-connector {
+            width: 30px;
+            height: 2px;
+            background: #333;
+            align-self: center;
+        }
+        .description-box {
             display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
             padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-top: 15px;
-            position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 2px solid #333;
+            border-radius: 5px;
+            z-index: 100;
+            max-width: 400px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
         }
-        .description-panel h3 {
-            margin-top: 0;
-            padding-right: 30px;
-        }
-        .node rect, .node circle, .node polygon {
-            cursor: pointer;
-            transition: stroke-width 0.2s;
-        }
-        .node rect:hover, .node circle:hover, .node polygon:hover {
-            stroke: #ff5722 !important;
-            stroke-width: 3px !important;
-        }
-        .wikipedia-icon {
+        .close-btn {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            color: #636363;
-            font-size: 1.2rem;
-        }
-        .wikipedia-icon:hover {
-            color: #000;
-        }
-        .edgeLabel {
+            top: 5px;
+            right: 10px;
             cursor: pointer;
+            font-weight: bold;
         }
-        .edgeLabel:hover {
-            background-color: #fff3e0 !important;
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
         }
     </style>
 </head>
-<body class="container py-4">
-    <h1 class="mb-4">White Russian Émigrés & Nazi Roots</h1>
-    
-    <div class="flowchart-container">
-        <div class="mermaid">
-            flowchart TD
-                %% Central Organizations
-                Aufbau["Aufbau Vereinigung<br>(Reconstruction Organization)"]
-                NaziParty["Nazi Party<br>(Early Influence)"]
-                WhiteMovement["White Émigré Networks"]
-                Protocols["Protocols of the Elders of Zion"]
-                WestRussianArmy["West Russian Volunteer Army"]
-                FarRightGroups["German Far-Right Groups"]
-
-                %% Key Individuals
-                Hitler["Adolf Hitler"]
-                Rosenberg["Alfred Rosenberg"]
-                ScheubnerRichter["Max Erwin von Scheubner-Richter"]
-                ShabelskyBork["Pyotr Shabelsky-Bork"]
-                Vinberg["Fyodor Vinberg"]
-                Biskupsky["Gen. Vasily Biskupsky"]
-                BermondtAvalov["Gen. Pavel Bermondt-Avalov"]
-                Taboritsky["Sergei Taboritsky"]
-                PoltavetsOstranitsa["Ivan Poltavets-Ostranitsa"]
-                MarkovII["Nikolai Markov II"]
-                Vonsiatsky["Anastasy Vonsiatsky"]
-
-                %% Connections
-                WhiteMovement --> Aufbau
-                Aufbau -->|Collaborated with| NaziParty
-                NaziParty --> Hitler
-                Hitler -->|Influenced by| Rosenberg
-                Hitler -->|Influenced by| ScheubnerRichter
-                ScheubnerRichter -->|Connected| Biskupsky
-                ScheubnerRichter -->|Worked with| ShabelskyBork
-                ShabelskyBork -->|Spread| Protocols
-                Vinberg -->|Published| Protocols
-                Protocols -->|Used by| NaziParty
-                Biskupsky -->|Funded| FarRightGroups
-                BermondtAvalov -->|Led| WestRussianArmy
-                WestRussianArmy -->|Pro-German| Aufbau
-                Taboritsky -->|Aufbau Member| ScheubnerRichter
-                PoltavetsOstranitsa -->|Cossack Lobbyist| Hitler
-                MarkovII -->|Black Hundreds| Vinberg
-                Vonsiatsky -.->|Transnational Fascism| Biskupsky
-
-                classDef clickable fill:none,stroke:#333,stroke-width:2px,cursor:pointer;
-                class Hitler,Rosenberg,ScheubnerRichter,ShabelskyBork,Vinberg,Biskupsky,BermondtAvalov,Taboritsky,PoltavetsOstranitsa,MarkovII,Vonsiatsky,Aufbau,NaziParty,WhiteMovement,Protocols,WestRussianArmy,FarRightGroups clickable;
+<body>
+    <h1>White Russian Roots of Nazism</h1>
+    <div class="flowchart">
+        <!-- Row 1 -->
+        <div class="row">
+            <div class="node org" onclick="openInfo('White_émigré')">White Émigré Networks</div>
+        </div>
+        <div class="connector"></div>
+        
+        <!-- Row 2 -->
+        <div class="row">
+            <div class="node org" onclick="openInfo('Aufbau_Organization')">Aufbau Vereinigung</div>
+        </div>
+        <div class="connector"></div>
+        
+        <!-- Row 3 -->
+        <div class="row">
+            <div class="node" onclick="openInfo('Max_Erwin_von_Scheubner-Richter')">Scheubner-Richter</div>
+            <div class="horizontal-connector"></div>
+            <div class="node" onclick="openInfo('Vasily_Biskupsky')">Biskupsky</div>
+            <div class="horizontal-connector"></div>
+            <div class="node" onclick="openInfo('Pyotr_Shabelsky-Bork')">Shabelsky-Bork</div>
+        </div>
+        <div class="connector"></div>
+        
+        <!-- Row 4 -->
+        <div class="row">
+            <div class="node" onclick="openInfo('Alfred_Rosenberg')">Rosenberg</div>
+            <div class="horizontal-connector"></div>
+            <div class="node org" onclick="openInfo('Nazi_Party')">Nazi Party</div>
+            <div class="horizontal-connector"></div>
+            <div class="node" onclick="openInfo('Fyodor_Vinberg')">Vinberg</div>
+        </div>
+        <div class="connector"></div>
+        
+        <!-- Row 5 -->
+        <div class="row">
+            <div class="node" onclick="openInfo('Adolf_Hitler')">Hitler</div>
+        </div>
+        
+        <!-- Row 6 -->
+        <div class="row">
+            <div class="node" onclick="openInfo('Pavel_Bermondt-Avalov')">Bermondt-Avalov</div>
+            <div class="horizontal-connector"></div>
+            <div class="node" onclick="openInfo('Sergei_Taboritsky')">Taboritsky</div>
+        </div>
+        
+        <!-- Row 7 -->
+        <div class="row">
+            <div class="node" onclick="openInfo('Ivan_Poltavets-Ostranitsa')">Poltavets-Ostranitsa</div>
+            <div class="horizontal-connector"></div>
+            <div class="node" onclick="openInfo('Nikolai_Markov')">Markov II</div>
         </div>
     </div>
 
-    <!-- Description Panels -->
-    <div id="descriptions">
-        <!-- Individuals -->
-        <div id="Hitler-desc" class="description-panel">
-            <a href="https://en.wikipedia.org/wiki/Adolf_Hitler" target="_blank" class="wikipedia-icon"><i class="fab fa-wikipedia-w"></i></a>
-            <h3>Adolf Hitler</h3>
-            <p>Adolf Hitler (1889–1945) was profoundly influenced by White Russian émigrés during his early political development in Munich. Through networks like the Aufbau Vereinigung, Hitler absorbed the conspiratorial worldview that framed Bolshevism as a Jewish plot. Key figures like Max Erwin von Scheubner-Richter and Alfred Rosenberg introduced Hitler to the Protocols of the Elders of Zion, which became foundational to Nazi ideology. The 1923 Beer Hall Putsch—directly inspired by Aufbau's plans for a German-Russian anti-Bolshevik crusade—demonstrated how deeply Hitler had internalized these émigré ideas. Throughout the 1920s, White Russian propagandists like Fyodor Vinberg reinforced Hitler's belief in "Judeo-Bolshevism," later manifesting in the Holocaust and Operation Barbarossa. Hitler's vision of Lebensraum (living space) in Eastern Europe was shaped by these early collaborations, which portrayed Slavic lands as territories to be conquered from "Jewish Bolshevik" control.</p>
-        </div>
-
-        <div id="Rosenberg-desc" class="description-panel">
-            <a href="https://en.wikipedia.org/wiki/Alfred_Rosenberg" target="_blank" class="wikipedia-icon"><i class="fab fa-wikipedia-w"></i></a>
-            <h3>Alfred Rosenberg</h3>
-            <p>Alfred Rosenberg (1893–1946), a Baltic German, served as the Nazi Party's chief ideologue and primary liaison to White Russian circles. As editor of the Völkischer Beobachter, Rosenberg published the Protocols of the Elders of Zion and promoted the "Judeo-Bolshevik" myth crafted by White Russian extremists. His 1930 book "The Myth of the Twentieth Century" synthesized White Russian anti-Semitism with Nazi racial theory, declaring Bolshevism a Jewish weapon to destroy Aryan civilization. During WWII, Rosenberg oversaw the Reich Ministry for the Occupied Eastern Territories, implementing policies of extermination and enslavement informed by his émigré connections. Notably, he collaborated with White Russian generals like Vasily Biskupsky to recruit Soviet POWs for anti-Stalinist units. Rosenberg's Nuremberg trial revealed how deeply White Russian propaganda had shaped Nazi genocide policies.</p>
-        </div>
-
-        <div id="ScheubnerRichter-desc" class="description-panel">
-            <a href="https://en.wikipedia.org/wiki/Max_Erwin_von_Scheubner-Richter" target="_blank" class="wikipedia-icon"><i class="fab fa-wikipedia-w"></i></a>
-            <h3>Max Erwin von Scheubner-Richter</h3>
-            <p>Max Erwin von Scheubner-Richter (1884–1923) was a Baltic German and the organizational force behind the Aufbau Vereinigung. As Hitler's early mentor, he introduced the future Führer to White Russian generals and anti-Semitic theorists. Scheubner-Richter arranged funding from émigré industrialists for Nazi activities and co-planned the 1923 Beer Hall Putsch, where he was killed. His "National Socialist Foreign Policy" memorandum advocated a German-Russian alliance to overthrow Bolshevism—a vision that later inspired Hitler's invasion of the USSR. Through his journal "Aufbau Correspondence," he disseminated White Russian propaganda claiming Lenin's government was run by Jewish commissars. Historians consider him the "gray eminence" who bridged pre-war Russian far-right ideologies with Nazism.</p>
-        </div>
-
-        <div id="ShabelskyBork-desc" class="description-panel">
-            <a href="https://en.wikipedia.org/wiki/Pyotr_Shabelsky-Bork" target="_blank" class="wikipedia-icon"><i class="fab fa-wikipedia-w"></i></a>
-            <h3>Pyotr Shabelsky-Bork</h3>
-            <p>Pyotr Shabelsky-Bork (1893–1952) was a White Russian officer who played a pivotal role in introducing the Protocols of the Elders of Zion to Nazi circles. After fleeing Russia, he smuggled a copy of the Protocols to Germany in 1919 and worked with Fyodor Vinberg to publish it in German. Shabelsky-Bork's writings portrayed the Russian Revolution as a Jewish plot and influenced early Nazi propaganda. He collaborated closely with Scheubner-Richter in the Aufbau Vereinigung, helping to establish the ideological link between White Russian anti-Semitism and Nazi racial theories. His 1920 pamphlet "The Reign of the Antichrist" directly inspired Hitler's view of communism as a Jewish conspiracy. Though marginalized after 1933, his early contributions shaped Nazi propaganda techniques.</p>
-        </div>
-
-        <div id="Vinberg-desc" class="description-panel">
-            <a href="https://en.wikipedia.org/wiki/Fyodor_Vinberg" target="_blank" class="wikipedia-icon"><i class="fab fa-wikipedia-w"></i></a>
-            <h3>Fyodor Vinberg</h3>
-            <p>Fyodor Vinberg (1868–1927) was a tsarist officer and virulent anti-Semitic propagandist who published the first German edition of the Protocols of the Elders of Zion in 1919. His Berlin-based newspaper "In the Struggle for Truth" became a key outlet for White Russian anti-Bolshevik propaganda. Vinberg's 1922 book "The Conquest of the World by the Jews" directly influenced Alfred Rosenberg and other Nazi ideologues. He argued that both capitalism and communism were Jewish inventions to enslave Aryans—a core Nazi belief. Vinberg's circle in Munich, which included Shabelsky-Bork and Scheubner-Richter, served as Hitler's introduction to Russian-style anti-Semitism. His theories about Jewish ritual murder would later appear in Nazi propaganda films like "The Eternal Jew."</p>
-        </div>
-
-        <!-- Add remaining descriptions following the same pattern -->
+    <div class="overlay" id="overlay"></div>
+    <div class="description-box" id="descriptionBox">
+        <span class="close-btn" onclick="hideDescription()">×</span>
+        <h3 id="descTitle">Title</h3>
+        <p id="descContent">Content goes here...</p>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            mermaid.initialize({ 
-                startOnLoad: true,
-                securityLevel: 'loose',
-                flowchart: {
-                    useMaxWidth: false,
-                    htmlLabels: true
-                }
-            });
+        // Wikipedia pages (fallback to descriptions)
+        const infoMap = {
+            // Wikipedia entries
+            "White_émigré": { wiki: "White_émigré" },
+            "Aufbau_Organization": { wiki: "Aufbau_Organization" },
+            "Max_Erwin_von_Scheubner-Richter": { wiki: "Max_Erwin_von_Scheubner-Richter" },
+            "Vasily_Biskupsky": { wiki: "Vasily_Biskupsky" },
+            "Alfred_Rosenberg": { wiki: "Alfred_Rosenberg" },
+            "Nazi_Party": { wiki: "Nazi_Party" },
+            "Adolf_Hitler": { wiki: "Adolf_Hitler" },
+            "Pavel_Bermondt-Avalov": { wiki: "Pavel_Bermondt-Avalov" },
+            "Nikolai_Markov": { wiki: "Nikolai_Markov" },
             
-            // Function to handle node clicks
-            function handleNodeClick(event) {
-                // Check if we clicked on a node or edge label
-                let target = event.target;
-                if (target.classList.contains('edgeLabel')) {
-                    return; // Skip edge labels if desired
-                }
-                
-                // Find the parent node if clicking on a text element
-                while (target && !target.classList.contains('node')) {
-                    target = target.parentElement;
-                }
-                
-                if (target) {
-                    const title = target.querySelector('title');
-                    if (title) {
-                        const id = title.textContent.replace(/[^a-zA-Z0-9]/g, '');
-                        const descPanel = document.getElementById(id + '-desc');
-                        
-                        document.querySelectorAll('.description-panel').forEach(panel => {
-                            panel.style.display = 'none';
-                        });
-                        
-                        if (descPanel) {
-                            descPanel.style.display = 'block';
-                            descPanel.scrollIntoView({ behavior: 'smooth' });
-                        }
-                    }
-                }
+            // Fallback descriptions (no Wikipedia page)
+            "Pyotr_Shabelsky-Bork": { 
+                desc: "Pyotr Shabelsky-Bork: White Russian officer who smuggled the Protocols of Zion into Germany and collaborated with early Nazis."
+            },
+            "Fyodor_Vinberg": { 
+                desc: "Fyodor Vinberg: Tsarist officer who published the Protocols of Zion in German and promoted the 'Judeo-Bolshevik conspiracy' theory."
+            },
+            "Sergei_Taboritsky": { 
+                desc: "Sergei Taboritsky: Russian monarchist and Aufbau member who later worked in Nazi propaganda during WWII."
+            },
+            "Ivan_Poltavets-Ostranitsa": { 
+                desc: "Ivan Poltavets-Ostranitsa: Cossack leader who lobbied the Nazis for an anti-Soviet Ukrainian state but was ultimately ignored by Hitler."
             }
+        };
+
+        function openInfo(id) {
+            const item = infoMap[id];
             
-            // Add click event to the flowchart container
-            document.querySelector('.flowchart-container').addEventListener('click', function(event) {
-                // Wait for mermaid to render
-                setTimeout(() => {
-                    handleNodeClick(event);
-                }, 100);
-            });
-        });
+            if (item.wiki) {
+                // Open Wikipedia in a new tab
+                window.open(`https://en.wikipedia.org/wiki/${item.wiki}`, '_blank');
+            } else if (item.desc) {
+                // Show fallback description
+                document.getElementById('descTitle').textContent = id.replace(/_/g, ' ');
+                document.getElementById('descContent').textContent = item.desc;
+                document.getElementById('descriptionBox').style.display = 'block';
+                document.getElementById('overlay').style.display = 'block';
+            }
+        }
+        
+        function hideDescription() {
+            document.getElementById('descriptionBox').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+        
+        // Close when clicking outside
+        document.getElementById('overlay').addEventListener('click', hideDescription);
     </script>
 </body>
 </html>

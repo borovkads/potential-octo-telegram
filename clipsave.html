@@ -72,15 +72,12 @@
     <script>
         document.getElementById('readClipboard').addEventListener('click', async () => {
             try {
-                // Focus the document first
                 window.focus();
                 
-                // Check clipboard permissions
                 if (!navigator.clipboard || !navigator.clipboard.readText) {
                     throw new Error('Clipboard API not supported in this browser');
                 }
                 
-                // Read clipboard with user gesture
                 const clipboardText = await navigator.clipboard.readText();
                 processContent(clipboardText);
                 
@@ -94,8 +91,7 @@
                 let extractedText = extractHiddenText(text);
                 
                 if (!extractedText) {
-                    extractedText = "No hidden comments found\n\n" + 
-                                   text.split('\n').slice(0, 5).join('\n');
+                    extractedText = text.split('\n').slice(0, 5).join('\n');
                 }
                 
                 document.getElementById('contentDisplay').textContent = 
@@ -108,12 +104,14 @@
         }
 
         function extractHiddenText(mermaidCode) {
-            const commentRegex = /%%\s*(.*?)\s*(?=\n|$)/g;
+            const commentRegex = /%%\s*([^FULL TEXT:].*?)\s*(?=\n|$)/g;
             let match;
             let extracted = [];
             
             while ((match = commentRegex.exec(mermaidCode)) !== null) {
-                extracted.push(match[1]);
+                if (!match[1].includes("FULL TEXT:")) {
+                    extracted.push(match[1].trim());
+                }
             }
             
             return extracted.length > 0 ? extracted.join('\n') : null;
@@ -124,7 +122,6 @@
             display.className = 'error';
             display.textContent = `Error: ${err.message}`;
             
-            // Show manual paste option
             document.getElementById('manualPaste').style.display = 'block';
             document.getElementById('manualPaste').addEventListener('paste', (e) => {
                 processContent(e.clipboardData.getData('text'));

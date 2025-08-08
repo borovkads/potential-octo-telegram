@@ -50,17 +50,43 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #3367d6;
+        }
+        #directoryInfo {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e8f0fe;
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+        .button-group {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <h1>Clipboard Content</h1>
     <div id="clipboardContent">Reading clipboard...</div>
+    
+    <div id="directoryInfo">No directory selected</div>
+    
+    <div class="button-group">
+        <button id="directoryBtn">Select Directory</button>
+        <button id="saveFileBtn" disabled>Save File</button>
+        <button onclick="window.location.reload()">Refresh</button>
+    </div>
 
     <script>
+        // Global variable to store directory handle
+        let directoryHandle = null;
+        
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                if (!navigator.clipboard || !navigator.clipboard.readText) {
+                if (!navigator.clipboard || !navigator.clipboard.readText()) {
                     throw new Error('Clipboard API not supported in this browser');
                 }
 
@@ -71,24 +97,81 @@
                 document.getElementById('clipboardContent').textContent = 
                     firstFourLines || 'Clipboard is empty or contains no text';
             } catch (err) {
-                document.getElementById('clipboardContent').className = 'error';
-                document.getElementById('clipboardContent').innerHTML = 
-                    `<strong>Error:</strong> ${err.message}<br><br>
-                    <button onclick="window.location.reload()">Try Again</button>
-                    <p>Or paste manually below:</p>`;
-                
-                const textarea = document.createElement('textarea');
-                textarea.placeholder = 'Paste your content here...';
-                document.body.appendChild(textarea);
-                
-                textarea.addEventListener('paste', (e) => {
-                    const pastedText = e.clipboardData.getData('text');
-                    const lines = pastedText.split('\n').slice(0, 4);
-                    document.getElementById('clipboardContent').textContent = lines.join('\n');
-                    textarea.remove();
-                });
+                showError(err);
             }
+            
+            // Set up button event listeners
+            document.getElementById('directoryBtn').addEventListener('click', selectDirectory);
+            document.getElementById('saveFileBtn').addEventListener('click', saveToFile);
         });
+
+        async function selectDirectory() {
+            try {
+                // Request directory access
+                directoryHandle = await window.showDirectoryPicker();
+                
+                // Verify permission
+                if (await directoryHandle.queryPermission({ mode: 'readwrite' }) !== 'granted') {
+                    const permission = await directoryHandle.requestPermission({ mode: 'readwrite' });
+                    if (permission !== 'granted') {
+                        throw new Error('Directory access denied');
+                    }
+                }
+                
+                // Update UI
+                document.getElementById('directoryInfo').textContent = 
+                    `Selected directory: ${directoryHandle.name}`;
+                document.getElementById('saveFileBtn').disabled = false;
+                
+            } catch (err) {
+                showError(err);
+            }
+        }
+
+        async function saveToFile() {
+            if (!directoryHandle) {
+                showError(new Error('Please select a directory first'));
+                return;
+            }
+
+            try {
+                // Get clipboard contents
+                const clipboardText = await navigator.clipboard.readText();
+                
+                // Create or get file handle
+                const fileHandle = await directoryHandle.getFileHandle('cliptemp.txt', { create: true });
+                
+                // Create writable stream
+                const writable = await fileHandle.createWritable();
+                
+                // Write contents
+                await writable.write(clipboardText);
+                await writable.close();
+                
+                alert('File saved successfully as cliptemp.txt');
+            } catch (err) {
+                showError(err);
+            }
+        }
+
+        function showError(err) {
+            document.getElementById('clipboardContent').className = 'error';
+            document.getElementById('clipboardContent').innerHTML = 
+                `<strong>Error:</strong> ${err.message}<br><br>
+                <button onclick="window.location.reload()">Try Again</button>
+                <p>Or paste manually below:</p>`;
+            
+            const textarea = document.createElement('textarea');
+            textarea.placeholder = 'Paste your content here...';
+            document.body.appendChild(textarea);
+            
+            textarea.addEventListener('paste', (e) => {
+                const pastedText = e.clipboardData.getData('text');
+                const lines = pastedText.split('\n').slice(0, 4);
+                document.getElementById('clipboardContent').textContent = lines.join('\n');
+                textarea.remove();
+            });
+        }
     </script>
 </body>
 </html>

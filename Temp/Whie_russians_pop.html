@@ -1,1 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White Russian Roots of Nazism Connections</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .row {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .node {
+            padding: 10px 15px;
+            margin: 0 10px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            max-width: 200px;
+        }
+        .node:hover {
+            background: #f0f0f0;
+        }
+        .org {
+            border-style: dashed;
+            border-color: #666;
+        }
+        .connector {
+            width: 2px;
+            height: 30px;
+            background: #333;
+            margin: 0 auto;
+        }
+        .horizontal-connector {
+            width: 30px;
+            height: 2px;
+            background: #333;
+            align-self: center;
+        }
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+        }
+        .popup-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 90%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .popup-header {
+            padding: 15px;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .popup-close {
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .popup-iframe {
+            width: 100%;
+            height: calc(100% - 50px);
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>White Russian Roots of Nazism</h1>
+    <div class="flowchart">
+        <!-- Row 1 -->
+        <div class="row">
+            <div class="node org" onclick="openWikiPopup('White_émigré')">White Émigré Networks</div>
+        </div>
+        <div class="connector"></div>
+        
+        <!-- Row 2 -->
+        <div class="row">
+            <div class="node org" onclick="openWikiPopup('Aufbau_Organization')">Aufbau Vereinigung</div>
+        </div>
+        <div class="connector"></div>
+        
+        <!-- Row 3 -->
+        <div class="row">
+            <div class="node" onclick="openWikiPopup('Max_Erwin_von_Scheubner-Richter')">Scheubner-Richter</div>
+            <div class="horizontal-connector"></div>
+            <div class="node" onclick="openWikiPopup('Vasily_Biskupsky')">Biskupsky</div>
+            <div class="horizontal-connector"></div>
+            <div class="node" onclick="openWikiPopup('Pyotr_Shabelsky-Bork')">Shabelsky-Bork</div>
+        </div>
+        <div class="connector"></div>
+        
+        <!-- Row 4 -->
+        <div class="row">
+            <div class="node" onclick="openWikiPopup('Alfred_Rosenberg')">Rosenberg</div>
+            <div class="horizontal-connector"></div>
+            <div class="node org" onclick="openWikiPopup('Nazi_Party')">Nazi Party</div>
+            <div class="horizontal-connector"></div>
+            <div class="node" onclick="openWikiPopup('Fyodor_Vinberg')">Vinberg</div>
+        </div>
+        <div class="connector"></div>
+        
+        <!-- Row 5 -->
+        <div class="row">
+            <div class="node" onclick="openWikiPopup('Adolf_Hitler')">Hitler</div>
+        </div>
+        
+        <!-- Row 6 -->
+        <div class="row">
+            <div class="node" onclick="openWikiPopup('Pavel_Bermondt-Avalov')">Bermondt-Avalov</div>
+            <div class="horizontal-connector"></div>
+            <div class="node" onclick="openWikiPopup('Sergey_Taboritsky')">Taboritsky</div>
+        </div>
+        
+        <!-- Row 7 -->
+        <div class="row">
+            <div class="node" onclick="openWikiPopup('Ukrainian_National_Free_Cossack_Society')">Poltavets-Ostranitsa</div>
+            <div class="horizontal-connector"></div>
+            <div class="node" onclick="openWikiPopup('Nikolai_Markov')">Markov II</div>
+        </div>
+    </div>
 
+    <div class="popup-overlay" id="wikiPopup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <span id="popupTitle">Wikipedia</span>
+                <span class="popup-close" onclick="closeWikiPopup()">×</span>
+            </div>
+            <iframe class="popup-iframe" id="wikiFrame" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        function openWikiPopup(page) {
+            document.getElementById('popupTitle').textContent = page.replace(/_/g, ' ');
+            document.getElementById('wikiFrame').src = `https://en.wikipedia.org/wiki/${page}`;
+            document.getElementById('wikiPopup').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeWikiPopup() {
+            document.getElementById('wikiPopup').style.display = 'none';
+            document.getElementById('wikiFrame').src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close popup when clicking outside content
+        document.getElementById('wikiPopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeWikiPopup();
+            }
+        });
+    </script>
+</body>
+</html>

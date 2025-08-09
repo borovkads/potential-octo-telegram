@@ -97,35 +97,41 @@
         
         document.getElementById('readClipboard').addEventListener('click', async () => {
             try {
-                // First try the modern async clipboard API
-                try {
-                    clipboardContent = await navigator.clipboard.readText();
+                // Method 1: Modern Async Clipboard API (requires HTTPS)
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    try {
+                        clipboardContent = await navigator.clipboard.readText();
+                        processContent(clipboardContent);
+                        return;
+                    } catch (asyncError) {
+                        console.log("Async clipboard failed, trying fallback...");
+                    }
+                }
+
+                // Method 2: Document.execCommand fallback
+                const tempTextarea = document.createElement('textarea');
+                tempTextarea.style.position = 'fixed';
+                tempTextarea.style.opacity = 0;
+                document.body.appendChild(tempTextarea);
+                tempTextarea.focus();
+                
+                if (document.execCommand('paste')) {
+                    clipboardContent = tempTextarea.value;
+                    document.body.removeChild(tempTextarea);
                     processContent(clipboardContent);
                     return;
-                } catch (asyncError) {
-                    console.log("Async clipboard failed, falling back...");
                 }
-                
-                // Fallback for browsers without async clipboard support
-                const textarea = document.createElement('textarea');
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = 0;
-                document.body.appendChild(textarea);
-                textarea.focus();
-                
-                if (!document.execCommand('paste')) {
-                    throw new Error('Clipboard access not supported');
-                }
-                
-                clipboardContent = textarea.value;
-                document.body.removeChild(textarea);
-                processContent(clipboardContent);
-                
+                document.body.removeChild(tempTextarea);
+
+                // Method 3: Show manual paste option
+                throw new Error('Automatic clipboard access blocked. Please paste manually below.');
+
             } catch (err) {
                 showError(err);
             }
         });
 
+        // Rest of your existing code (directory handling, content processing, etc.)
         document.getElementById('directoryBtn').addEventListener('click', async () => {
             try {
                 if (!window.showDirectoryPicker) {

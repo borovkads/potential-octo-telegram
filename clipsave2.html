@@ -111,17 +111,88 @@
             }
         });
 
-        // [Previous directory and file handling functions remain unchanged...]
+        document.getElementById('directoryBtn').addEventListener('click', async () => {
+            try {
+                if (!window.showDirectoryPicker) {
+                    throw new Error('Directory selection not supported');
+                }
+                
+                selectedDirectoryHandle = await window.showDirectoryPicker();
+                const path = await getDirectoryPath(selectedDirectoryHandle);
+                
+                // Format the path with "Redmi Note 10 Pro" as root
+                const formattedPath = formatPathFromRedmi(path);
+                document.getElementById('directoryInfo').innerHTML = formattedPath;
+                document.getElementById('saveBtn').disabled = false;
+                
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    document.getElementById('directoryInfo').textContent = 
+                        `Error: ${err.message}. Using default download location.`;
+                }
+            }
+        });
+
+        async function getDirectoryPath(directoryHandle) {
+            const parts = [directoryHandle.name];
+            let currentHandle = directoryHandle;
+            
+            try {
+                while (currentHandle && currentHandle.parent) {
+                    currentHandle = await currentHandle.parent;
+                    if (currentHandle.name) {
+                        parts.unshift(currentHandle.name);
+                    }
+                }
+            } catch (e) {
+                console.log("Couldn't get full path hierarchy");
+            }
+            
+            return parts.join('/');
+        }
+
+        function formatPathFromRedmi(fullPath) {
+            const redmiIndex = fullPath.toLowerCase().indexOf('redmi note 10 pro');
+            
+            if (redmiIndex >= 0) {
+                const relevantPath = fullPath.substring(redmiIndex);
+                const segments = relevantPath.split('/');
+                
+                return segments.map((segment, index) => {
+                    if (index === 0) {
+                        return `<span class="path-segment">${segment}</span>`;
+                    }
+                    return segment;
+                }).join(' / ');
+            }
+            
+            return fullPath;
+        }
+
+        document.getElementById('saveBtn').addEventListener('click', async () => {
+            try {
+                if (!clipboardContent) {
+                    throw new Error('No content to save');
+                }
+                
+                if (selectedDirectoryHandle) {
+                    const fileHandle = await selectedDirectoryHandle.getFileHandle('cliptemp.txt', { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(clipboardContent);
+                    await writable.close();
+                    alert('File saved successfully!');
+                } else {
+                    downloadFile(clipboardContent);
+                }
+                
+            } catch (err) {
+                alert(`Error saving file: ${err.message}`);
+            }
+        });
 
         function processContent(text) {
             try {
-                // First try to extract as Mermaid hidden text
-                let extractedText = extractMermaidHiddenText(text);
-                
-                // If no Mermaid content found, use plain text processing
-                if (!extractedText) {
-                    extractedText = cleanTextContent(text).split('\n').slice(0, 5).join('\n');
-                }
+                let extractedText = extractHiddenText(text);
                 
                 document.getElementById('contentDisplay').textContent = 
                     extractedText.split('\n').slice(0, 5).join('\n');
@@ -132,39 +203,53 @@
             }
         }
 
-        function extractMermaidHiddenText(content) {
-            // Check if content contains Mermaid diagram
-            const mermaidMatch = content.match(/```mermaid([\s\S]*?)```/);
-            if (!mermaidMatch) return null;
-            
-            const mermaidContent = mermaidMatch[1];
-            // Extract all comments including FULL TEXT sections
-            const commentRegex = /%%\s*(.*?)\s*(?=\n|$)/g;
-            let match;
-            let extracted = [];
-            
-            while ((match = commentRegex.exec(mermaidContent)) !== null) {
-                extracted.push(match[1].trim());
+        function extractHiddenText(mermaidCode) {
+            // 1. Find FULL TEXT section (more flexible matching)
+            const fullTextMatch = mermaidCode.match(/%% FULL TEXT:\s*\n([\s\S]*?)(?=\s*%% [^\n]|\s*```|$)/);
+            if (fullTextMatch) {
+                return fullTextMatch[1]
+                    .replace(/^%%\s?/gm, '')  // Remove comment markers
+                    .replace(/^\s+|\s+$/g, ''); // Trim whitespace
             }
-            
-            return extracted.length > 0 ? extracted.join('\n') : null;
+
+            // 2. Fallback to all comments
+            const comments = mermaidCode.match(/%%\s*(.+?)\s*(?=\n|$)/g);
+            if (comments) {
+                return comments.map(c => c.replace(/^%%\s*/, '')).join('\n');
+            }
+
+            // 3. Final fallback: first 10 non-empty lines
+            return mermaidCode.split('\n')
+                .filter(line => line.trim().length > 0)
+                .slice(0, 10)
+                .join('\n');
         }
 
-        function cleanTextContent(text) {
-            // Create temporary div to parse HTML content
-            const temp = document.createElement('div');
-            temp.innerHTML = text;
+        function showError(err) {
+            const display = document.getElementById('contentDisplay');
+            display.className = 'error';
+            display.textContent = `Error: ${err.message}`;
             
-            // Remove script and style elements
-            Array.from(temp.querySelectorAll('script, style')).forEach(el => el.remove());
-            
-            // Get text content and clean up whitespace
-            return temp.textContent
-                .replace(/\s+/g, ' ')
-                .trim();
+            document.getElementById('manualPaste').style.display = 'block';
+            document.getElementById('manualPaste').addEventListener('paste', (e) => {
+                clipboardContent = e.clipboardData.getData('text');
+                processContent(clipboardContent);
+                document.getElementById('saveBtn').disabled = false;
+                e.preventDefault();
+            });
         }
 
-        // [Previous showError, downloadFile, and other functions remain unchanged...]
+        function downloadFile(content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cliptemp.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
     </script>
 </body>
 </html>

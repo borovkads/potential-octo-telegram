@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clipboard Content Extractor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #222;
+        }
+        #contentDisplay {
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 5px solid #4285f4;
+            font-size: 1.3rem;
+            line-height: 1.8;
+            height: 120px;
+            overflow-y: auto;
+            margin-bottom: 30px;
+        }
+        .error {
+            color: #d32f2f;
+            font-size: 1.2rem;
+        }
+        button {
+            font-size: 1.1rem;
+            padding: 12px 24px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        #manualPaste {
+            display: none;
+            width: 100%;
+            min-height: 150px;
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 1.2rem;
+        }
+        .button-group {
+            margin-bottom: 20px;
+        }
+        #directoryInfo {
+            margin: 15px 0;
+            padding: 12px;
+            background-color: #f0f0f0;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            word-break: break-all;
+        }
+        #saveBtn {
+            background-color: #34a853;
+        }
+        #directoryBtn {
+            background-color: #ea4335;
+        }
+        .path-segment {
+            color: #4285f4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Clipboard Content</h1>
+    
+    <div class="button-group">
+        <button id="readClipboard">Read Clipboard</button>
+        <button id="directoryBtn">Select Directory</button>
+        <button id="saveBtn" disabled>Save File</button>
+    </div>
+    
+    <div id="directoryInfo">No directory selected. Files will be saved to default download location.</div>
+    
+    <div id="contentDisplay">Click "Read Clipboard" to start</div>
+    
+    <textarea id="manualPaste" placeholder="Or paste manually here..."></textarea>
+
+    <script>
+        let selectedDirectoryHandle = null;
+        let clipboardContent = '';
+        
+        document.getElementById('readClipboard').addEventListener('click', async () => {
+            try {
+                window.focus();
+                
+                if (!navigator.clipboard || !navigator.clipboard.readText) {
+                    throw new Error('Clipboard API not supported in this browser');
+                }
+                
+                clipboardContent = await navigator.clipboard.readText();
+                processContent(clipboardContent);
+                
+            } catch (err) {
+                showError(err);
+            }
+        });
+
+        // [Previous directory and file handling functions remain unchanged...]
+
+        function processContent(text) {
+            try {
+                // First try to extract as Mermaid hidden text
+                let extractedText = extractMermaidHiddenText(text);
+                
+                // If no Mermaid content found, use plain text processing
+                if (!extractedText) {
+                    extractedText = cleanTextContent(text).split('\n').slice(0, 5).join('\n');
+                }
+                
+                document.getElementById('contentDisplay').textContent = 
+                    extractedText.split('\n').slice(0, 5).join('\n');
+                document.getElementById('contentDisplay').className = '';
+                
+            } catch (err) {
+                showError(err);
+            }
+        }
+
+        function extractMermaidHiddenText(content) {
+            // Check if content contains Mermaid diagram
+            const mermaidMatch = content.match(/```mermaid([\s\S]*?)```/);
+            if (!mermaidMatch) return null;
+            
+            const mermaidContent = mermaidMatch[1];
+            // Extract all comments including FULL TEXT sections
+            const commentRegex = /%%\s*(.*?)\s*(?=\n|$)/g;
+            let match;
+            let extracted = [];
+            
+            while ((match = commentRegex.exec(mermaidContent)) !== null) {
+                extracted.push(match[1].trim());
+            }
+            
+            return extracted.length > 0 ? extracted.join('\n') : null;
+        }
+
+        function cleanTextContent(text) {
+            // Create temporary div to parse HTML content
+            const temp = document.createElement('div');
+            temp.innerHTML = text;
+            
+            // Remove script and style elements
+            Array.from(temp.querySelectorAll('script, style')).forEach(el => el.remove());
+            
+            // Get text content and clean up whitespace
+            return temp.textContent
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        // [Previous showError, downloadFile, and other functions remain unchanged...]
+    </script>
+</body>
+</html>

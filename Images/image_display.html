@@ -3,38 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Background</title>
+    <title>Interactive Image Viewer</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            height: 100vh;
-            background-image: url('deepseek_mermaid_20250809_596d87.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
+            overflow: hidden;
+            background-color: #222;
+            touch-action: none;
         }
         
-        .content {
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            max-width: 80%;
-            text-align: center;
+        #viewport {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        #image-container {
+            position: absolute;
+            transform-origin: 0 0;
+        }
+        
+        #image-container img {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="content">
-        <h1>Your Content Here</h1>
-        <p>This page displays "deepseek_mermaid_20250809_596d87.jpg" as its background.</p>
-        <p>Add your text or other HTML elements inside this container.</p>
+    <div id="viewport">
+        <div id="image-container">
+            <img src="deepseek_mermaid_20250809_596d87.jpg" alt="Document">
+        </div>
     </div>
+
+    <script>
+        const container = document.getElementById('image-container');
+        const img = container.querySelector('img');
+        let scale = 1;
+        let posX = 0;
+        let posY = 0;
+        let isDragging = false;
+        let startX, startY;
+        
+        // Center image on load
+        window.addEventListener('load', () => {
+            centerImage();
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            centerImage();
+        });
+        
+        // Mouse/touch events
+        container.addEventListener('mousedown', startDrag);
+        container.addEventListener('touchstart', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+        container.addEventListener('wheel', zoom);
+        
+        function centerImage() {
+            const viewport = document.getElementById('viewport');
+            scale = Math.min(
+                viewport.clientWidth / img.width,
+                viewport.clientHeight / img.height
+            );
+            
+            posX = (viewport.clientWidth - img.width * scale) / 2;
+            posY = (viewport.clientHeight - img.height * scale) / 2;
+            
+            updateTransform();
+        }
+        
+        function startDrag(e) {
+            isDragging = true;
+            startX = e.clientX || e.touches[0].clientX;
+            startY = e.clientY || e.touches[0].clientY;
+        }
+        
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            const x = e.clientX || e.touches[0].clientX;
+            const y = e.clientY || e.touches[0].clientY;
+            
+            posX += x - startX;
+            posY += y - startY;
+            
+            startX = x;
+            startY = y;
+            
+            updateTransform();
+        }
+        
+        function endDrag() {
+            isDragging = false;
+        }
+        
+        function zoom(e) {
+            e.preventDefault();
+            
+            const delta = -Math.sign(e.deltaY);
+            const zoomFactor = 0.1;
+            
+            const mouseX = e.clientX - posX;
+            const mouseY = e.clientY - posY;
+            
+            const prevScale = scale;
+            scale *= (1 + delta * zoomFactor);
+            scale = Math.max(0.1, Math.min(scale, 10));
+            
+            posX -= (mouseX / prevScale) * (scale - prevScale);
+            posY -= (mouseY / prevScale) * (scale - prevScale);
+            
+            updateTransform();
+        }
+        
+        function updateTransform() {
+            container.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+        }
+    </script>
 </body>
 </html>

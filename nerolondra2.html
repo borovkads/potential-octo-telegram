@@ -3,181 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nero di Londra - British-Italian Connections</title>
+    <title>Nero di Londra - British-Italian Connections Flowchart</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
         }
-        .flowchart {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
+        .flowchart-container {
+            position: relative;
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
         }
-        .cell {
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.3s;
+        .flowchart-image {
+            width: 100%;
             border: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .cell:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        .clickable-area {
+            position: absolute;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
         }
-        .british {
-            background-color: #d4e6f1;
-            border-color: #5d8fc2;
+        .clickable-area:hover {
+            border-color: rgba(0, 119, 204, 0.5);
+            background-color: rgba(0, 119, 204, 0.1);
         }
-        .italian {
-            background-color: #f1d4d4;
-            border-color: #c25d5d;
+        .british-area:hover {
+            border-color: rgba(0, 74, 131, 0.5);
+            background-color: rgba(0, 74, 131, 0.1);
         }
-        .action {
-            background-color: #f0f0f0;
-            font-style: italic;
-            text-align: center;
+        .italian-area:hover {
+            border-color: rgba(131, 0, 0, 0.5);
+            background-color: rgba(131, 0, 0, 0.1);
+        }
+        .action-area:hover {
+            border-color: rgba(100, 100, 100, 0.5);
+            background-color: rgba(100, 100, 100, 0.1);
         }
         .modal {
             display: none;
             position: fixed;
-            z-index: 100;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.7);
+            background-color: rgba(0,0,0,0.8);
+            overflow: auto;
         }
         .modal-content {
             background-color: #fff;
             margin: 5% auto;
-            padding: 20px;
-            border-radius: 5px;
-            width: 80%;
-            max-width: 800px;
-            max-height: 80vh;
-            overflow-y: auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 85%;
+            max-width: 900px;
+            max-height: 85vh;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
         }
         .close {
+            position: absolute;
+            right: 25px;
+            top: 15px;
             color: #aaa;
-            float: right;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
         }
+        .close:hover {
+            color: #333;
+        }
+        .wiki-content {
+            height: 70vh;
+            overflow-y: auto;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
         .wiki-form {
             margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .wiki-form h3 {
+            margin-top: 0;
+            color: #555;
         }
         .wiki-form input {
-            width: 70%;
-            padding: 8px;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
         }
         .wiki-form button {
-            padding: 8px 15px;
             background-color: #4CAF50;
             color: white;
+            padding: 10px 15px;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
+        }
+        .wiki-form button:hover {
+            background-color: #45a049;
+        }
+        .coordinates-display {
+            font-size: 12px;
+            color: #777;
+            margin-top: 5px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
         }
     </style>
 </head>
 <body>
     <h1>Nero di Londra - British-Italian Connections</h1>
     
-    <div class="flowchart">
-        <!-- Row 1 -->
-        <div class="cell british" onclick="showInfo('British_Government')">British Government<br>(Geopolitical Interests)</div>
-        <div class="cell action" colspan="2" onclick="showInfo('Strategic_Goal')">Strategic Goal: Pro-British Italy<br>Post-Caporetto (1917)</div>
+    <div class="flowchart-container">
+        <!-- Background image -->
+        <img src="nerolondra.jpg" alt="British-Italian Connections Flowchart" class="flowchart-image" id="flowchartImage">
         
-        <!-- Row 2 -->
-        <div class="cell british" onclick="showInfo('Directorate_of_Military_Intelligence')">British Directorate of Military Intelligence (DMI)</div>
-        <div class="cell action" onclick="showInfo('The_Project')">Covert Plan 'The Project'</div>
-        <div class="cell british" onclick="showInfo('Samuel_Hoare')">Sir Samuel Hoare<br>(DMI Head in Italy)</div>
+        <!-- Clickable areas - coordinates based on OCR from image -->
+        <!-- British Goals -->
+        <div class="clickable-area british-area" style="top: 5%; left: 10%; width: 20%; height: 10%;" onclick="showInfo('British_Goals')"></div>
         
-        <!-- Row 3 -->
-        <div class="cell action" onclick="showInfo('Methods')">Methods:<br>- Covert funding<br>- Propaganda<br>- Paramilitary support</div>
-        <div class="cell action" onclick="showInfo('Funds_Directives')">Funds & Directives</div>
-        <div class="cell british" onclick="showInfo('British_Secret_Service')">British Secret Service</div>
+        <!-- British Government -->
+        <div class="clickable-area british-area" style="top: 15%; left: 10%; width: 20%; height: 10%;" onclick="showInfo('British_Government')"></div>
         
-        <!-- Row 4 -->
-        <div class="cell action" onclick="showInfo('Financial_Support')">Financial Support (1918+)</div>
-        <div class="cell action" onclick="showInfo('Coordinates_via')">Coordinates via</div>
-        <div class="cell italian" onclick="showInfo('Benito_Mussolini')">Benito Mussolini<br>('The Count')</div>
+        <!-- Strategic Goal -->
+        <div class="clickable-area action-area" style="top: 15%; left: 35%; width: 30%; height: 10%;" onclick="showInfo('Strategic_Goal')"></div>
         
-        <!-- Row 5 -->
-        <div class="cell action" onclick="showInfo('Arms_Squads')">Arms Squads & Propaganda</div>
-        <div class="cell action" onclick="showInfo('Funds')">Funds</div>
-        <div class="cell action" onclick="showInfo('Leads')">Leads</div>
-        <div class="cell action" onclick="showInfo('Controls')">Controls</div>
+        <!-- British DMI -->
+        <div class="clickable-area british-area" style="top: 25%; left: 10%; width: 20%; height: 10%;" onclick="showInfo('British_DMI')"></div>
         
-        <!-- Row 6 -->
-        <div class="cell italian" onclick="showInfo('Luigi_Resnati')">Luigi Resnati<br>('The Doctor')<br>(Republican Freemason Liaison)</div>
-        <div class="cell italian" onclick="showInfo('Fasci_Italiani')">Fasci Italiani di Combattimento</div>
-        <div class="cell italian" onclick="showInfo('Mussolini_Newspapers')">Mussolini's Newspapers<br>(e.g., Il Popolo d'Italia)</div>
+        <!-- The Project -->
+        <div class="clickable-area action-area" style="top: 25%; left: 35%; width: 20%; height: 10%;" onclick="showInfo('The_Project')"></div>
         
-        <!-- Row 7 -->
-        <div class="cell action" onclick="showInfo('Mobilizes')">Mobilizes</div>
-        <div class="cell action" onclick="showInfo('Paramilitary_Force')">Paramilitary Force<br>(300+ men)</div>
-        <div class="cell italian" onclick="showInfo('Nationalist_Veterans')">Nationalist Veterans & Extremist Groups</div>
+        <!-- Sir Samuel Hoare -->
+        <div class="clickable-area british-area" style="top: 25%; left: 60%; width: 20%; height: 10%;" onclick="showInfo('Samuel_Hoare')"></div>
+        
+        <!-- Methods -->
+        <div class="clickable-area action-area" style="top: 35%; left: 10%; width: 20%; height: 15%;" onclick="showInfo('Methods')"></div>
+        
+        <!-- Funds & Directives -->
+        <div class="clickable-area action-area" style="top: 35%; left: 35%; width: 20%; height: 10%;" onclick="showInfo('Funds_Directives')"></div>
+        
+        <!-- British Secret Service -->
+        <div class="clickable-area british-area" style="top: 35%; left: 60%; width: 20%; height: 10%;" onclick="showInfo('British_Secret_Service')"></div>
+        
+        <!-- Financial Support -->
+        <div class="clickable-area action-area" style="top: 45%; left: 10%; width: 20%; height: 10%;" onclick="showInfo('Financial_Support')"></div>
+        
+        <!-- Coordinates via -->
+        <div class="clickable-area action-area" style="top: 45%; left: 35%; width: 20%; height: 10%;" onclick="showInfo('Coordinates_via')"></div>
+        
+        <!-- Benito Mussolini -->
+        <div class="clickable-area italian-area" style="top: 45%; left: 60%; width: 20%; height: 10%;" onclick="showInfo('Benito_Mussolini')"></div>
+        
+        <!-- Arms Squads & Propaganda -->
+        <div class="clickable-area action-area" style="top: 55%; left: 10%; width: 20%; height: 10%;" onclick="showInfo('Arms_Squads')"></div>
+        
+        <!-- Funds -->
+        <div class="clickable-area action-area" style="top: 55%; left: 35%; width: 10%; height: 10%;" onclick="showInfo('Funds')"></div>
+        
+        <!-- Leads -->
+        <div class="clickable-area action-area" style="top: 55%; left: 50%; width: 10%; height: 10%;" onclick="showInfo('Leads')"></div>
+        
+        <!-- Controls -->
+        <div class="clickable-area action-area" style="top: 55%; left: 65%; width: 10%; height: 10%;" onclick="showInfo('Controls')"></div>
+        
+        <!-- Luigi Resnati -->
+        <div class="clickable-area italian-area" style="top: 65%; left: 10%; width: 20%; height: 15%;" onclick="showInfo('Luigi_Resnati')"></div>
+        
+        <!-- Fasci Italiani -->
+        <div class="clickable-area italian-area" style="top: 65%; left: 35%; width: 20%; height: 10%;" onclick="showInfo('Fasci_Italiani')"></div>
+        
+        <!-- Mussolini's Newspapers -->
+        <div class="clickable-area italian-area" style="top: 65%; left: 60%; width: 20%; height: 10%;" onclick="showInfo('Mussolini_Newspapers')"></div>
+        
+        <!-- Mobilizes -->
+        <div class="clickable-area action-area" style="top: 75%; left: 10%; width: 20%; height: 10%;" onclick="showInfo('Mobilizes')"></div>
+        
+        <!-- Paramilitary Force -->
+        <div class="clickable-area action-area" style="top: 75%; left: 35%; width: 20%; height: 10%;" onclick="showInfo('Paramilitary_Force')"></div>
+        
+        <!-- Nationalist Veterans -->
+        <div class="clickable-area italian-area" style="top: 75%; left: 60%; width: 20%; height: 10%;" onclick="showInfo('Nationalist_Veterans')"></div>
     </div>
 
+    <!-- Modal Popup -->
     <div id="infoModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
             <h2 id="modalTitle">Title</h2>
-            <div id="modalContent">Loading...</div>
-            <div class="wiki-form" id="wikiForm" style="display:none;">
-                <p>No Wikipedia entry found. Add one:</p>
-                <input type="text" id="wikiLink" placeholder="Enter Wikipedia URL">
-                <button onclick="saveWikiLink()">Save</button>
+            <div class="coordinates-display" id="coordinatesDisplay"></div>
+            <div class="wiki-content" id="wikiContent"></div>
+            <div class="wiki-form" id="wikiForm" style="display: none;">
+                <h3>No Wikipedia entry found</h3>
+                <p>Add a Wikipedia link for this item:</p>
+                <input type="text" id="wikiLink" placeholder="Enter Wikipedia URL or article name (e.g., Benito_Mussolini)">
+                <button onclick="saveWikiLink()">Save Link</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Wikipedia API endpoints for each item
+        // Wikipedia API endpoints for known items
         const wikiLinks = {
             'British_Government': 'British_Empire',
-            'Directorate_of_Military_Intelligence': 'Directorate_of_Military_Intelligence_(United_Kingdom)',
+            'British_DMI': 'Directorate_of_Military_Intelligence_(United_Kingdom)',
             'Samuel_Hoare': 'Samuel_Hoare,_1st_Viscount_Templewood',
             'British_Secret_Service': 'Secret_Intelligence_Service',
             'Benito_Mussolini': 'Benito_Mussolini',
             'Fasci_Italiani': 'Fasci_Italiani_di_Combattimento',
-            'Luigi_Resnati': '', // No known Wikipedia page
             'Mussolini_Newspapers': 'Il_Popolo_d%27Italia',
             'Nationalist_Veterans': 'Italian_nationalism'
         };
 
-        // User-added links
+        // User-added links (loaded from localStorage)
         const userLinks = JSON.parse(localStorage.getItem('wikiLinks')) || {};
 
+        // Current selected item
         let currentItem = '';
+        
+        // Text content for each area (from OCR)
+        const areaTexts = {
+            'British_Goals': 'British Goals:\n- Keep Italy in WWI\n- Counter socialist/anti-war movements\n- Secure Mediterranean interests',
+            'British_Government': 'British Government\n(Geopolitical Interests)',
+            'Strategic_Goal': 'Strategic Goal: Pro-British Italy\nPost-Caporetto (1917)',
+            'British_DMI': 'British Directorate of Military Intelligence (DMI)',
+            'The_Project': "Covert Plan 'The Project'",
+            'Samuel_Hoare': 'Sir Samuel Hoare\n(DMI Head in Italy)',
+            'Methods': 'Methods:\n- Covert funding\n- Propaganda\n- Paramilitary support',
+            'Funds_Directives': 'Funds & Directives',
+            'British_Secret_Service': 'British Secret Service',
+            'Financial_Support': 'Financial Support (1918+)',
+            'Coordinates_via': 'Coordinates via',
+            'Benito_Mussolini': 'Benito Mussolini\n("The Count")',
+            'Arms_Squads': 'Arms Squads & Propaganda',
+            'Funds': 'Funds',
+            'Leads': 'Leads',
+            'Controls': 'Controls',
+            'Luigi_Resnati': 'Luigi Resnati\n("The Doctor")\n(Republican Freemason Liaison)',
+            'Fasci_Italiani': 'Fasci Italiani di Combattimento',
+            'Mussolini_Newspapers': "Mussolini's Newspapers\n(e.g., Il Popolo d'Italia)",
+            'Mobilizes': 'Mobilizes',
+            'Paramilitary_Force': 'Paramilitary Force\n(300+ men)',
+            'Nationalist_Veterans': 'Nationalist Veterans & Extremist Groups'
+        };
 
+        // Show info when clicking an area
         function showInfo(item) {
             currentItem = item;
             const modal = document.getElementById('infoModal');
             const title = document.getElementById('modalTitle');
-            const content = document.getElementById('modalContent');
+            const content = document.getElementById('wikiContent');
             const form = document.getElementById('wikiForm');
+            const coordsDisplay = document.getElementById('coordinatesDisplay');
 
-            // Set title
-            title.textContent = document.querySelector(`[onclick="showInfo('${item}')"]`).textContent.trim();
+            // Set title and coordinates
+            title.textContent = areaTexts[item].split('\n')[0];
+            const area = document.querySelector(`[onclick="showInfo('${item}')"]`);
+            coordsDisplay.textContent = `Position: ${area.style.top}, ${area.style.left} | Size: ${area.style.width}, ${area.style.height}`;
 
-            // Check if we have a Wikipedia link
+            // Check for Wikipedia link
             const wikiSlug = userLinks[item] || wikiLinks[item];
             
             if (wikiSlug) {
-                // Load Wikipedia content
-                content.innerHTML = `<iframe src="https://en.wikipedia.org/wiki/${wikiSlug}" style="width:100%; height:60vh; border:none;"></iframe>`;
+                // Display Wikipedia content in iframe
+                content.innerHTML = `
+                    <p><strong>From the flowchart:</strong> ${areaTexts[item].replace(/\n/g, '<br>')}</p>
+                    <hr>
+                    <iframe src="https://en.wikipedia.org/wiki/${wikiSlug}" 
+                            style="width:100%; height:60vh; border:none; margin-top:10px;"></iframe>
+                `;
                 form.style.display = 'none';
             } else {
-                // Show form to add link
-                content.innerHTML = '<p>No Wikipedia information available for this item.</p>';
+                // Show form to add Wikipedia link
+                content.innerHTML = `
+                    <p><strong>From the flowchart:</strong> ${areaTexts[item].replace(/\n/g, '<br>')}</p>
+                    <p>No Wikipedia information available for this item.</p>
+                `;
                 form.style.display = 'block';
                 document.getElementById('wikiLink').value = '';
             }
@@ -190,19 +308,20 @@
         }
 
         function saveWikiLink() {
-            const link = document.getElementById('wikiLink').value.trim();
-            if (link) {
-                // Extract the Wikipedia slug from URL
-                let slug = '';
-                if (link.includes('wikipedia.org/wiki/')) {
-                    slug = link.split('wiki/')[1];
-                } else {
-                    slug = link;
+            const linkInput = document.getElementById('wikiLink').value.trim();
+            if (linkInput) {
+                // Extract slug from URL or use directly
+                let slug = linkInput;
+                if (linkInput.includes('wikipedia.org/wiki/')) {
+                    slug = linkInput.split('wiki/')[1].split('#')[0];
                 }
                 
+                // Save to user links
                 userLinks[currentItem] = slug;
                 localStorage.setItem('wikiLinks', JSON.stringify(userLinks));
-                showInfo(currentItem); // Refresh
+                
+                // Refresh the modal
+                showInfo(currentItem);
             }
         }
 
@@ -213,6 +332,12 @@
                 closeModal();
             }
         }
+
+        // Adjust clickable areas when image loads
+        document.getElementById('flowchartImage').onload = function() {
+            // This would be more precise with actual image dimensions
+            // For now using percentages works for responsive layout
+        };
     </script>
 </body>
 </html>

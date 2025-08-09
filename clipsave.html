@@ -197,10 +197,6 @@
             try {
                 let extractedText = extractHiddenText(text);
                 
-                if (!extractedText) {
-                    extractedText = text.split('\n').slice(0, 5).join('\n');
-                }
-                
                 document.getElementById('contentDisplay').textContent = 
                     extractedText.split('\n').slice(0, 5).join('\n');
                 document.getElementById('contentDisplay').className = '';
@@ -211,18 +207,23 @@
         }
 
         function extractHiddenText(mermaidCode) {
-    // Find all FULL TEXT content between %% markers
-    const fullTextMatch = mermaidCode.match(/%% FULL TEXT:\n([\s\S]*?)(?=\n%% [^\n]|\n```|$)/);
-    if (fullTextMatch && fullTextMatch[1]) {
-        // Clean up the extracted text
-        return fullTextMatch[1].replace(/^%% /gm, '').trim();
-    }
-    
-    // Fallback to first 5 lines if no FULL TEXT section found
-    return mermaidCode.split('\n').slice(0, 5).join('\n');
-}
+            // Find all FULL TEXT content between %% markers
+            const fullTextMatch = mermaidCode.match(/%% FULL TEXT:\n([\s\S]*?)(?=\n%% [^\n]|\n```|$)/);
+            if (fullTextMatch && fullTextMatch[1]) {
+                // Clean up the extracted text
+                return fullTextMatch[1].replace(/^%% /gm, '').trim();
+            }
             
-            return extracted.length > 0 ? extracted.join('\n') : null;
+            // Fallback: extract all comments if no FULL TEXT section
+            const commentRegex = /%%\s*(.*?)\s*(?=\n|$)/g;
+            let match;
+            let extracted = [];
+            
+            while ((match = commentRegex.exec(mermaidCode)) !== null) {
+                extracted.push(match[1].trim());
+            }
+            
+            return extracted.length > 0 ? extracted.join('\n') : mermaidCode.split('\n').slice(0, 5).join('\n');
         }
 
         function showError(err) {

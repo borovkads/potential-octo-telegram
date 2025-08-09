@@ -2,130 +2,163 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Image Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Image Viewer</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            background-color: #222;
+            box-sizing: border-box;
             touch-action: none;
         }
         
-        #viewport {
+        body {
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #image-container {
             position: absolute;
             width: 100%;
             height: 100%;
             overflow: hidden;
         }
         
-        #image-container {
+        #background-image {
             position: absolute;
             transform-origin: 0 0;
+            will-change: transform;
         }
         
-        #image-container img {
-            display: block;
+        .debug-info {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
-    <div id="viewport">
-        <div id="image-container">
-            <img src="deepseek_mermaid_20250809_596d87.jpg" alt="Document">
-        </div>
+    <div id="image-container">
+        <img id="background-image" src="deepseek_mermaid_20250809_596d87.jpg" alt="Document">
+    </div>
+    
+    <div class="debug-info">
+        Scale: <span id="scale-display">1.00</span> | 
+        Position: <span id="pos-display">0, 0</span>
     </div>
 
     <script>
+        const img = document.getElementById('background-image');
         const container = document.getElementById('image-container');
-        const img = container.querySelector('img');
+        const scaleDisplay = document.getElementById('scale-display');
+        const posDisplay = document.getElementById('pos-display');
+        
         let scale = 1;
         let posX = 0;
         let posY = 0;
-        let isDragging = false;
+        let lastDist = 0;
+        let isZooming = false;
+        let isPanning = false;
         let startX, startY;
         
-        // Center image on load
-        window.addEventListener('load', () => {
-            centerImage();
-        });
-        
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            centerImage();
-        });
-        
-        // Mouse/touch events
-        container.addEventListener('mousedown', startDrag);
-        container.addEventListener('touchstart', startDrag);
-        document.addEventListener('mousemove', drag);
-        document.addEventListener('touchmove', drag);
-        document.addEventListener('mouseup', endDrag);
-        document.addEventListener('touchend', endDrag);
-        container.addEventListener('wheel', zoom);
-        
-        function centerImage() {
-            const viewport = document.getElementById('viewport');
+        // Initialize image position
+        function initImage() {
+            const viewportWidth = container.clientWidth;
+            const viewportHeight = container.clientHeight;
+            
+            // Reset to initial state
             scale = Math.min(
-                viewport.clientWidth / img.width,
-                viewport.clientHeight / img.height
+                viewportWidth / img.naturalWidth,
+                viewportHeight / img.naturalHeight
             );
             
-            posX = (viewport.clientWidth - img.width * scale) / 2;
-            posY = (viewport.clientHeight - img.height * scale) / 2;
+            posX = (viewportWidth - img.naturalWidth * scale) / 2;
+            posY = (viewportHeight - img.naturalHeight * scale) / 2;
             
             updateTransform();
         }
         
-        function startDrag(e) {
-            isDragging = true;
-            startX = e.clientX || e.touches[0].clientX;
-            startY = e.clientY || e.touches[0].clientY;
-        }
-        
-        function drag(e) {
-            if (!isDragging) return;
-            e.preventDefault();
-            
-            const x = e.clientX || e.touches[0].clientX;
-            const y = e.clientY || e.touches[0].clientY;
-            
-            posX += x - startX;
-            posY += y - startY;
-            
-            startX = x;
-            startY = y;
-            
-            updateTransform();
-        }
-        
-        function endDrag() {
-            isDragging = false;
-        }
-        
-        function zoom(e) {
-            e.preventDefault();
-            
-            const delta = -Math.sign(e.deltaY);
-            const zoomFactor = 0.1;
-            
-            const mouseX = e.clientX - posX;
-            const mouseY = e.clientY - posY;
-            
-            const prevScale = scale;
-            scale *= (1 + delta * zoomFactor);
-            scale = Math.max(0.1, Math.min(scale, 10));
-            
-            posX -= (mouseX / prevScale) * (scale - prevScale);
-            posY -= (mouseY / prevScale) * (scale - prevScale);
-            
-            updateTransform();
-        }
-        
+        // Update image transform
         function updateTransform() {
-            container.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+            img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+            scaleDisplay.textContent = scale.toFixed(2);
+            posDisplay.textContent = `${Math.round(posX)}, ${Math.round(posY)}`;
         }
+        
+        // Handle touch events
+        container.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                // Two-finger zoom start
+                isZooming = true;
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                lastDist = Math.hypot(
+                    touch2.clientX - touch1.clientX,
+                    touch2.clientY - touch1.clientY
+                );
+            } else if (e.touches.length === 1) {
+                // One-finger pan start
+                isPanning = true;
+                startX = e.touches[0].clientX - posX;
+                startY = e.touches[0].clientY - posY;
+            }
+            e.preventDefault();
+        });
+        
+        container.addEventListener('touchmove', (e) => {
+            if (isZooming && e.touches.length === 2) {
+                // Handle zooming
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const currentDist = Math.hypot(
+                    touch2.clientX - touch1.clientX,
+                    touch2.clientY - touch1.clientY
+                );
+                
+                if (lastDist > 0) {
+                    const newScale = scale * (currentDist / lastDist);
+                    scale = Math.max(0.5, Math.min(newScale, 5)); // Limit zoom range
+                    updateTransform();
+                }
+                lastDist = currentDist;
+            } else if (isPanning && e.touches.length === 1) {
+                // Handle panning
+                posX = e.touches[0].clientX - startX;
+                posY = e.touches[0].clientY - startY;
+                updateTransform();
+            }
+            e.preventDefault();
+        });
+        
+        container.addEventListener('touchend', (e) => {
+            isZooming = false;
+            isPanning = false;
+            lastDist = 0;
+        });
+        
+        // Handle double-tap to reset
+        container.addEventListener('touchend', (e) => {
+            if (e.touches.length === 0 && e.changedTouches.length === 1) {
+                const touch = e.changedTouches[0];
+                const now = Date.now();
+                if (touch.lastTap && (now - touch.lastTap) < 300) {
+                    initImage(); // Reset on double-tap
+                }
+                touch.lastTap = now;
+            }
+        });
+        
+        // Initialize on load
+        img.onload = initImage;
+        window.addEventListener('resize', initImage);
     </script>
 </body>
 </html>

@@ -2,24 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nero di Londra Flowchart</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: none;
+        }
+        
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
             background-color: #f5f5f5;
         }
+        
+        #flowchart-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            cursor: grab;
+        }
+        
+        #flowchart-wrapper {
+            position: absolute;
+            transform-origin: 0 0;
+            will-change: transform;
+            padding: 20px;
+            min-width: 100%;
+        }
+        
         .flowchart {
             display: flex;
             flex-direction: column;
             align-items: center;
+            transform-origin: 0 0;
+            width: max-content;
+            margin: 0 auto;
         }
+        
         .row {
             display: flex;
             justify-content: center;
             margin: 10px 0;
+            width: max-content;
+            max-width: 100%;
         }
+        
         .cell {
             border: 2px solid #333;
             border-radius: 8px;
@@ -30,20 +63,64 @@
             text-align: center;
             min-width: 200px;
             transition: all 0.3s;
+            flex-shrink: 0;
         }
+        
         .cell:hover {
             background-color: #f0f0f0;
             transform: scale(1.05);
         }
-        .arrow {
-            font-size: 24px;
-            margin: 0 10px;
-            align-self: center;
+        
+        .connection-label {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin: 5px 0;
+            width: 100%;
         }
+        
+        h1 {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            max-width: calc(100% - 20px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            background: white;
+            border: 1px solid #333;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Modal styles remain the same */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 100;
             left: 0;
             top: 0;
             width: 100%;
@@ -51,16 +128,19 @@
             overflow: auto;
             background-color: rgba(0,0,0,0.8);
         }
+        
         .modal-content {
             background-color: #fefefe;
             margin: 5% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%;
+            width: 90%;
+            max-width: 800px;
             height: 80%;
             border-radius: 10px;
             overflow: auto;
         }
+        
         .close {
             color: #aaa;
             float: right;
@@ -68,72 +148,66 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .close:hover {
-            color: black;
-        }
-        #editForm {
-            display: none;
-            margin-top: 20px;
-        }
-        textarea {
-            width: 100%;
-            height: 200px;
-            margin-bottom: 10px;
-        }
-        .connection-label {
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            margin: 5px 0;
-        }
     </style>
 </head>
 <body>
     <h1>Nero di Londra: British-Italian Connections</h1>
     
-    <div class="flowchart">
-        <!-- Row 1 -->
-        <div class="row">
-            <div class="cell" onclick="openModal('British Government')">British Government<br>(Geopolitical Interests)</div>
+    <div id="flowchart-container">
+        <div id="flowchart-wrapper">
+            <div class="flowchart">
+                <!-- Rows remain the same as before -->
+                <!-- Row 1 -->
+                <div class="row">
+                    <div class="cell" onclick="openModal('British Government')">British Government<br>(Geopolitical Interests)</div>
+                </div>
+                
+                <!-- Arrow -->
+                <div class="connection-label">Strategic Goal: Pro-British Italy Post-Caporetto (1917)</div>
+                
+                <!-- Row 2 -->
+                <div class="row">
+                    <div class="cell" onclick="openModal('British Directorate of Military Intelligence')">British Directorate of Military Intelligence (DMI)</div>
+                </div>
+                
+                <!-- Arrow -->
+                <div class="connection-label">Covert Plan 'The Project'</div>
+                
+                <!-- Row 3 -->
+                <div class="row">
+                    <div class="cell" onclick="openModal('Samuel Hoare')">Sir Samuel Hoare<br>(DMI Head in Italy)</div>
+                </div>
+                
+                <!-- Arrow -->
+                <div class="connection-label">Funds & Directives</div>
+                
+                <!-- Row 4 -->
+                <div class="row">
+                    <div class="cell" onclick="openModal('British Secret Service')">British Secret Service</div>
+                </div>
+                
+                <!-- Row 5 -->
+                <div class="row">
+                    <div class="cell" onclick="openModal('Benito Mussolini')">Benito Mussolini<br>('The Count')</div>
+                    <div class="cell" onclick="openModal('Fasci Italiani di Combattimento')">Fasci Italiani di Combattimento</div>
+                    <div class="cell" onclick="openModal('Luigi Resnati')">Luigi Resnati<br>('The Doctor')<br>(Republican Freemason Liaison)</div>
+                </div>
+                
+                <!-- Row 6 -->
+                <div class="row">
+                    <div class="cell" onclick="openModal('Il Popolo dItalia')">Mussolini's Newspapers<br>(e.g., Il Popolo d'Italia)</div>
+                    <div class="connection-label">Paramilitary Force<br>(300+ men)</div>
+                    <div class="cell" onclick="openModal('Nationalist Veterans')">Nationalist Veterans<br>& Extremist Groups</div>
+                </div>
+            </div>
         </div>
-        
-        <!-- Arrow -->
-        <div class="connection-label">Strategic Goal: Pro-British Italy Post-Caporetto (1917)</div>
-        
-        <!-- Row 2 -->
-        <div class="row">
-            <div class="cell" onclick="openModal('British Directorate of Military Intelligence')">British Directorate of Military Intelligence (DMI)</div>
-        </div>
-        
-        <!-- Arrow -->
-        <div class="connection-label">Covert Plan 'The Project'</div>
-        
-        <!-- Row 3 -->
-        <div class="row">
-            <div class="cell" onclick="openModal('Samuel Hoare')">Sir Samuel Hoare<br>(DMI Head in Italy)</div>
-        </div>
-        
-        <!-- Arrow -->
-        <div class="connection-label">Funds & Directives</div>
-        
-        <!-- Row 4 -->
-        <div class="row">
-            <div class="cell" onclick="openModal('British Secret Service')">British Secret Service</div>
-        </div>
-        
-        <!-- Row 5 -->
-        <div class="row">
-            <div class="cell" onclick="openModal('Benito Mussolini')">Benito Mussolini<br>('The Count')</div>
-            <div class="cell" onclick="openModal('Fasci Italiani di Combattimento')">Fasci Italiani di Combattimento</div>
-            <div class="cell" onclick="openModal('Luigi Resnati')">Luigi Resnati<br>('The Doctor')<br>(Republican Freemason Liaison)</div>
-        </div>
-        
-        <!-- Row 6 -->
-        <div class="row">
-            <div class="cell" onclick="openModal('Il Popolo dItalia')">Mussolini's Newspapers<br>(e.g., Il Popolo d'Italia)</div>
-            <div class="connection-label">Paramilitary Force<br>(300+ men)</div>
-            <div class="cell" onclick="openModal('Nationalist Veterans')">Nationalist Veterans<br>& Extremist Groups</div>
-        </div>
+    </div>
+
+    <!-- Control Buttons -->
+    <div class="controls">
+        <button class="control-btn" onclick="zoomIn()">+</button>
+        <button class="control-btn" onclick="zoomOut()">-</button>
+        <button class="control-btn" onclick="resetView()">↻</button>
     </div>
 
     <!-- Modal -->
@@ -149,7 +223,104 @@
     </div>
 
     <script>
-        // Store custom content
+        // Pan and Zoom Variables
+        let scale = 1;
+        let posX = 0;
+        let posY = 0;
+        let isDragging = false;
+        let startX, startY;
+        const wrapper = document.getElementById('flowchart-wrapper');
+        const container = document.getElementById('flowchart-container');
+        
+        // Initialize
+        function initPanZoom() {
+            // Mouse events
+            container.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+            
+            // Touch events
+            container.addEventListener('touchstart', handleTouchStart, { passive: false });
+            container.addEventListener('touchmove', handleTouchMove, { passive: false });
+            container.addEventListener('touchend', endDrag);
+            
+            // Double click to reset
+            container.addEventListener('dblclick', resetView);
+            
+            resetView();
+        }
+        
+        function startDrag(e) {
+            if (e.target.classList.contains('cell')) return;
+            isDragging = true;
+            startX = (e.clientX || e.touches[0].clientX) - posX;
+            startY = (e.clientY || e.touches[0].clientY) - posY;
+            container.style.cursor = 'grabbing';
+            e.preventDefault();
+        }
+        
+        function drag(e) {
+            if (!isDragging) return;
+            const clientX = e.clientX || (e.touches[0] && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches[0] && e.touches[0].clientY);
+            
+            if (clientX && clientY) {
+                posX = clientX - startX;
+                posY = clientY - startY;
+                updateTransform();
+            }
+            e.preventDefault();
+        }
+        
+        function endDrag() {
+            isDragging = false;
+            container.style.cursor = 'grab';
+        }
+        
+        function handleTouchStart(e) {
+            if (e.touches.length === 1 && !e.target.classList.contains('cell')) {
+                startDrag(e.touches[0]);
+            }
+        }
+        
+        function handleTouchMove(e) {
+            if (e.touches.length === 1) {
+                drag(e.touches[0]);
+            }
+        }
+        
+        function zoomIn() {
+            scale *= 1.2;
+            updateTransform();
+        }
+        
+        function zoomOut() {
+            scale /= 1.2;
+            updateTransform();
+        }
+        
+        function resetView() {
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+            const flowchartWidth = document.querySelector('.flowchart').scrollWidth;
+            const flowchartHeight = document.querySelector('.flowchart').scrollHeight;
+            
+            scale = Math.min(
+                containerWidth / flowchartWidth,
+                containerHeight / flowchartHeight
+            ) * 0.9;
+            
+            posX = (containerWidth - flowchartWidth * scale) / 2;
+            posY = (containerHeight - flowchartHeight * scale) / 2;
+            
+            updateTransform();
+        }
+        
+        function updateTransform() {
+            wrapper.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+        }
+        
+        // Original modal functionality
         const contentStorage = JSON.parse(localStorage.getItem('flowchartContent')) || {};
         let currentCell = '';
         
@@ -161,24 +332,21 @@
             
             modal.style.display = 'block';
             
-            // Check if we have custom content
             if (contentStorage[cellName]) {
                 modalContent.innerHTML = marked.parse(contentStorage[cellName]);
                 editForm.style.display = 'none';
-                return;
+            } else {
+                fetchWikipedia(cellName).then(data => {
+                    if (data) {
+                        modalContent.innerHTML = marked.parse(data);
+                        editForm.style.display = 'none';
+                    } else {
+                        modalContent.innerHTML = `<h2>${cellName}</h2><p>No Wikipedia entry found.</p>`;
+                        editForm.style.display = 'block';
+                        document.getElementById('editText').value = `# ${cellName}\n\nEnter information here...`;
+                    }
+                });
             }
-            
-            // Try to fetch from Wikipedia
-            fetchWikipedia(cellName).then(data => {
-                if (data) {
-                    modalContent.innerHTML = marked.parse(data);
-                    editForm.style.display = 'none';
-                } else {
-                    modalContent.innerHTML = `<h2>${cellName}</h2><p>No Wikipedia entry found.</p>`;
-                    editForm.style.display = 'block';
-                    document.getElementById('editText').value = `# ${cellName}\n\nEnter information here...`;
-                }
-            });
         }
         
         function closeModal() {
@@ -195,7 +363,6 @@
         
         async function fetchWikipedia(term) {
             try {
-                // Clean the term for Wikipedia search
                 const cleanTerm = term.replace(/\(.*?\)/g, '').trim();
                 const response = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cleanTerm)}`);
                 
@@ -208,13 +375,18 @@
             }
         }
         
-        // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('myModal');
             if (event.target == modal) {
                 closeModal();
             }
         }
+        
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initPanZoom();
+            resetView();
+        });
     </script>
     
     <!-- Marked.js for Markdown support -->

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clipboard Content Extractor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #222;
+        }
+        #contentDisplay {
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 5px solid #4285f4;
+            font-size: 1.3rem;
+            line-height: 1.8;
+            height: 120px;
+            overflow-y: auto;
+            margin-bottom: 30px;
+        }
+        .error {
+            color: #d32f2f;
+            font-size: 1.2rem;
+        }
+        button {
+            font-size: 1.1rem;
+            padding: 12px 24px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        #textInput {
+            width: 100%;
+            min-height: 150px;
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 1.2rem;
+        }
+        .button-group {
+            margin-bottom: 20px;
+        }
+        #directoryInfo {
+            margin: 15px 0;
+            padding: 12px;
+            background-color: #f0f0f0;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            word-break: break-all;
+        }
+        #saveBtn {
+            background-color: #34a853;
+        }
+        #directoryBtn {
+            background-color: #ea4335;
+        }
+        #stripBtn {
+            background-color: #fbbc05;
+        }
+        .path-segment {
+            color: #4285f4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Clipboard Content Extractor</h1>
+    
+    <div class="button-group">
+        <button id="stripBtn">Strip Text</button>
+        <button id="directoryBtn">Select Directory</button>
+        <button id="saveBtn" disabled>Save File</button>
+    </div>
+    
+    <div id="directoryInfo">No directory selected. Files will be saved to default download location.</div>
+    
+    <div id="contentDisplay">Paste your content below and click "Strip Text"</div>
+    
+    <textarea id="textInput" placeholder="Paste your content here..."></textarea>
+
+    <script>
+        let selectedDirectoryHandle = null;
+        let clipboardContent = '';
+        
+        document.getElementById('stripBtn').addEventListener('click', () => {
+            try {
+                clipboardContent = document.getElementById('textInput').value;
+                if (!clipboardContent.trim()) {
+                    throw new Error('No content to process');
+                }
+                processContent(clipboardContent);
+            } catch (err) {
+                showError(err);
+            }
+        });
+
+        document.getElementById('directoryBtn').addEventListener('click', async () => {
+            try {
+                if (!window.showDirectoryPicker) {
+                    throw new Error('Directory selection not supported');
+                }
+                
+                selectedDirectoryHandle = await window.showDirectoryPicker();
+                const path = await getDirectoryPath(selectedDirectoryHandle);
+                
+                const formattedPath = formatPathFromRedmi(path);
+                document.getElementById('directoryInfo').innerHTML = formattedPath;
+                document.getElementById('saveBtn').disabled = false;
+                
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    document.getElementById('directoryInfo').textContent = 
+                        `Error: ${err.message}. Using default download location.`;
+                }
+            }
+        });
+
+        async function getDirectoryPath(directoryHandle) {
+            const parts = [directoryHandle.name];
+            let currentHandle = directoryHandle;
+            
+            try {
+                while (currentHandle && currentHandle.parent) {
+                    currentHandle = await currentHandle.parent;
+                    if (currentHandle.name) {
+                        parts.unshift(currentHandle.name);
+                    }
+                }
+            } catch (e) {
+                console.log("Couldn't get full path hierarchy");
+            }
+            
+            return parts.join('/');
+        }
+
+        function formatPathFromRedmi(fullPath) {
+            const redmiIndex = fullPath.toLowerCase().indexOf('redmi note 10 pro');
+            
+            if (redmiIndex >= 0) {
+                const relevantPath = fullPath.substring(redmiIndex);
+                const segments = relevantPath.split('/');
+                
+                return segments.map((segment, index) => {
+                    if (index === 0) {
+                        return `<span class="path-segment">${segment}</span>`;
+                    }
+                    return segment;
+                }).join(' / ');
+            }
+            
+            return fullPath;
+        }
+
+        document.getElementById('saveBtn').addEventListener('click', async () => {
+            try {
+                if (!clipboardContent) {
+                    throw new Error('No content to save');
+                }
+                
+                if (selectedDirectoryHandle) {
+                    const fileHandle = await selectedDirectoryHandle.getFileHandle('cliptemp.txt', { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(clipboardContent);
+                    await writable.close();
+                    alert('File saved successfully!');
+                } else {
+                    downloadFile(clipboardContent);
+                }
+                
+            } catch (err) {
+                alert(`Error saving file: ${err.message}`);
+            }
+        });
+
+        function processContent(text) {
+            try {
+                let extractedText = extractHiddenText(text);
+                
+                document.getElementById('contentDisplay').textContent = 
+                    extractedText.split('\n').slice(0, 5).join('\n');
+                document.getElementById('contentDisplay').className = '';
+                document.getElementById('saveBtn').disabled = false;
+                
+            } catch (err) {
+                showError(err);
+            }
+        }
+
+        function extractHiddenText(mermaidCode) {
+            // 1. Find FULL TEXT section (more flexible matching)
+            const fullTextMatch = mermaidCode.match(/%% FULL TEXT:\s*\n([\s\S]*?)(?=\s*%% [^\n]|\s*```|$)/);
+            if (fullTextMatch) {
+                return fullTextMatch[1]
+                    .replace(/^%%\s?/gm, '')  // Remove comment markers
+                    .replace(/^\s+|\s+$/g, ''); // Trim whitespace
+            }
+
+            // 2. Fallback to all comments
+            const comments = mermaidCode.match(/%%\s*(.+?)\s*(?=\n|$)/g);
+            if (comments) {
+                return comments.map(c => c.replace(/^%%\s*/, '')).join('\n');
+            }
+
+            // 3. Final fallback: first 10 non-empty lines
+            return mermaidCode.split('\n')
+                .filter(line => line.trim().length > 0)
+                .slice(0, 10)
+                .join('\n');
+        }
+
+        function showError(err) {
+            const display = document.getElementById('contentDisplay');
+            display.className = 'error';
+            display.textContent = `Error: ${err.message}`;
+        }
+
+        function downloadFile(content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cliptemp.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

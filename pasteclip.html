@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mermaid Text Extractor</title>
+    <title>Mermaid Hidden Text Extractor</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -129,9 +129,6 @@
                 
                 extractedContent = extractHiddenContent(inputText);
                 
-                // DEBUG: Log the extracted content
-                console.log('Extracted content:', extractedContent);
-                
                 // Update output display
                 const outputElement = document.getElementById('outputText');
                 outputElement.textContent = extractedContent || "No text content found";
@@ -168,32 +165,32 @@
         });
 
         function extractHiddenContent(mermaidCode) {
-            // Try to extract FULL TEXT section first
-            const fullTextMatch = mermaidCode.match(/%% FULL TEXT:\s*\n([\s\S]*?)(?=\s*%%|\s*```|$)/);
-            if (fullTextMatch) {
-                const fullText = fullTextMatch[1]
-                    .replace(/^%%\s?/gm, '')  // Remove comment markers
-                    .replace(/^\s+|\s+$/g, ''); // Trim whitespace
-                
-                console.log('Found FULL TEXT section:', fullText);
-                return fullText;
-            }
-
-            // If no FULL TEXT section, extract all comments
-            const comments = mermaidCode.match(/%%\s*(.+?)\s*(?=\n|$)/gm);
-            if (comments && comments.length > 0) {
-                const allComments = comments.map(c => c.replace(/^%%\s*/, '')).join('\n');
-                console.log('Extracted comments:', allComments);
-                return allComments;
-            }
-
-            // If no comments found, return the first 30 non-empty lines
-            const lines = mermaidCode.split('\n')
-                .filter(line => line.trim().length > 0);
+            // More robust FULL TEXT section extraction
+            const fullTextSections = mermaidCode.split(/%% FULL TEXT:\s*\n/);
             
-            const fallbackContent = lines.slice(0, 30).join('\n');
-            console.log('Using fallback content:', fallbackContent);
-            return fallbackContent;
+            if (fullTextSections.length > 1) {
+                // Take everything after the first FULL TEXT marker
+                let fullText = fullTextSections[1];
+                
+                // Remove any trailing %% or ``` markers
+                fullText = fullText.split(/\s*(?:%%|```)/)[0];
+                
+                // Clean up comment markers and whitespace
+                return fullText.replace(/^%%\s?/gm, '')
+                              .replace(/^\s+|\s+$/g, '');
+            }
+
+            // Fallback to extracting all non-FULL-TEXT comments
+            const comments = mermaidCode.match(/^%%\s+(?!FULL TEXT:)(.+)$/gm);
+            if (comments) {
+                return comments.map(c => c.replace(/^%%\s*/, '')).join('\n');
+            }
+
+            // Final fallback
+            return mermaidCode.split('\n')
+                .filter(line => line.trim().length > 0 && !line.startsWith('%%'))
+                .slice(0, 30)
+                .join('\n');
         }
 
         function showStatus(message, type) {

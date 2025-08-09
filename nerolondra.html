@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nero di Londra Flowchart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .flowchart {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .cell {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #ddd;
+        }
+        .cell:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .british {
+            background-color: #e6f2ff;
+            border-color: #b3d7ff;
+        }
+        .italian {
+            background-color: #ffe6e6;
+            border-color: #ffb3b3;
+        }
+        .action {
+            background-color: #f0fff0;
+            border-color: #b3ffb3;
+            font-style: italic;
+        }
+        .note {
+            background-color: #fff2e6;
+            border-color: #ffd9b3;
+            font-size: 0.9em;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow: auto;
+        }
+        .popup-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+        }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+        .wiki-input {
+            margin-top: 20px;
+        }
+        .wiki-input input {
+            width: 70%;
+            padding: 8px;
+        }
+        .wiki-input button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nero di Londra: British-Italian Relations Flowchart</h1>
+    
+    <div class="flowchart">
+        <!-- British Section -->
+        <div class="cell british" data-title="British Government (Geopolitical Interests)" data-wiki="British_Government">
+            British Government<br>(Geopolitical Interests)
+        </div>
+        
+        <div class="cell action" data-title="Strategic Goal: Pro-British Italy Post-Caporetto (1917)" data-wiki="Battle_of_Caporetto">
+            Strategic Goal: Pro-British Italy<br>Post-Caporetto (1917)
+        </div>
+        
+        <div class="cell british" data-title="British Directorate of Military Intelligence (DMI)" data-wiki="Directorate_of_Military_Intelligence_(United_Kingdom)">
+            British Directorate of Military Intelligence (DMI)
+        </div>
+        
+        <div class="cell action" data-title="Covert Plan 'The Project'">
+            Covert Plan 'The Project'
+        </div>
+        
+        <div class="cell british" data-title="Sir Samuel Hoare (DMI Head in Italy)" data-wiki="Samuel_Hoare,_1st_Viscount_Templewood">
+            Sir Samuel Hoare<br>(DMI Head in Italy)
+        </div>
+        
+        <div class="cell note" data-title="British Goals">
+            British Goals:<br>
+            - Keep Italy in WWI<br>
+            - Counter socialist/anti-war movements<br>
+            - Secure Mediterranean interests
+        </div>
+        
+        <div class="cell action" data-title="Funds & Directives">
+            Funds & Directives
+        </div>
+        
+        <div class="cell british" data-title="British Secret Service" data-wiki="Secret_Intelligence_Service">
+            British Secret Service
+        </div>
+        
+        <div class="cell note" data-title="Methods">
+            Methods:<br>
+            - Covert funding<br>
+            - Propaganda<br>
+            - Paramilitary support
+        </div>
+        
+        <!-- Italian Section -->
+        <div class="cell action" data-title="Financial Support (1918+)">
+            Financial Support (1918+)
+        </div>
+        
+        <div class="cell italian" data-title="Benito Mussolini ('The Count')" data-wiki="Benito_Mussolini">
+            Benito Mussolini<br>('The Count')
+        </div>
+        
+        <div class="cell action" data-title="Arms Squads & Propaganda">
+            Arms Squads & Propaganda
+        </div>
+        
+        <div class="cell action" data-title="Coordinates via">
+            Coordinates via
+        </div>
+        
+        <div class="cell italian" data-title="Luigi Resnati ('The Doctor') (Republican Freemason Liaison)">
+            Luigi Resnati<br>('The Doctor')<br>(Republican Freemason Liaison)
+        </div>
+        
+        <div class="cell italian" data-title="Fasci Italiani di Combattimento" data-wiki="Fasci_Italiani_di_Combattimento">
+            Fasci Italiani di Combattimento
+        </div>
+        
+        <div class="cell action" data-title="Leads">
+            Leads
+        </div>
+        
+        <div class="cell action" data-title="Controls">
+            Controls
+        </div>
+        
+        <div class="cell italian" data-title="Mussolini's Newspapers (e.g., Il Popolo d'Italia)" data-wiki="Il_Popolo_d%27Italia">
+            Mussolini's Newspapers<br>(e.g., Il Popolo d'Italia)
+        </div>
+        
+        <div class="cell action" data-title="Mobilizes">
+            Mobilizes
+        </div>
+        
+        <div class="cell action" data-title="Paramilitary Force (300+ men)">
+            Paramilitary Force<br>(300+ men)
+        </div>
+        
+        <div class="cell italian" data-title="Nationalist Veterans & Extremist Groups" data-wiki="Italian_nationalism">
+            Nationalist Veterans & Extremist Groups
+        </div>
+        
+        <div class="cell action" data-title="Funds">
+            Funds
+        </div>
+    </div>
+    
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="popup-title"></h2>
+            <div id="wiki-content"></div>
+            <div class="wiki-input" id="wiki-input" style="display: none;">
+                <p>No Wikipedia entry found. Please enter a Wikipedia URL:</p>
+                <input type="text" id="wiki-url" placeholder="https://en.wikipedia.org/wiki/...">
+                <button id="save-wiki">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Store wiki links in localStorage
+        const wikiLinks = JSON.parse(localStorage.getItem('wikiLinks')) || {};
+        
+        // Get all cells
+        const cells = document.querySelectorAll('.cell');
+        const popup = document.getElementById('popup');
+        const popupTitle = document.getElementById('popup-title');
+        const wikiContent = document.getElementById('wiki-content');
+        const wikiInput = document.getElementById('wiki-input');
+        const wikiUrl = document.getElementById('wiki-url');
+        const saveBtn = document.getElementById('save-wiki');
+        const closeBtn = document.querySelector('.close-btn');
+        
+        let currentCell = null;
+        
+        // Handle cell clicks
+        cells.forEach(cell => {
+            cell.addEventListener('click', function() {
+                currentCell = this;
+                const title = this.getAttribute('data-title');
+                const defaultWiki = this.getAttribute('data-wiki');
+                const storedWiki = wikiLinks[title];
+                
+                popupTitle.textContent = title;
+                popup.style.display = 'block';
+                
+                // Check if we have a stored wiki link or a default one
+                const wikiPage = storedWiki || defaultWiki;
+                
+                if (wikiPage) {
+                    wikiContent.innerHTML = `<iframe src="https://en.wikipedia.org/wiki/${wikiPage}"></iframe>`;
+                    wikiInput.style.display = 'none';
+                } else {
+                    wikiContent.innerHTML = '<p>No Wikipedia information available.</p>';
+                    wikiInput.style.display = 'block';
+                    wikiUrl.value = '';
+                }
+            });
+        });
+        
+        // Save wiki link
+        saveBtn.addEventListener('click', function() {
+            const url = wikiUrl.value.trim();
+            if (url) {
+                // Extract page name from URL
+                let pageName = '';
+                if (url.includes('wikipedia.org/wiki/')) {
+                    pageName = url.split('wiki/')[1];
+                } else {
+                    pageName = url; // Assume it's just the page name
+                }
+                
+                // Store in localStorage
+                const title = currentCell.getAttribute('data-title');
+                wikiLinks[title] = pageName;
+                localStorage.setItem('wikiLinks', JSON.stringify(wikiLinks));
+                
+                // Reload the content
+                wikiContent.innerHTML = `<iframe src="https://en.wikipedia.org/wiki/${pageName}"></iframe>`;
+                wikiInput.style.display = 'none';
+            }
+        });
+        
+        // Close popup
+        closeBtn.addEventListener('click', function() {
+            popup.style.display = 'none';
+        });
+        
+        // Close when clicking outside content
+        window.addEventListener('click', function(event) {
+            if (event.target === popup) {
+                popup.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

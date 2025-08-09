@@ -211,15 +211,16 @@
         }
 
         function extractHiddenText(mermaidCode) {
-            const commentRegex = /%%\s*([^FULL TEXT:].*?)\s*(?=\n|$)/g;
-            let match;
-            let extracted = [];
-            
-            while ((match = commentRegex.exec(mermaidCode)) !== null) {
-                if (!match[1].includes("FULL TEXT:")) {
-                    extracted.push(match[1].trim());
-                }
-            }
+    // Find all FULL TEXT content between %% markers
+    const fullTextMatch = mermaidCode.match(/%% FULL TEXT:\n([\s\S]*?)(?=\n%% [^\n]|\n```|$)/);
+    if (fullTextMatch && fullTextMatch[1]) {
+        // Clean up the extracted text
+        return fullTextMatch[1].replace(/^%% /gm, '').trim();
+    }
+    
+    // Fallback to first 5 lines if no FULL TEXT section found
+    return mermaidCode.split('\n').slice(0, 5).join('\n');
+}
             
             return extracted.length > 0 ? extracted.join('\n') : null;
         }

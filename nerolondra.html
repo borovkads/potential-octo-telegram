@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nero di Londra Flowchart</title>
+    <title>Nero di Londra - British-Italian Relations Flowchart</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,277 +12,310 @@
         }
         .flowchart {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(5, 1fr);
+            grid-gap: 15px;
             max-width: 1200px;
             margin: 0 auto;
         }
-        .cell {
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .node {
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #e1f5fe;
+            border: 2px solid #0288d1;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid #ddd;
+            transition: all 0.3s;
+            text-align: center;
         }
-        .cell:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        .node:hover {
+            background-color: #b3e5fc;
+            transform: scale(1.02);
         }
         .british {
-            background-color: #e6f2ff;
-            border-color: #b3d7ff;
+            background-color: #e1f5fe;
+            border-color: #0288d1;
         }
         .italian {
-            background-color: #ffe6e6;
-            border-color: #ffb3b3;
+            background-color: #e8f5e9;
+            border-color: #388e3c;
         }
         .action {
-            background-color: #f0fff0;
-            border-color: #b3ffb3;
+            background-color: #fff3e0;
+            border-color: #fb8c00;
             font-style: italic;
         }
         .note {
-            background-color: #fff2e6;
-            border-color: #ffd9b3;
+            background-color: #f3e5f5;
+            border-color: #8e24aa;
             font-size: 0.9em;
         }
-        .popup {
+        .modal {
             display: none;
             position: fixed;
-            top: 0;
+            z-index: 1;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            z-index: 1000;
             overflow: auto;
+            background-color: rgba(0,0,0,0.4);
         }
-        .popup-content {
-            background-color: white;
-            margin: 5% auto;
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
             padding: 20px;
+            border: 1px solid #888;
             width: 80%;
             max-width: 800px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-radius: 5px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
         }
-        .close-btn {
+        .close {
+            color: #aaa;
             float: right;
             font-size: 28px;
+            font-weight: bold;
             cursor: pointer;
         }
-        iframe {
-            width: 100%;
-            height: 500px;
-            border: none;
+        .close:hover {
+            color: black;
         }
-        .wiki-input {
+        #wikiContent {
             margin-top: 20px;
         }
-        .wiki-input input {
+        .link-input {
+            margin-top: 20px;
+        }
+        .link-input input {
             width: 70%;
             padding: 8px;
         }
-        .wiki-input button {
+        .link-input button {
             padding: 8px 15px;
             background-color: #4CAF50;
             color: white;
             border: none;
             cursor: pointer;
         }
+        h2 {
+            color: #0288d1;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>Nero di Londra: British-Italian Relations Flowchart</h1>
+    <h1>Nero di Londra - British-Italian Relations Flowchart</h1>
     
     <div class="flowchart">
-        <!-- British Section -->
-        <div class="cell british" data-title="British Government (Geopolitical Interests)" data-wiki="British_Government">
+        <!-- Row 1 -->
+        <div class="node note" onclick="openModal('British Goals')">
+            British Goals:<br>- Keep Italy in WWI<br>- Counter socialist/anti-war movements<br>- Secure Mediterranean interests
+        </div>
+        <div style="grid-column: span 4;"></div>
+        
+        <!-- Row 2 -->
+        <div class="node british" onclick="openModal('British Government')">
             British Government<br>(Geopolitical Interests)
         </div>
+        <div style="grid-column: span 4;"></div>
         
-        <div class="cell action" data-title="Strategic Goal: Pro-British Italy Post-Caporetto (1917)" data-wiki="Battle_of_Caporetto">
+        <!-- Row 3 -->
+        <div class="node action" onclick="openModal('Strategic Goal')">
             Strategic Goal: Pro-British Italy<br>Post-Caporetto (1917)
         </div>
+        <div style="grid-column: span 4;"></div>
         
-        <div class="cell british" data-title="British Directorate of Military Intelligence (DMI)" data-wiki="Directorate_of_Military_Intelligence_(United_Kingdom)">
+        <!-- Row 4 -->
+        <div class="node british" onclick="openModal('British Directorate of Military Intelligence')">
             British Directorate of Military Intelligence (DMI)
         </div>
+        <div style="grid-column: span 4;"></div>
         
-        <div class="cell action" data-title="Covert Plan 'The Project'">
+        <!-- Row 5 -->
+        <div class="node action" onclick="openModal('The Project')">
             Covert Plan 'The Project'
         </div>
+        <div style="grid-column: span 4;"></div>
         
-        <div class="cell british" data-title="Sir Samuel Hoare (DMI Head in Italy)" data-wiki="Samuel_Hoare,_1st_Viscount_Templewood">
+        <!-- Row 6 -->
+        <div class="node british" onclick="openModal('Sir Samuel Hoare')">
             Sir Samuel Hoare<br>(DMI Head in Italy)
         </div>
+        <div style="grid-column: span 4;"></div>
         
-        <div class="cell note" data-title="British Goals">
-            British Goals:<br>
-            - Keep Italy in WWI<br>
-            - Counter socialist/anti-war movements<br>
-            - Secure Mediterranean interests
+        <!-- Row 7 -->
+        <div class="node note" onclick="openModal('Methods')">
+            Methods:<br>- Covert funding<br>- Propaganda<br>- Paramilitary support
         </div>
+        <div style="grid-column: span 4;"></div>
         
-        <div class="cell action" data-title="Funds & Directives">
+        <!-- Row 8 -->
+        <div class="node action" onclick="openModal('Funds & Directives')">
             Funds & Directives
         </div>
+        <div style="grid-column: span 4;"></div>
         
-        <div class="cell british" data-title="British Secret Service" data-wiki="Secret_Intelligence_Service">
+        <!-- Row 9 -->
+        <div class="node british" onclick="openModal('British Secret Service')">
             British Secret Service
         </div>
+        <div style="grid-column: span 4;"></div>
         
-        <div class="cell note" data-title="Methods">
-            Methods:<br>
-            - Covert funding<br>
-            - Propaganda<br>
-            - Paramilitary support
-        </div>
-        
-        <!-- Italian Section -->
-        <div class="cell action" data-title="Financial Support (1918+)">
+        <!-- Row 10 -->
+        <div class="node action" onclick="openModal('Financial Support')">
             Financial Support (1918+)
         </div>
-        
-        <div class="cell italian" data-title="Benito Mussolini ('The Count')" data-wiki="Benito_Mussolini">
-            Benito Mussolini<br>('The Count')
-        </div>
-        
-        <div class="cell action" data-title="Arms Squads & Propaganda">
-            Arms Squads & Propaganda
-        </div>
-        
-        <div class="cell action" data-title="Coordinates via">
+        <div class="node action" onclick="openModal('Coordinates via')">
             Coordinates via
         </div>
+        <div style="grid-column: span 3;"></div>
         
-        <div class="cell italian" data-title="Luigi Resnati ('The Doctor') (Republican Freemason Liaison)">
+        <!-- Row 11 -->
+        <div class="node italian" onclick="openModal('Benito Mussolini')">
+            Benito Mussolini<br>('The Count')
+        </div>
+        <div class="node italian" onclick="openModal('Luigi Resnati')">
             Luigi Resnati<br>('The Doctor')<br>(Republican Freemason Liaison)
         </div>
+        <div style="grid-column: span 3;"></div>
         
-        <div class="cell italian" data-title="Fasci Italiani di Combattimento" data-wiki="Fasci_Italiani_di_Combattimento">
-            Fasci Italiani di Combattimento
+        <!-- Row 12 -->
+        <div class="node action" onclick="openModal('Arms Squads & Propaganda')">
+            Arms Squads & Propaganda
         </div>
-        
-        <div class="cell action" data-title="Leads">
+        <div class="node action" onclick="openModal('Funds')">
+            Funds
+        </div>
+        <div class="node action" onclick="openModal('Leads')">
             Leads
         </div>
-        
-        <div class="cell action" data-title="Controls">
+        <div class="node action" onclick="openModal('Controls')">
             Controls
         </div>
-        
-        <div class="cell italian" data-title="Mussolini's Newspapers (e.g., Il Popolo d'Italia)" data-wiki="Il_Popolo_d%27Italia">
-            Mussolini's Newspapers<br>(e.g., Il Popolo d'Italia)
-        </div>
-        
-        <div class="cell action" data-title="Mobilizes">
+        <div class="node action" onclick="openModal('Mobilizes')">
             Mobilizes
         </div>
         
-        <div class="cell action" data-title="Paramilitary Force (300+ men)">
+        <!-- Row 13 -->
+        <div class="node italian" onclick="openModal('Fasci Italiani di Combattimento')">
+            Fasci Italiani di Combattimento
+        </div>
+        <div class="node italian" onclick="openModal('Mussolinis Newspapers')">
+            Mussolini's Newspapers<br>(e.g., Il Popolo d'Italia)
+        </div>
+        <div style="grid-column: span 3;"></div>
+        
+        <!-- Row 14 -->
+        <div class="node action" onclick="openModal('Paramilitary Force')">
             Paramilitary Force<br>(300+ men)
         </div>
+        <div style="grid-column: span 4;"></div>
         
-        <div class="cell italian" data-title="Nationalist Veterans & Extremist Groups" data-wiki="Italian_nationalism">
+        <!-- Row 15 -->
+        <div class="node italian" onclick="openModal('Nationalist Veterans & Extremist Groups')">
             Nationalist Veterans & Extremist Groups
         </div>
-        
-        <div class="cell action" data-title="Funds">
-            Funds
-        </div>
+        <div style="grid-column: span 4;"></div>
     </div>
-    
-    <div id="popup" class="popup">
-        <div class="popup-content">
-            <span class="close-btn">&times;</span>
-            <h2 id="popup-title"></h2>
-            <div id="wiki-content"></div>
-            <div class="wiki-input" id="wiki-input" style="display: none;">
-                <p>No Wikipedia entry found. Please enter a Wikipedia URL:</p>
-                <input type="text" id="wiki-url" placeholder="https://en.wikipedia.org/wiki/...">
-                <button id="save-wiki">Save</button>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Modal Title</h2>
+            <div id="wikiContent"></div>
+            <div class="link-input" id="linkInputContainer" style="display: none;">
+                <p>No Wikipedia entry found. Please provide a link:</p>
+                <input type="text" id="wikiLinkInput" placeholder="Enter Wikipedia URL">
+                <button onclick="saveWikiLink()">Save</button>
             </div>
         </div>
     </div>
-    
+
     <script>
-        // Store wiki links in localStorage
-        const wikiLinks = JSON.parse(localStorage.getItem('wikiLinks')) || {};
+        // Wikipedia API endpoints for different entities
+        const wikiEndpoints = {
+            'British Government': 'British_Government',
+            'British Directorate of Military Intelligence': 'Directorate_of_Military_Intelligence',
+            'Sir Samuel Hoare': 'Samuel_Hoare,_1st_Viscount_Templewood',
+            'British Secret Service': 'Secret_Intelligence_Service',
+            'Benito Mussolini': 'Benito_Mussolini',
+            'Luigi Resnati': '', // No known Wikipedia page
+            'Fasci Italiani di Combattimento': 'Fasci_Italiani_di_Combattimento',
+            'Nationalist Veterans & Extremist Groups': 'Italian_nationalism',
+            'Mussolinis Newspapers': 'Il_Popolo_d%27Italia'
+        };
+
+        let currentCell = '';
+        const modal = document.getElementById('myModal');
+        const span = document.getElementsByClassName('close')[0];
         
-        // Get all cells
-        const cells = document.querySelectorAll('.cell');
-        const popup = document.getElementById('popup');
-        const popupTitle = document.getElementById('popup-title');
-        const wikiContent = document.getElementById('wiki-content');
-        const wikiInput = document.getElementById('wiki-input');
-        const wikiUrl = document.getElementById('wiki-url');
-        const saveBtn = document.getElementById('save-wiki');
-        const closeBtn = document.querySelector('.close-btn');
-        
-        let currentCell = null;
-        
-        // Handle cell clicks
-        cells.forEach(cell => {
-            cell.addEventListener('click', function() {
-                currentCell = this;
-                const title = this.getAttribute('data-title');
-                const defaultWiki = this.getAttribute('data-wiki');
-                const storedWiki = wikiLinks[title];
-                
-                popupTitle.textContent = title;
-                popup.style.display = 'block';
-                
-                // Check if we have a stored wiki link or a default one
-                const wikiPage = storedWiki || defaultWiki;
-                
-                if (wikiPage) {
-                    wikiContent.innerHTML = `<iframe src="https://en.wikipedia.org/wiki/${wikiPage}"></iframe>`;
-                    wikiInput.style.display = 'none';
-                } else {
-                    wikiContent.innerHTML = '<p>No Wikipedia information available.</p>';
-                    wikiInput.style.display = 'block';
-                    wikiUrl.value = '';
-                }
-            });
-        });
-        
-        // Save wiki link
-        saveBtn.addEventListener('click', function() {
-            const url = wikiUrl.value.trim();
-            if (url) {
-                // Extract page name from URL
-                let pageName = '';
-                if (url.includes('wikipedia.org/wiki/')) {
-                    pageName = url.split('wiki/')[1];
-                } else {
-                    pageName = url; // Assume it's just the page name
-                }
-                
-                // Store in localStorage
-                const title = currentCell.getAttribute('data-title');
-                wikiLinks[title] = pageName;
-                localStorage.setItem('wikiLinks', JSON.stringify(wikiLinks));
-                
-                // Reload the content
-                wikiContent.innerHTML = `<iframe src="https://en.wikipedia.org/wiki/${pageName}"></iframe>`;
-                wikiInput.style.display = 'none';
+        function openModal(cellName) {
+            currentCell = cellName;
+            document.getElementById('modalTitle').textContent = cellName;
+            
+            // Check if we have a Wikipedia endpoint for this cell
+            if (wikiEndpoints[cellName]) {
+                fetchWikipediaContent(cellName);
+                document.getElementById('linkInputContainer').style.display = 'none';
+            } else {
+                document.getElementById('wikiContent').innerHTML = '<p>No Wikipedia information available for this item.</p>';
+                document.getElementById('linkInputContainer').style.display = 'block';
+                document.getElementById('wikiLinkInput').value = '';
             }
-        });
-        
-        // Close popup
-        closeBtn.addEventListener('click', function() {
-            popup.style.display = 'none';
-        });
-        
-        // Close when clicking outside content
-        window.addEventListener('click', function(event) {
-            if (event.target === popup) {
-                popup.style.display = 'none';
+            
+            modal.style.display = 'block';
+        }
+
+        function fetchWikipediaContent(cellName) {
+            const endpoint = wikiEndpoints[cellName];
+            const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${endpoint}`;
+            
+            document.getElementById('wikiContent').innerHTML = '<p>Loading Wikipedia content...</p>';
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    let content = '';
+                    if (data.extract) {
+                        content = `<p>${data.extract}</p>`;
+                        if (data.thumbnail) {
+                            content += `<img src="${data.thumbnail.source}" width="200" style="float: right; margin-left: 15px;">`;
+                        }
+                        content += `<p><a href="https://en.wikipedia.org/wiki/${endpoint}" target="_blank">Read more on Wikipedia</a></p>`;
+                    } else {
+                        content = '<p>No Wikipedia information available for this item.</p>';
+                    }
+                    document.getElementById('wikiContent').innerHTML = content;
+                })
+                .catch(error => {
+                    document.getElementById('wikiContent').innerHTML = '<p>Error loading Wikipedia content.</p>';
+                    document.getElementById('linkInputContainer').style.display = 'block';
+                });
+        }
+
+        function saveWikiLink() {
+            const link = document.getElementById('wikiLinkInput').value;
+            if (link) {
+                // Extract the Wikipedia page title from the URL
+                const match = link.match(/wikipedia\.org\/wiki\/([^?#]+)/);
+                if (match && match[1]) {
+                    wikiEndpoints[currentCell] = match[1];
+                    fetchWikipediaContent(currentCell);
+                } else {
+                    alert('Please enter a valid Wikipedia URL');
+                }
             }
-        });
+        }
+
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
     </script>
 </body>
 </html>

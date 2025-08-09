@@ -26,7 +26,7 @@
             border-left: 5px solid #4285f4;
             font-size: 1.3rem;
             line-height: 1.8;
-            height: 120px;
+            min-height: 120px;
             overflow-y: auto;
             margin-bottom: 30px;
         }
@@ -51,6 +51,7 @@
             margin-top: 20px;
             padding: 15px;
             font-size: 1.2rem;
+            font-family: monospace;
         }
         .button-group {
             margin-bottom: 20px;
@@ -190,19 +191,16 @@
         function processContent(text) {
             try {
                 let extractedText = extractHiddenText(text);
-                
-                document.getElementById('contentDisplay').textContent = 
-                    extractedText.split('\n').slice(0, 5).join('\n');
+                document.getElementById('contentDisplay').textContent = extractedText;
                 document.getElementById('contentDisplay').className = '';
                 document.getElementById('saveBtn').disabled = false;
-                
             } catch (err) {
                 showError(err);
             }
         }
 
         function extractHiddenText(mermaidCode) {
-            // 1. Find FULL TEXT section (more flexible matching)
+            // 1. Find FULL TEXT section
             const fullTextMatch = mermaidCode.match(/%% FULL TEXT:\s*\n([\s\S]*?)(?=\s*%% [^\n]|\s*```|$)/);
             if (fullTextMatch) {
                 return fullTextMatch[1]
@@ -210,17 +208,19 @@
                     .replace(/^\s+|\s+$/g, ''); // Trim whitespace
             }
 
-            // 2. Fallback to all comments
+            // 2. If no %% markers found, return the whole text
+            if (!mermaidCode.includes('%%')) {
+                return mermaidCode;
+            }
+
+            // 3. Fallback to all comments
             const comments = mermaidCode.match(/%%\s*(.+?)\s*(?=\n|$)/g);
             if (comments) {
                 return comments.map(c => c.replace(/^%%\s*/, '')).join('\n');
             }
 
-            // 3. Final fallback: first 10 non-empty lines
-            return mermaidCode.split('\n')
-                .filter(line => line.trim().length > 0)
-                .slice(0, 10)
-                .join('\n');
+            // 4. Final fallback: first 20 lines
+            return mermaidCode.split('\n').slice(0, 20).join('\n');
         }
 
         function showError(err) {
@@ -240,6 +240,9 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
+
+        // Auto-focus the textarea on page load
+        document.getElementById('textInput').focus();
     </script>
 </body>
 </html>

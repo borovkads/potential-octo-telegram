@@ -3,204 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clipboard Content Extractor</title>
+    <title>Mermaid Text Extractor</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 30px;
-            line-height: 1.6;
+            padding: 20px;
+            background-color: #f5f5f5;
             color: #333;
         }
         h1 {
-            font-size: 2.5rem;
+            color: #2c3e50;
+            text-align: center;
             margin-bottom: 30px;
-            color: #222;
         }
-        #contentDisplay {
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .input-area, .output-area {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        #outputText {
             white-space: pre-wrap;
             background-color: #f8f9fa;
-            padding: 25px;
-            border-radius: 8px;
-            border-left: 5px solid #4285f4;
-            font-size: 1.3rem;
-            line-height: 1.8;
-            min-height: 120px;
-            overflow-y: auto;
-            margin-bottom: 30px;
-        }
-        .error {
-            color: #d32f2f;
-            font-size: 1.2rem;
-        }
-        button {
-            font-size: 1.1rem;
-            padding: 12px 24px;
-            background-color: #4285f4;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-        #textInput {
-            width: 100%;
-            min-height: 150px;
-            margin-top: 20px;
             padding: 15px;
-            font-size: 1.2rem;
-            font-family: monospace;
+            border-radius: 4px;
+            min-height: 100px;
+            font-family: 'Consolas', monospace;
+            overflow-y: auto;
         }
         .button-group {
-            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
-        #directoryInfo {
-            margin: 15px 0;
-            padding: 12px;
-            background-color: #f0f0f0;
-            border-radius: 6px;
-            font-size: 1.1rem;
-            word-break: break-all;
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        #extractBtn {
+            background-color: #3498db;
+            color: white;
+        }
+        #extractBtn:hover {
+            background-color: #2980b9;
         }
         #saveBtn {
-            background-color: #34a853;
+            background-color: #2ecc71;
+            color: white;
         }
-        #directoryBtn {
-            background-color: #ea4335;
+        #saveBtn:hover {
+            background-color: #27ae60;
         }
-        #stripBtn {
-            background-color: #fbbc05;
+        #saveBtn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
         }
-        .path-segment {
-            color: #4285f4;
-            font-weight: bold;
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
 <body>
-    <h1>Clipboard Content Extractor</h1>
+    <h1>Mermaid Hidden Text Extractor</h1>
     
-    <div class="button-group">
-        <button id="stripBtn">Strip Text</button>
-        <button id="directoryBtn">Select Directory</button>
-        <button id="saveBtn" disabled>Save File</button>
+    <div class="container">
+        <div class="input-area">
+            <h2>Input Mermaid Diagram</h2>
+            <textarea id="inputText" placeholder="Paste your Mermaid diagram here..."></textarea>
+            <div class="button-group">
+                <button id="extractBtn">Extract Hidden Text</button>
+                <button id="saveBtn" disabled>Save Extracted Text</button>
+            </div>
+        </div>
+        
+        <div class="output-area">
+            <h2>Extracted Content</h2>
+            <div id="outputText">Extracted text will appear here...</div>
+            <div id="statusMessage" class="status"></div>
+        </div>
     </div>
-    
-    <div id="directoryInfo">No directory selected. Files will be saved to default download location.</div>
-    
-    <div id="contentDisplay">Paste your content below and click "Strip Text"</div>
-    
-    <textarea id="textInput" placeholder="Paste your content here..."></textarea>
 
     <script>
-        let selectedDirectoryHandle = null;
-        let clipboardContent = '';
+        let extractedContent = '';
         
-        document.getElementById('stripBtn').addEventListener('click', () => {
+        document.getElementById('extractBtn').addEventListener('click', () => {
             try {
-                clipboardContent = document.getElementById('textInput').value;
-                if (!clipboardContent.trim()) {
-                    throw new Error('No content to process');
-                }
-                processContent(clipboardContent);
-            } catch (err) {
-                showError(err);
-            }
-        });
-
-        document.getElementById('directoryBtn').addEventListener('click', async () => {
-            try {
-                if (!window.showDirectoryPicker) {
-                    throw new Error('Directory selection not supported');
+                const inputText = document.getElementById('inputText').value.trim();
+                if (!inputText) {
+                    throw new Error('Please paste a Mermaid diagram first');
                 }
                 
-                selectedDirectoryHandle = await window.showDirectoryPicker();
-                const path = await getDirectoryPath(selectedDirectoryHandle);
-                
-                const formattedPath = formatPathFromRedmi(path);
-                document.getElementById('directoryInfo').innerHTML = formattedPath;
+                extractedContent = extractHiddenContent(inputText);
+                document.getElementById('outputText').textContent = extractedContent;
                 document.getElementById('saveBtn').disabled = false;
                 
+                showStatus('Text extracted successfully!', 'success');
             } catch (err) {
-                if (err.name !== 'AbortError') {
-                    document.getElementById('directoryInfo').textContent = 
-                        `Error: ${err.message}. Using default download location.`;
-                }
+                showStatus(`Error: ${err.message}`, 'error');
+                console.error(err);
             }
         });
 
-        async function getDirectoryPath(directoryHandle) {
-            const parts = [directoryHandle.name];
-            let currentHandle = directoryHandle;
-            
+        document.getElementById('saveBtn').addEventListener('click', () => {
             try {
-                while (currentHandle && currentHandle.parent) {
-                    currentHandle = await currentHandle.parent;
-                    if (currentHandle.name) {
-                        parts.unshift(currentHandle.name);
-                    }
-                }
-            } catch (e) {
-                console.log("Couldn't get full path hierarchy");
-            }
-            
-            return parts.join('/');
-        }
-
-        function formatPathFromRedmi(fullPath) {
-            const redmiIndex = fullPath.toLowerCase().indexOf('redmi note 10 pro');
-            
-            if (redmiIndex >= 0) {
-                const relevantPath = fullPath.substring(redmiIndex);
-                const segments = relevantPath.split('/');
-                
-                return segments.map((segment, index) => {
-                    if (index === 0) {
-                        return `<span class="path-segment">${segment}</span>`;
-                    }
-                    return segment;
-                }).join(' / ');
-            }
-            
-            return fullPath;
-        }
-
-        document.getElementById('saveBtn').addEventListener('click', async () => {
-            try {
-                if (!clipboardContent) {
+                if (!extractedContent) {
                     throw new Error('No content to save');
                 }
                 
-                if (selectedDirectoryHandle) {
-                    const fileHandle = await selectedDirectoryHandle.getFileHandle('cliptemp.txt', { create: true });
-                    const writable = await fileHandle.createWritable();
-                    await writable.write(clipboardContent);
-                    await writable.close();
-                    alert('File saved successfully!');
-                } else {
-                    downloadFile(clipboardContent);
-                }
+                const blob = new Blob([extractedContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'extracted-content.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
                 
+                showStatus('File saved successfully!', 'success');
             } catch (err) {
-                alert(`Error saving file: ${err.message}`);
+                showStatus(`Error: ${err.message}`, 'error');
             }
         });
 
-        function processContent(text) {
-            try {
-                let extractedText = extractHiddenText(text);
-                document.getElementById('contentDisplay').textContent = extractedText;
-                document.getElementById('contentDisplay').className = '';
-                document.getElementById('saveBtn').disabled = false;
-            } catch (err) {
-                showError(err);
-            }
-        }
-
-        function extractHiddenText(mermaidCode) {
-            // 1. Find FULL TEXT section
+        function extractHiddenContent(mermaidCode) {
+            // Try to extract FULL TEXT section first
             const fullTextMatch = mermaidCode.match(/%% FULL TEXT:\s*\n([\s\S]*?)(?=\s*%% [^\n]|\s*```|$)/);
             if (fullTextMatch) {
                 return fullTextMatch[1]
@@ -208,41 +166,33 @@
                     .replace(/^\s+|\s+$/g, ''); // Trim whitespace
             }
 
-            // 2. If no %% markers found, return the whole text
-            if (!mermaidCode.includes('%%')) {
-                return mermaidCode;
-            }
-
-            // 3. Fallback to all comments
+            // If no FULL TEXT section, extract all comments
             const comments = mermaidCode.match(/%%\s*(.+?)\s*(?=\n|$)/g);
             if (comments) {
                 return comments.map(c => c.replace(/^%%\s*/, '')).join('\n');
             }
 
-            // 4. Final fallback: first 20 lines
-            return mermaidCode.split('\n').slice(0, 20).join('\n');
+            // If no comments found, return the first 30 non-empty lines
+            const lines = mermaidCode.split('\n')
+                .filter(line => line.trim().length > 0);
+                
+            return lines.slice(0, 30).join('\n');
         }
 
-        function showError(err) {
-            const display = document.getElementById('contentDisplay');
-            display.className = 'error';
-            display.textContent = `Error: ${err.message}`;
+        function showStatus(message, type) {
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+            
+            // Clear status after 5 seconds
+            setTimeout(() => {
+                statusElement.textContent = '';
+                statusElement.className = 'status';
+            }, 5000);
         }
 
-        function downloadFile(content) {
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'cliptemp.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        // Auto-focus the textarea on page load
-        document.getElementById('textInput').focus();
+        // Auto-focus the input textarea
+        document.getElementById('inputText').focus();
     </script>
 </body>
 </html>

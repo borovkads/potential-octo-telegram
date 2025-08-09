@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mobile Image Viewer</title>
+    <title>Fixed Image with Movable Viewport</title>
     <style>
         * {
             margin: 0;
@@ -16,20 +16,24 @@
             overflow: hidden;
             width: 100vw;
             height: 100vh;
-            position: relative;
         }
         
-        #image-container {
+        #viewport {
             position: absolute;
             width: 100%;
             height: 100%;
             overflow: hidden;
+            transform-origin: 0 0;
+            will-change: transform;
         }
         
         #background-image {
             position: absolute;
-            transform-origin: 0 0;
-            will-change: transform;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: none; /* Disables automatic resizing */
         }
         
         .debug-info {
@@ -42,61 +46,76 @@
             border-radius: 4px;
             font-family: Arial, sans-serif;
             font-size: 12px;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
-    <div id="image-container">
+    <div id="viewport">
         <img id="background-image" src="deepseek_mermaid_20250809_596d87.jpg" alt="Document">
     </div>
     
     <div class="debug-info">
-        Scale: <span id="scale-display">1.00</span> | 
-        Position: <span id="pos-display">0, 0</span>
+        Zoom: <span id="scale-display">1.00</span> | 
+        Viewport: <span id="pos-display">0, 0</span>
     </div>
 
     <script>
+        const viewport = document.getElementById('viewport');
         const img = document.getElementById('background-image');
-        const container = document.getElementById('image-container');
         const scaleDisplay = document.getElementById('scale-display');
         const posDisplay = document.getElementById('pos-display');
         
         let scale = 1;
-        let posX = 0;
-        let posY = 0;
+        let viewportX = 0;
+        let viewportY = 0;
         let lastDist = 0;
         let isZooming = false;
-        let isPanning = false;
-        let startX, startY;
+        let imgWidth, imgHeight;
         
-        // Initialize image position
-        function initImage() {
-            const viewportWidth = container.clientWidth;
-            const viewportHeight = container.clientHeight;
+        // Initialize image and viewport
+        function init() {
+            img.onload = function() {
+                imgWidth = img.naturalWidth;
+                imgHeight = img.naturalHeight;
+                
+                // Set image dimensions (original size)
+                img.style.width = imgWidth + 'px';
+                img.style.height = imgHeight + 'px';
+                
+                resetViewport();
+            };
+        }
+        
+        // Reset viewport to initial state
+        function resetViewport() {
+            const containerWidth = window.innerWidth;
+            const containerHeight = window.innerHeight;
             
-            // Reset to initial state
             scale = Math.min(
-                viewportWidth / img.naturalWidth,
-                viewportHeight / img.naturalHeight
+                containerWidth / imgWidth,
+                containerHeight / imgHeight
             );
             
-            posX = (viewportWidth - img.naturalWidth * scale) / 2;
-            posY = (viewportHeight - img.naturalHeight * scale) / 2;
+            viewportX = (containerWidth - imgWidth * scale) / 2;
+            viewportY = (containerHeight - imgHeight * scale) / 2;
             
-            updateTransform();
+            updateViewport();
         }
         
-        // Update image transform
-        function updateTransform() {
-            img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+        // Update viewport transform
+        function updateViewport() {
+            viewport.style.transform = `
+                translate(${viewportX}px, ${viewportY}px)
+                scale(${scale})
+            `;
             scaleDisplay.textContent = scale.toFixed(2);
-            posDisplay.textContent = `${Math.round(posX)}, ${Math.round(posY)}`;
+            posDisplay.textContent = `${Math.round(viewportX)}, ${Math.round(viewportY)}`;
         }
         
-        // Handle touch events
-        container.addEventListener('touchstart', (e) => {
+        // Handle touch events for zooming
+        viewport.addEventListener('touchstart', (e) => {
             if (e.touches.length === 2) {
-                // Two-finger zoom start
                 isZooming = true;
                 const touch1 = e.touches[0];
                 const touch2 = e.touches[1];
@@ -104,18 +123,12 @@
                     touch2.clientX - touch1.clientX,
                     touch2.clientY - touch1.clientY
                 );
-            } else if (e.touches.length === 1) {
-                // One-finger pan start
-                isPanning = true;
-                startX = e.touches[0].clientX - posX;
-                startY = e.touches[0].clientY - posY;
             }
             e.preventDefault();
         });
         
-        container.addEventListener('touchmove', (e) => {
+        viewport.addEventListener('touchmove', (e) => {
             if (isZooming && e.touches.length === 2) {
-                // Handle zooming
                 const touch1 = e.touches[0];
                 const touch2 = e.touches[1];
                 const currentDist = Math.hypot(
@@ -124,41 +137,46 @@
                 );
                 
                 if (lastDist > 0) {
+                    // Calculate new scale centered between fingers
                     const newScale = scale * (currentDist / lastDist);
                     scale = Math.max(0.5, Math.min(newScale, 5)); // Limit zoom range
-                    updateTransform();
+                    
+                    // Adjust viewport position to zoom toward center point
+                    const centerX = (touch1.clientX + touch2.clientX) / 2;
+                    const centerY = (touch1.clientY + touch2.clientY) / 2;
+                    
+                    viewportX = centerX - (centerX - viewportX) * (scale / (scale / (currentDist / lastDist)));
+                    viewportY = centerY - (centerY - viewportY) * (scale / (scale / (currentDist / lastDist)));
+                    
+                    updateViewport();
                 }
                 lastDist = currentDist;
-            } else if (isPanning && e.touches.length === 1) {
-                // Handle panning
-                posX = e.touches[0].clientX - startX;
-                posY = e.touches[0].clientY - startY;
-                updateTransform();
             }
             e.preventDefault();
         });
         
-        container.addEventListener('touchend', (e) => {
+        viewport.addEventListener('touchend', (e) => {
             isZooming = false;
-            isPanning = false;
             lastDist = 0;
         });
         
-        // Handle double-tap to reset
-        container.addEventListener('touchend', (e) => {
+        // Double-tap to reset
+        viewport.addEventListener('touchend', (e) => {
             if (e.touches.length === 0 && e.changedTouches.length === 1) {
                 const touch = e.changedTouches[0];
                 const now = Date.now();
                 if (touch.lastTap && (now - touch.lastTap) < 300) {
-                    initImage(); // Reset on double-tap
+                    resetViewport();
                 }
                 touch.lastTap = now;
             }
         });
         
-        // Initialize on load
-        img.onload = initImage;
-        window.addEventListener('resize', initImage);
+        // Handle window resize
+        window.addEventListener('resize', resetViewport);
+        
+        // Initialize
+        init();
     </script>
 </body>
 </html>

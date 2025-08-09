@@ -77,7 +77,7 @@
     </style>
 </head>
 <body>
-    <h1>Clipboard Content</h1>
+    <h1>Clipboard Content Extractor</h1>
     
     <div class="button-group">
         <button id="readClipboard">Read Clipboard</button>
@@ -97,13 +97,28 @@
         
         document.getElementById('readClipboard').addEventListener('click', async () => {
             try {
-                window.focus();
-                
-                if (!navigator.clipboard || !navigator.clipboard.readText) {
-                    throw new Error('Clipboard API not supported in this browser');
+                // First try the modern async clipboard API
+                try {
+                    clipboardContent = await navigator.clipboard.readText();
+                    processContent(clipboardContent);
+                    return;
+                } catch (asyncError) {
+                    console.log("Async clipboard failed, falling back...");
                 }
                 
-                clipboardContent = await navigator.clipboard.readText();
+                // Fallback for browsers without async clipboard support
+                const textarea = document.createElement('textarea');
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = 0;
+                document.body.appendChild(textarea);
+                textarea.focus();
+                
+                if (!document.execCommand('paste')) {
+                    throw new Error('Clipboard access not supported');
+                }
+                
+                clipboardContent = textarea.value;
+                document.body.removeChild(textarea);
                 processContent(clipboardContent);
                 
             } catch (err) {
@@ -120,7 +135,6 @@
                 selectedDirectoryHandle = await window.showDirectoryPicker();
                 const path = await getDirectoryPath(selectedDirectoryHandle);
                 
-                // Format the path with "Redmi Note 10 Pro" as root
                 const formattedPath = formatPathFromRedmi(path);
                 document.getElementById('directoryInfo').innerHTML = formattedPath;
                 document.getElementById('saveBtn').disabled = false;
@@ -197,6 +211,7 @@
                 document.getElementById('contentDisplay').textContent = 
                     extractedText.split('\n').slice(0, 5).join('\n');
                 document.getElementById('contentDisplay').className = '';
+                document.getElementById('saveBtn').disabled = false;
                 
             } catch (err) {
                 showError(err);

@@ -47,6 +47,7 @@
             min-height: 100px;
             font-family: 'Consolas', monospace;
             overflow-y: auto;
+            border: 1px solid #ddd;
         }
         .button-group {
             display: flex;
@@ -87,10 +88,12 @@
         .success {
             background-color: #d4edda;
             color: #155724;
+            border: 1px solid #c3e6cb;
         }
         .error {
             background-color: #f8d7da;
             color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
@@ -109,7 +112,7 @@
         
         <div class="output-area">
             <h2>Extracted Content</h2>
-            <div id="outputText">Extracted text will appear here...</div>
+            <pre id="outputText">Extracted text will appear here...</pre>
             <div id="statusMessage" class="status"></div>
         </div>
     </div>
@@ -125,13 +128,20 @@
                 }
                 
                 extractedContent = extractHiddenContent(inputText);
-                document.getElementById('outputText').textContent = extractedContent;
-                document.getElementById('saveBtn').disabled = false;
+                
+                // DEBUG: Log the extracted content
+                console.log('Extracted content:', extractedContent);
+                
+                // Update output display
+                const outputElement = document.getElementById('outputText');
+                outputElement.textContent = extractedContent || "No text content found";
+                
+                document.getElementById('saveBtn').disabled = !extractedContent;
                 
                 showStatus('Text extracted successfully!', 'success');
             } catch (err) {
                 showStatus(`Error: ${err.message}`, 'error');
-                console.error(err);
+                console.error('Extraction error:', err);
             }
         });
 
@@ -159,24 +169,31 @@
 
         function extractHiddenContent(mermaidCode) {
             // Try to extract FULL TEXT section first
-            const fullTextMatch = mermaidCode.match(/%% FULL TEXT:\s*\n([\s\S]*?)(?=\s*%% [^\n]|\s*```|$)/);
+            const fullTextMatch = mermaidCode.match(/%% FULL TEXT:\s*\n([\s\S]*?)(?=\s*%%|\s*```|$)/);
             if (fullTextMatch) {
-                return fullTextMatch[1]
+                const fullText = fullTextMatch[1]
                     .replace(/^%%\s?/gm, '')  // Remove comment markers
                     .replace(/^\s+|\s+$/g, ''); // Trim whitespace
+                
+                console.log('Found FULL TEXT section:', fullText);
+                return fullText;
             }
 
             // If no FULL TEXT section, extract all comments
-            const comments = mermaidCode.match(/%%\s*(.+?)\s*(?=\n|$)/g);
-            if (comments) {
-                return comments.map(c => c.replace(/^%%\s*/, '')).join('\n');
+            const comments = mermaidCode.match(/%%\s*(.+?)\s*(?=\n|$)/gm);
+            if (comments && comments.length > 0) {
+                const allComments = comments.map(c => c.replace(/^%%\s*/, '')).join('\n');
+                console.log('Extracted comments:', allComments);
+                return allComments;
             }
 
             // If no comments found, return the first 30 non-empty lines
             const lines = mermaidCode.split('\n')
                 .filter(line => line.trim().length > 0);
-                
-            return lines.slice(0, 30).join('\n');
+            
+            const fallbackContent = lines.slice(0, 30).join('\n');
+            console.log('Using fallback content:', fallbackContent);
+            return fallbackContent;
         }
 
         function showStatus(message, type) {

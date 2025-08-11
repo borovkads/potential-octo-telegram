@@ -85,12 +85,13 @@
             background-color: rgba(0,0,0,0.5);
             z-index: 999;
         }
-        .node rect {
+        /* Make all flowchart elements clickable */
+        .node rect, .node polygon, .node circle {
             cursor: pointer;
-            transition: all 0.3s;
+            transition: filter 0.2s;
         }
-        .node rect:hover {
-            fill: #f0f8ff !important;
+        .node rect:hover, .node polygon:hover, .node circle:hover {
+            filter: brightness(1.1);
         }
     </style>
 </head>
@@ -102,7 +103,7 @@
 
     <div class="overlay" id="overlay"></div>
 
-    <!-- Popups for each node -->
+    <!-- Popups - Only showing 3 as example, include all in your actual code -->
     <div class="popup" id="popup-A">
         <h2>Korean Christian Research Labs</h2>
         <div class="popup-content">
@@ -116,13 +117,38 @@
         <button class="close-btn" onclick="closePopup()">Close</button>
     </div>
 
-    <!-- Other popups remain the same as before -->
-    <!-- ... (include all other popup divs from the original code) ... -->
+    <div class="popup" id="popup-B">
+        <h2>Bible Translation AI</h2>
+        <div class="popup-content">
+            AI systems for rapid Bible translation into minority languages (e.g., Nabak, Kurdish dialects).
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Bible_translations" target="_blank">Wikipedia: Bible Translations</a>
+            <a href="https://slator.com/ai-machine-translation/the-ai-bible-translation-movement/" target="_blank">Slator: AI Bible Translation</a>
+            <a href="https://www.wycliffe.org/technology" target="_blank">Wycliffe Bible Translators Tech</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="popup-C">
+        <h2>Digital Evangelism Tools</h2>
+        <div class="popup-content">
+            Software suite for online proselytization, including analytics for targeting unreached groups.
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Digital_evangelism" target="_blank">Wikipedia: Digital Evangelism</a>
+            <a href="https://www.christianitytoday.com/ct/2021/june-web-only/digital-evangelism-tools-missions-technology.html" target="_blank">CT: Digital Tools for Missions</a>
+            <a href="https://www.gospeltech.net" target="_blank">Gospel Tech Network</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <!-- Include all other popups here (D-K) following same pattern -->
 
     <script>
-        // Initialize Mermaid
+        // Initialize Mermaid with proper settings
         mermaid.initialize({
-            startOnLoad: true,
+            startOnLoad: false, // We'll init manually
             theme: 'default',
             flowchart: {
                 useMaxWidth: true,
@@ -150,15 +176,62 @@
                 classDef clickable fill:#f9f9f9,stroke:#3498db,stroke-width:2px,cursor:pointer
         `;
 
-        // Insert the flowchart
-        document.getElementById('flowchart').innerHTML = graphDefinition;
-
-        // Function to handle popups
-        function showPopup(nodeId) {
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById(`popup-${nodeId}`).style.display = 'block';
+        // Render the flowchart
+        async function renderFlowchart() {
+            const { svg } = await mermaid.render('flowchart-svg', graphDefinition);
+            document.getElementById('flowchart').innerHTML = svg;
+            attachClickHandlers();
         }
 
+        // Node to popup mapping
+        const nodeMap = {
+            'A': 'popup-A',
+            'B': 'popup-B',
+            'C': 'popup-C',
+            'D': 'popup-D',
+            'E': 'popup-E',
+            'F': 'popup-F',
+            'G': 'popup-G',
+            'H': 'popup-H',
+            'I': 'popup-I',
+            'J': 'popup-J',
+            'K': 'popup-K'
+        };
+
+        // Attach click handlers to SVG elements
+        function attachClickHandlers() {
+            // Wait for SVG to be fully rendered
+            setTimeout(() => {
+                const svg = document.querySelector('#flowchart svg');
+                if (!svg) return;
+
+                // Add click handler to the entire SVG
+                svg.addEventListener('click', (event) => {
+                    const target = event.target;
+                    
+                    // Check if we clicked a node element
+                    if (target.classList.contains('node')) {
+                        // Find the text element inside the node
+                        const textElement = target.querySelector('text');
+                        if (!textElement) return;
+                        
+                        // Get the first letter of the node text (our ID)
+                        const nodeId = textElement.textContent.trim().charAt(0);
+                        if (nodeMap[nodeId]) {
+                            showPopup(nodeMap[nodeId]);
+                        }
+                    }
+                });
+            }, 300);
+        }
+
+        // Show popup function
+        function showPopup(popupId) {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById(popupId).style.display = 'block';
+        }
+
+        // Close popup function
         function closePopup() {
             document.getElementById('overlay').style.display = 'none';
             document.querySelectorAll('.popup').forEach(popup => {
@@ -166,50 +239,13 @@
             });
         }
 
-        // Add click handlers after rendering
-        function bindNodeClicks() {
-            // Wait for Mermaid to render
-            setTimeout(() => {
-                const nodes = document.querySelectorAll('.node');
-                
-                nodes.forEach(node => {
-                    // Get the text content and map to our node IDs
-                    const text = node.querySelector('text')?.textContent.trim();
-                    if (!text) return;
-                    
-                    // Simple mapping - first letter of each word
-                    let nodeId = '';
-                    if (text.includes('Korean Christian')) nodeId = 'A';
-                    else if (text.includes('Bible Translation')) nodeId = 'B';
-                    else if (text.includes('Digital Evangelism')) nodeId = 'C';
-                    else if (text.includes('Real-Time Language')) nodeId = 'D';
-                    else if (text.includes('North Korean Dialect')) nodeId = 'E';
-                    else if (text.includes('VR Prayer')) nodeId = 'F';
-                    else if (text.includes('Algorithmic Scripture')) nodeId = 'G';
-                    else if (text.includes('Underground USB')) nodeId = 'H';
-                    else if (text.includes('Sanction Circumvention')) nodeId = 'I';
-                    else if (text.includes('Gen Z Conversions')) nodeId = 'J';
-                    else if (text.includes('Social Media Integration')) nodeId = 'K';
-                    
-                    if (nodeId) {
-                        node.style.cursor = 'pointer';
-                        node.addEventListener('click', () => showPopup(nodeId));
-                    }
-                });
-            }, 1000); // Longer delay to ensure rendering completes
-        }
-
-        // Initialize everything
-        document.addEventListener('DOMContentLoaded', function() {
-            // Re-render to apply changes
-            mermaid.init(undefined, document.querySelectorAll('#flowchart'));
+        // Initialize everything when DOM loads
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFlowchart();
             
-            // Bind click events
-            bindNodeClicks();
+            // Close popup when clicking overlay
+            document.getElementById('overlay').addEventListener('click', closePopup);
         });
-
-        // Close popup when clicking overlay
-        document.getElementById('overlay').addEventListener('click', closePopup);
     </script>
 </body>
 </html>

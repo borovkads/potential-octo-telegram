@@ -8,17 +8,11 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
             max-width: 1200px;
             margin: 0 auto;
-            background-color: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: #f5f5f5;
+            color: #333;
         }
         h1 {
             color: #2c3e50;
@@ -26,140 +20,69 @@
             margin-bottom: 30px;
         }
         #flowchart {
-            width: 100%;
-            min-height: 600px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             margin-bottom: 30px;
         }
-        .popup {
+        .modal {
             display: none;
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            z-index: 1000;
-            max-width: 500px;
-            width: 90%;
-        }
-        .popup h2 {
-            color: #2c3e50;
-            margin-top: 0;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        .popup-content {
-            margin-bottom: 15px;
-            line-height: 1.6;
-        }
-        .popup-links a {
-            display: block;
-            margin-bottom: 8px;
-            color: #3498db;
-            text-decoration: none;
-        }
-        .popup-links a:hover {
-            text-decoration: underline;
-        }
-        .close-btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            float: right;
-        }
-        .close-btn:hover {
-            background-color: #2980b9;
-        }
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
+            z-index: 1;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 999;
+            background-color: rgba(0,0,0,0.7);
         }
-        /* Make all flowchart elements clickable */
-        .node rect, .node polygon, .node circle {
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 70%;
+            max-width: 700px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
             cursor: pointer;
-            transition: filter 0.2s;
         }
-        .node rect:hover, .node polygon:hover, .node circle:hover {
-            filter: brightness(1.1);
+        .close:hover {
+            color: black;
+        }
+        .links {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .links a {
+            display: block;
+            margin-bottom: 8px;
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        .node {
+            cursor: pointer;
+        }
+        .node:hover {
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Protestant Missionary Technology Network</h1>
-        <div id="flowchart"></div>
-    </div>
-
-    <div class="overlay" id="overlay"></div>
-
-    <!-- Popups - Only showing 3 as example, include all in your actual code -->
-    <div class="popup" id="popup-A">
-        <h2>Korean Christian Research Labs</h2>
-        <div class="popup-content">
-            Cutting-edge R&D centers funded by Korean megachurches to develop evangelical technologies.
-        </div>
-        <div class="popup-links">
-            <a href="https://en.wikipedia.org/wiki/Christianity_in_Korea" target="_blank">Wikipedia: Christianity in Korea</a>
-            <a href="https://www.christianitytoday.com/ct/2020/february-web-only/korea-christianity-research-development-missions.html" target="_blank">Christianity Today: Korean Mission Tech</a>
-            <a href="https://www.koreatimes.co.kr/www/nation/2023/05/113_350079.html" target="_blank">Korea Times: Religious Tech Innovation</a>
-        </div>
-        <button class="close-btn" onclick="closePopup()">Close</button>
-    </div>
-
-    <div class="popup" id="popup-B">
-        <h2>Bible Translation AI</h2>
-        <div class="popup-content">
-            AI systems for rapid Bible translation into minority languages (e.g., Nabak, Kurdish dialects).
-        </div>
-        <div class="popup-links">
-            <a href="https://en.wikipedia.org/wiki/Bible_translations" target="_blank">Wikipedia: Bible Translations</a>
-            <a href="https://slator.com/ai-machine-translation/the-ai-bible-translation-movement/" target="_blank">Slator: AI Bible Translation</a>
-            <a href="https://www.wycliffe.org/technology" target="_blank">Wycliffe Bible Translators Tech</a>
-        </div>
-        <button class="close-btn" onclick="closePopup()">Close</button>
-    </div>
-
-    <div class="popup" id="popup-C">
-        <h2>Digital Evangelism Tools</h2>
-        <div class="popup-content">
-            Software suite for online proselytization, including analytics for targeting unreached groups.
-        </div>
-        <div class="popup-links">
-            <a href="https://en.wikipedia.org/wiki/Digital_evangelism" target="_blank">Wikipedia: Digital Evangelism</a>
-            <a href="https://www.christianitytoday.com/ct/2021/june-web-only/digital-evangelism-tools-missions-technology.html" target="_blank">CT: Digital Tools for Missions</a>
-            <a href="https://www.gospeltech.net" target="_blank">Gospel Tech Network</a>
-        </div>
-        <button class="close-btn" onclick="closePopup()">Close</button>
-    </div>
-
-    <!-- Include all other popups here (D-K) following same pattern -->
-
-    <script>
-        // Initialize Mermaid with proper settings
-        mermaid.initialize({
-            startOnLoad: false, // We'll init manually
-            theme: 'default',
-            flowchart: {
-                useMaxWidth: true,
-                htmlLabels: true,
-                curve: 'basis'
-            },
-            securityLevel: 'loose'
-        });
-
-        // Define the flowchart with explicit IDs
-        const graphDefinition = `
+    <h1>Korean Protestant Missionary Technology Network</h1>
+    
+    <div id="flowchart">
+        <div class="mermaid">
             flowchart TD
                 A["Korean Christian Research Labs"] --> B["Bible Translation AI"]
                 A --> C["Digital Evangelism Tools"]
@@ -171,81 +94,161 @@
                 E --> I["Sanction Circumvention"]
                 F --> J["Gen Z Conversions"]
                 G --> K["Social Media Integration"]
+        </div>
+    </div>
 
-                class A,B,C,D,E,F,G,H,I,J,K clickable
-                classDef clickable fill:#f9f9f9,stroke:#3498db,stroke-width:2px,cursor:pointer
-        `;
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-title"></h2>
+            <p id="modal-description"></p>
+            <div class="links">
+                <h3>Learn More:</h3>
+                <a id="wiki-link" target="_blank">Wikipedia</a>
+                <a id="link1" target="_blank">Additional Resource 1</a>
+                <a id="link2" target="_blank">Additional Resource 2</a>
+            </div>
+        </div>
+    </div>
 
-        // Render the flowchart
-        async function renderFlowchart() {
-            const { svg } = await mermaid.render('flowchart-svg', graphDefinition);
-            document.getElementById('flowchart').innerHTML = svg;
-            attachClickHandlers();
-        }
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true
+            }
+        });
 
-        // Node to popup mapping
-        const nodeMap = {
-            'A': 'popup-A',
-            'B': 'popup-B',
-            'C': 'popup-C',
-            'D': 'popup-D',
-            'E': 'popup-E',
-            'F': 'popup-F',
-            'G': 'popup-G',
-            'H': 'popup-H',
-            'I': 'popup-I',
-            'J': 'popup-J',
-            'K': 'popup-K'
+        // Modal functionality
+        const modal = document.getElementById("modal");
+        const span = document.getElementsByClassName("close")[0];
+        
+        // Data for each node
+        const nodeData = {
+            "A": {
+                title: "Korean Christian Research Labs",
+                description: "Cutting-edge R&D centers funded by Korean megachurches to develop evangelical technologies.",
+                wiki: "https://en.wikipedia.org/wiki/Christianity_in_Korea",
+                link1: "https://www.koreaherald.com/view.php?ud=20211206000734",
+                link2: "https://www.christianitytoday.com/ct/2022/june-web-only/korea-christianity-missions-research-technology.html"
+            },
+            "B": {
+                title: "Bible Translation AI",
+                description: "AI systems for rapid Bible translation into minority languages (e.g., Nabak, Kurdish dialects).",
+                wiki: "https://en.wikipedia.org/wiki/Bible_translations",
+                link1: "https://slator.com/ai-machine-translation-bible-translation-jesus-film-project/",
+                link2: "https://www.christianitytoday.com/news/2023/july/bible-translation-ai-chatgpt-natural-language-llm.html"
+            },
+            "C": {
+                title: "Digital Evangelism Tools",
+                description: "Software suite for online proselytization, including analytics for targeting unreached groups.",
+                wiki: "https://en.wikipedia.org/wiki/Digital_evangelism",
+                link1: "https://www.lausanne.org/content/networking/technology-in-mission-digital-evangelism",
+                link2: "https://missionexus.org/the-rise-of-digital-missionaries/"
+            },
+            "D": {
+                title: "Real-Time Language AI",
+                description: "Live translation apps used by missionaries in multilingual fieldwork (e.g., Amazon tribes).",
+                wiki: "https://en.wikipedia.org/wiki/Speech_translation",
+                link1: "https://www.wycliffe.org.uk/about/news/ai-translation-missions/",
+                link2: "https://www.christianpost.com/news/ai-translation-breaks-language-barriers-for-missionaries.html"
+            },
+            "E": {
+                title: "North Korean Dialect Support",
+                description: "Covert NLP models tailored to Northern dialects for underground Bible distribution.",
+                wiki: "https://en.wikipedia.org/wiki/Christianity_in_North_Korea",
+                link1: "https://www.nknews.org/pro/underground-christians-in-north-korea-are-using-smuggled-usb-bibles-report-says/",
+                link2: "https://www.opendoorsusa.org/christian-persecution/stories/north-korea-smuggling-bibles/"
+            },
+            "F": {
+                title: "VR Prayer Apps",
+                description: "Virtual reality experiences simulating Jerusalem pilgrimage or 'walking with Jesus.'",
+                wiki: "https://en.wikipedia.org/wiki/Religious_technology",
+                link1: "https://www.christianitytoday.com/ct/2022/january-february/virtual-reality-church-metaverse-ministry.html",
+                link2: "https://missionexus.org/virtual-reality-as-a-mission-tool/"
+            },
+            "G": {
+                title: "Algorithmic Scripture Targeting",
+                description: "Social media algorithms that deliver Bible verses based on user behavior data.",
+                wiki: "https://en.wikipedia.org/wiki/Targeted_advertising",
+                link1: "https://www.christianitytoday.com/ct/2023/april-web-only/ai-evangelism-social-media-algorithms-christian.html",
+                link2: "https://www.lausanne.org/content/statement/algorithmic-evangelism"
+            },
+            "H": {
+                title: "Underground USB Bibles",
+                description: "MicroSD cards/AI-translated Bibles smuggled into restricted nations (e.g., Yemen, North Korea).",
+                wiki: "https://en.wikipedia.org/wiki/Samizdat",
+                link1: "https://www.opendoorsusa.org/christian-persecution/stories/underground-usb-bibles/",
+                link2: "https://www.christianpost.com/news/underground-church-uses-tech-to-smuggle-bibles-into-north-korea.html"
+            },
+            "I": {
+                title: "Sanction Circumvention",
+                description: "Use of blockchain/crypto to fund missions in sanctioned regions (e.g., Iran).",
+                wiki: "https://en.wikipedia.org/wiki/Cryptocurrency_and_religion",
+                link1: "https://www.christianitytoday.com/ct/2022/july-august/crypto-missions-ministry-fundraising-blockchain.html",
+                link2: "https://www.lausanne.org/content/blockchain-and-the-future-of-mission-giving"
+            },
+            "J": {
+                title: "Gen Z Conversions",
+                description: "Youth-focused campaigns leveraging TikTok/Reels with AI-personalized gospel content.",
+                wiki: "https://en.wikipedia.org/wiki/Generation_Z",
+                link1: "https://www.christianitytoday.com/ct/2023/july-web-only/gen-z-evangelism-tiktok-social-media.html",
+                link2: "https://missionexus.org/reaching-gen-z-through-digital-evangelism/"
+            },
+            "K": {
+                title: "Social Media Integration",
+                description: "Automated missionary chatbots on WhatsApp/Telegram in majority-Muslim countries.",
+                wiki: "https://en.wikipedia.org/wiki/Christian_missionary",
+                link1: "https://www.christianitytoday.com/ct/2023/may-web-only/chatbots-evangelism-missions-ai-christian.html",
+                link2: "https://www.lausanne.org/content/networking/digital-discipleship-in-muslim-contexts"
+            }
         };
 
-        // Attach click handlers to SVG elements
-        function attachClickHandlers() {
-            // Wait for SVG to be fully rendered
+        // Add click handlers after Mermaid renders
+        function addNodeClickHandlers() {
+            // Wait a moment for Mermaid to finish rendering
             setTimeout(() => {
-                const svg = document.querySelector('#flowchart svg');
-                if (!svg) return;
-
-                // Add click handler to the entire SVG
-                svg.addEventListener('click', (event) => {
-                    const target = event.target;
-                    
-                    // Check if we clicked a node element
-                    if (target.classList.contains('node')) {
-                        // Find the text element inside the node
-                        const textElement = target.querySelector('text');
-                        if (!textElement) return;
-                        
-                        // Get the first letter of the node text (our ID)
-                        const nodeId = textElement.textContent.trim().charAt(0);
-                        if (nodeMap[nodeId]) {
-                            showPopup(nodeMap[nodeId]);
-                        }
+                const nodes = document.querySelectorAll('.node');
+                nodes.forEach(node => {
+                    const nodeId = node.id.replace(/^flowchart-/, '').replace(/-[0-9]+$/, '');
+                    if (nodeData[nodeId]) {
+                        node.style.cursor = 'pointer';
+                        node.addEventListener('click', () => {
+                            const data = nodeData[nodeId];
+                            document.getElementById('modal-title').textContent = data.title;
+                            document.getElementById('modal-description').textContent = data.description;
+                            document.getElementById('wiki-link').href = data.wiki;
+                            document.getElementById('wiki-link').textContent = 'Wikipedia: ' + data.title;
+                            document.getElementById('link1').href = data.link1;
+                            document.getElementById('link1').textContent = 'Article: ' + new URL(data.link1).hostname.replace('www.', '');
+                            document.getElementById('link2').href = data.link2;
+                            document.getElementById('link2').textContent = 'Report: ' + new URL(data.link2).hostname.replace('www.', '');
+                            modal.style.display = "block";
+                        });
                     }
                 });
-            }, 300);
+            }, 500);
         }
 
-        // Show popup function
-        function showPopup(popupId) {
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById(popupId).style.display = 'block';
-        }
-
-        // Close popup function
-        function closePopup() {
-            document.getElementById('overlay').style.display = 'none';
-            document.querySelectorAll('.popup').forEach(popup => {
-                popup.style.display = 'none';
-            });
-        }
-
-        // Initialize everything when DOM loads
+        // Initialize click handlers when Mermaid is done
         document.addEventListener('DOMContentLoaded', () => {
-            renderFlowchart();
-            
-            // Close popup when clicking overlay
-            document.getElementById('overlay').addEventListener('click', closePopup);
+            const observer = new MutationObserver(addNodeClickHandlers);
+            observer.observe(document.getElementById('flowchart'), { childList: true, subtree: true });
         });
+
+        // Close modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
     </script>
 </body>
 </html>

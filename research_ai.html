@@ -8,65 +8,242 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
+            margin: 0;
             padding: 20px;
             background-color: #f5f5f5;
         }
-        #flowchart {
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             background-color: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        #info-panel {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            min-height: 200px;
-        }
-        .node {
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .node:hover {
-            opacity: 0.8;
-        }
-        .link {
-            color: #0066cc;
-            text-decoration: none;
-            margin-right: 15px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         h1 {
             color: #2c3e50;
-            border-bottom: 2px solid #3498db;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        #flowchart {
+            width: 100%;
+            min-height: 600px;
+            margin-bottom: 30px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 500px;
+            width: 90%;
+        }
+        .popup h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
             padding-bottom: 10px;
         }
-        h2 {
-            color: #3498db;
+        .popup-content {
+            margin-bottom: 15px;
+            line-height: 1.6;
         }
-        .hidden {
+        .popup-links a {
+            display: block;
+            margin-bottom: 8px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .popup-links a:hover {
+            text-decoration: underline;
+        }
+        .close-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+        }
+        .close-btn:hover {
+            background-color: #2980b9;
+        }
+        .overlay {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
         }
     </style>
 </head>
 <body>
-    <h1>Protestant Missionary Technology Network</h1>
-    <div id="flowchart"></div>
-    <div id="info-panel">
-        <h2 id="info-title">Click any node to learn more</h2>
-        <div id="info-description"></div>
-        <div id="info-links" class="hidden">
-            <h3>Learn More:</h3>
-            <ul id="links-list"></ul>
+    <div class="container">
+        <h1>Protestant Missionary Technology Network</h1>
+        <div id="flowchart"></div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Popups for each node -->
+    <div class="popup" id="popup-A">
+        <h2>Korean Christian Research Labs</h2>
+        <div class="popup-content">
+            Cutting-edge R&D centers funded by Korean megachurches to develop evangelical technologies.
         </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Christianity_in_Korea" target="_blank">Wikipedia: Christianity in Korea</a>
+            <a href="https://www.christianitytoday.com/ct/2020/february-web-only/korea-christianity-research-development-missions.html" target="_blank">Christianity Today: Korean Mission Tech</a>
+            <a href="https://www.koreatimes.co.kr/www/nation/2023/05/113_350079.html" target="_blank">Korea Times: Religious Tech Innovation</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="popup-B">
+        <h2>Bible Translation AI</h2>
+        <div class="popup-content">
+            AI systems for rapid Bible translation into minority languages (e.g., Nabak, Kurdish dialects).
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Bible_translations" target="_blank">Wikipedia: Bible Translations</a>
+            <a href="https://slator.com/ai-machine-translation/the-ai-bible-translation-movement/" target="_blank">Slator: AI Bible Translation</a>
+            <a href="https://www.wycliffe.org/technology" target="_blank">Wycliffe Bible Translators Tech</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="popup-C">
+        <h2>Digital Evangelism Tools</h2>
+        <div class="popup-content">
+            Software suite for online proselytization, including analytics for targeting unreached groups.
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Digital_evangelism" target="_blank">Wikipedia: Digital Evangelism</a>
+            <a href="https://www.christianitytoday.com/ct/2021/june-web-only/digital-evangelism-tools-missions-technology.html" target="_blank">CT: Digital Tools for Missions</a>
+            <a href="https://www.gospeltech.net" target="_blank">Gospel Tech Network</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="popup-D">
+        <h2>Real-Time Language AI</h2>
+        <div class="popup-content">
+            Live translation apps used by missionaries in multilingual fieldwork (e.g., Amazon tribes).
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Speech_translation" target="_blank">Wikipedia: Speech Translation</a>
+            <a href="https://www.technologyreview.com/2023/04/12/1071288/missionaries-are-using-ai-to-translate-the-bible/" target="_blank">MIT Tech Review: Missionary AI</a>
+            <a href="https://www.jesusfilm.org/blog/technology/real-time-translation-missions/" target="_blank">Jesus Film Project Tech</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="popup-E">
+        <h2>North Korean Dialect Support</h2>
+        <div class="popup-content">
+            Covert NLP models tailored to Northern dialects for underground Bible distribution.
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Christianity_in_North_Korea" target="_blank">Wikipedia: Christianity in NK</a>
+            <a href="https://www.uscirf.gov/news-room/releases-statements/uscirf-report-technology-religious-freedom-north-korea" target="_blank">USCIRF Report on NK Tech</a>
+            <a href="https://www.opendoorsusa.org/christian-persecution/stories/north-korea-underground-christians/" target="_blank">Open Doors: NK Underground</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="popup-F">
+        <h2>VR Prayer Apps</h2>
+        <div class="popup-content">
+            Virtual reality experiences simulating Jerusalem pilgrimage or "walking with Jesus."
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Virtual_reality" target="_blank">Wikipedia: Virtual Reality</a>
+            <a href="https://www.christianpost.com/news/virtual-reality-brings-bible-stories-to-life.html" target="_blank">Christian Post: VR Bible</a>
+            <a href="https://www.sacredvr.com" target="_blank">Sacred VR Experiences</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="popup-G">
+        <h2>Algorithmic Scripture Targeting</h2>
+        <div class="popup-content">
+            Social media algorithms that deliver Bible verses based on user behavior data.
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Targeted_advertising" target="_blank">Wikipedia: Targeted Ads</a>
+            <a href="https://www.relevantmagazine.com/current/faith-and-tech-how-churches-are-using-algorithms/" target="_blank">Relevant: Faith & Algorithms</a>
+            <a href="https://www.godtoolsapp.com" target="_blank">GodTools App</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="popup-H">
+        <h2>Underground USB Bibles</h2>
+        <div class="popup-content">
+            MicroSD cards/AI-translated Bibles smuggled into restricted nations (e.g., Yemen, North Korea).
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Samizdat" target="_blank">Wikipedia: Samizdat</a>
+            <a href="https://www.foxnews.com/world/bible-smugglers-using-tech-to-reach-persecuted-christians" target="_blank">Fox: Bible Smuggling Tech</a>
+            <a href="https://www.bibles.org" target="_blank">Bibles.org Digital Distribution</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="popup-I">
+        <h2>Sanction Circumvention</h2>
+        <div class="popup-content">
+            Use of blockchain/crypto to fund missions in sanctioned regions (e.g., Iran).
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Cryptocurrency" target="_blank">Wikipedia: Cryptocurrency</a>
+            <a href="https://www.coindesk.com/markets/2022/03/15/christian-groups-turn-to-crypto-to-send-aid-to-ukraine-russia/" target="_blank">CoinDesk: Crypto Missions</a>
+            <a href="https://www.faithwire.com/2023/04/12/christian-ministries-using-cryptocurrency-to-fund-underground-churches/" target="_blank">Faithwire: Crypto for Churches</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="popup-J">
+        <h2>Gen Z Conversions</h2>
+        <div class="popup-content">
+            Youth-focused campaigns leveraging TikTok/Reels with AI-personalized gospel content.
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Generation_Z" target="_blank">Wikipedia: Gen Z</a>
+            <a href="https://www.barna.com/research/gen-z-missions" target="_blank">Barna: Gen Z & Faith</a>
+            <a href="https://www.tiktok.com/@jesus" target="_blank">Jesus TikTok</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="popup-K">
+        <h2>Social Media Integration</h2>
+        <div class="popup-content">
+            Automated missionary chatbots on WhatsApp/Telegram in majority-Muslim countries.
+        </div>
+        <div class="popup-links">
+            <a href="https://en.wikipedia.org/wiki/Chatbot" target="_blank">Wikipedia: Chatbots</a>
+            <a href="https://www.christianitytoday.com/ct/2023/april-web-only/muslim-evangelism-chatbots-ai-jesus-film.html" target="_blank">CT: Muslim-Targeted Chatbots</a>
+            <a href="https://www.botnerds.com/christian-chatbots/" target="_blank">Christian Chatbot Examples</a>
+        </div>
+        <button class="close-btn" onclick="closePopup()">Close</button>
     </div>
 
     <script>
+        // Initialize Mermaid
         mermaid.initialize({
             startOnLoad: true,
+            theme: 'default',
             flowchart: {
                 useMaxWidth: true,
                 htmlLabels: true,
@@ -74,102 +251,50 @@
             }
         });
 
+        // Define the flowchart
         document.addEventListener('DOMContentLoaded', function() {
-            // Node data with descriptions and links
-            const nodeData = {
-                'A': {
-                    title: 'Korean Christian Research Labs',
-                    description: 'Cutting-edge R&D centers funded by Korean megachurches to develop evangelical technologies.',
-                    links: [
-                        {name: 'Wikipedia: Christianity in Korea', url: 'https://en.wikipedia.org/wiki/Christianity_in_Korea'},
-                        {name: 'Korea Research Institute for Missions', url: 'https://www.krim.org'},
-                        {name: 'Korean megachurches and technology', url: 'https://www.christianitytoday.com/ct/2020/february-web-only/korea-christianity-yoido-full-gospel-church-technology.html'}
-                    ]
-                },
-                'B': {
-                    title: 'Bible Translation AI',
-                    description: 'AI systems for rapid Bible translation into minority languages (e.g., Nabak, Kurdish dialects).',
-                    links: [
-                        {name: 'Wikipedia: Bible translations', url: 'https://en.wikipedia.org/wiki/Bible_translations'},
-                        {name: 'AI Bible translation projects', url: 'https://slator.com/ai-machine-translation/united-bible-societies-ai-for-scripture-translation/'},
-                        {name: 'Wycliffe Bible Translators', url: 'https://www.wycliffe.org'}
-                    ]
-                },
-                // Add all other nodes following the same pattern
-                'C': {
-                    title: 'Digital Evangelism Tools',
-                    description: 'Software suite for online proselytization, including analytics for targeting unreached groups.',
-                    links: [
-                        {name: 'Wikipedia: Digital evangelism', url: 'https://en.wikipedia.org/wiki/Digital_evangelism'},
-                        {name: 'Digital missions strategies', url: 'https://www.missionfrontiers.org/issue/article/digital-strategies-for-reaching-the-unreached'},
-                        {name: 'Joshua Project digital tools', url: 'https://joshuaproject.net'}
-                    ]
-                },
-                'D': {
-                    title: 'Real-Time Language AI',
-                    description: 'Live translation apps used by missionaries in multilingual fieldwork (e.g., Amazon tribes).',
-                    links: [
-                        {name: 'Wikipedia: Machine translation', url: 'https://en.wikipedia.org/wiki/Machine_translation'},
-                        {name: 'Faith-based translation tech', url: 'https://www.christianitytoday.com/ct/2023/march-web-only/bible-translation-ai-chatgpt-artificial-intelligence.html'},
-                        {name: 'Google AI for endangered languages', url: 'https://blog.google/outreach-initiatives/accessibility/1000-languages-initiative/'}
-                    ]
-                },
-                'E': {
-                    title: 'North Korean Dialect Support',
-                    description: 'Covert NLP models tailored to Northern dialects for underground Bible distribution.',
-                    links: [
-                        {name: 'Wikipedia: Christianity in North Korea', url: 'https://en.wikipedia.org/wiki/Christianity_in_North_Korea'},
-                        {name: 'Bible smuggling methods', url: 'https://www.opendoorsusa.org/christian-persecution/stories/north-korea-smuggling-bibles/'},
-                        {name: 'Korean language technology', url: 'https://www.koreatimes.co.kr/www/tech/2023/04/419_348552.html'}
-                    ]
-                }
-                // Continue with remaining nodes...
-            };
+            const graphDefinition = `
+                flowchart TD
+                    A["Korean Christian Research Labs"]:::clickable --> B["Bible Translation AI"]:::clickable
+                    A --> C["Digital Evangelism Tools"]:::clickable
+                    B --> D["Real-Time Language AI"]:::clickable
+                    B --> E["North Korean Dialect Support"]:::clickable
+                    C --> F["VR Prayer Apps"]:::clickable
+                    C --> G["Algorithmic Scripture Targeting"]:::clickable
+                    D --> H["Underground USB Bibles"]:::clickable
+                    E --> I["Sanction Circumvention"]:::clickable
+                    F --> J["Gen Z Conversions"]:::clickable
+                    G --> K["Social Media Integration"]:::clickable
 
-            // Add click handlers after diagram renders
-            const observer = new MutationObserver(function() {
+                    classDef clickable fill:#f9f9f9,stroke:#3498db,stroke-width:2px,cursor:pointer;
+            `;
+
+            document.getElementById('flowchart').innerHTML = graphDefinition;
+
+            // Re-render to apply changes
+            mermaid.init(undefined, document.getElementById('flowchart'));
+
+            // Add click handlers after a short delay to allow rendering
+            setTimeout(() => {
                 document.querySelectorAll('.node').forEach(node => {
-                    const nodeId = node.id.replace('flowchart-', '').replace('-title', '');
-                    if (nodeData[nodeId]) {
+                    const nodeId = node.id.replace('node-', '');
+                    if (nodeId) {
                         node.style.cursor = 'pointer';
-                        node.addEventListener('click', function() {
-                            const data = nodeData[nodeId];
-                            document.getElementById('info-title').textContent = data.title;
-                            document.getElementById('info-description').innerHTML = `<p>${data.description}</p>`;
-                            
-                            const linksList = document.getElementById('links-list');
-                            linksList.innerHTML = '';
-                            data.links.forEach(link => {
-                                const li = document.createElement('li');
-                                li.innerHTML = `<a href="${link.url}" target="_blank" class="link">${link.name}</a>`;
-                                linksList.appendChild(li);
-                            });
-                            
-                            document.getElementById('info-links').classList.remove('hidden');
+                        node.addEventListener('click', () => {
+                            document.getElementById('overlay').style.display = 'block';
+                            document.getElementById(`popup-${nodeId}`).style.display = 'block';
                         });
                     }
                 });
-            });
-
-            observer.observe(document.body, { childList: true, subtree: true });
-
-            // Insert the flowchart
-            document.getElementById('flowchart').innerHTML = `
-                <div class="mermaid">
-                    flowchart TD
-                        A[Korean Christian Research Labs] --> B[Bible Translation AI]
-                        A --> C[Digital Evangelism Tools]
-                        B --> D[Real-Time Language AI]
-                        B --> E[North Korean Dialect Support]
-                        C --> F[VR Prayer Apps]
-                        C --> G[Algorithmic Scripture Targeting]
-                        D --> H[Underground USB Bibles]
-                        E --> I[Sanction Circumvention]
-                        F --> J[Gen Z Conversions]
-                        G --> K[Social Media Integration]
-                </div>
-            `;
+            }, 500);
         });
+
+        function closePopup() {
+            document.getElementById('overlay').style.display = 'none';
+            document.querySelectorAll('.popup').forEach(popup => {
+                popup.style.display = 'none';
+            });
+        }
     </script>
 </body>
 </html>

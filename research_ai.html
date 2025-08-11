@@ -125,119 +125,45 @@
         // Modal functionality
         const modal = document.getElementById("modal");
         const span = document.getElementsByClassName("close")[0];
-        
-        // Data for each node
-        const nodeData = {
-            "A": {
-                title: "Korean Christian Research Labs",
-                description: "Cutting-edge R&D centers funded by Korean megachurches to develop evangelical technologies.",
-                wiki: "https://en.wikipedia.org/wiki/Christianity_in_Korea",
-                link1: "https://www.koreaherald.com/view.php?ud=20211206000734",
-                link2: "https://www.christianitytoday.com/ct/2022/june-web-only/korea-christianity-missions-research-technology.html"
-            },
-            "B": {
-                title: "Bible Translation AI",
-                description: "AI systems for rapid Bible translation into minority languages (e.g., Nabak, Kurdish dialects).",
-                wiki: "https://en.wikipedia.org/wiki/Bible_translations",
-                link1: "https://slator.com/ai-machine-translation-bible-translation-jesus-film-project/",
-                link2: "https://www.christianitytoday.com/news/2023/july/bible-translation-ai-chatgpt-natural-language-llm.html"
-            },
-            "C": {
-                title: "Digital Evangelism Tools",
-                description: "Software suite for online proselytization, including analytics for targeting unreached groups.",
-                wiki: "https://en.wikipedia.org/wiki/Digital_evangelism",
-                link1: "https://www.lausanne.org/content/networking/technology-in-mission-digital-evangelism",
-                link2: "https://missionexus.org/the-rise-of-digital-missionaries/"
-            },
-            "D": {
-                title: "Real-Time Language AI",
-                description: "Live translation apps used by missionaries in multilingual fieldwork (e.g., Amazon tribes).",
-                wiki: "https://en.wikipedia.org/wiki/Speech_translation",
-                link1: "https://www.wycliffe.org.uk/about/news/ai-translation-missions/",
-                link2: "https://www.christianpost.com/news/ai-translation-breaks-language-barriers-for-missionaries.html"
-            },
-            "E": {
-                title: "North Korean Dialect Support",
-                description: "Covert NLP models tailored to Northern dialects for underground Bible distribution.",
-                wiki: "https://en.wikipedia.org/wiki/Christianity_in_North_Korea",
-                link1: "https://www.nknews.org/pro/underground-christians-in-north-korea-are-using-smuggled-usb-bibles-report-says/",
-                link2: "https://www.opendoorsusa.org/christian-persecution/stories/north-korea-smuggling-bibles/"
-            },
-            "F": {
-                title: "VR Prayer Apps",
-                description: "Virtual reality experiences simulating Jerusalem pilgrimage or 'walking with Jesus.'",
-                wiki: "https://en.wikipedia.org/wiki/Religious_technology",
-                link1: "https://www.christianitytoday.com/ct/2022/january-february/virtual-reality-church-metaverse-ministry.html",
-                link2: "https://missionexus.org/virtual-reality-as-a-mission-tool/"
-            },
-            "G": {
-                title: "Algorithmic Scripture Targeting",
-                description: "Social media algorithms that deliver Bible verses based on user behavior data.",
-                wiki: "https://en.wikipedia.org/wiki/Targeted_advertising",
-                link1: "https://www.christianitytoday.com/ct/2023/april-web-only/ai-evangelism-social-media-algorithms-christian.html",
-                link2: "https://www.lausanne.org/content/statement/algorithmic-evangelism"
-            },
-            "H": {
-                title: "Underground USB Bibles",
-                description: "MicroSD cards/AI-translated Bibles smuggled into restricted nations (e.g., Yemen, North Korea).",
-                wiki: "https://en.wikipedia.org/wiki/Samizdat",
-                link1: "https://www.opendoorsusa.org/christian-persecution/stories/underground-usb-bibles/",
-                link2: "https://www.christianpost.com/news/underground-church-uses-tech-to-smuggle-bibles-into-north-korea.html"
-            },
-            "I": {
-                title: "Sanction Circumvention",
-                description: "Use of blockchain/crypto to fund missions in sanctioned regions (e.g., Iran).",
-                wiki: "https://en.wikipedia.org/wiki/Cryptocurrency_and_religion",
-                link1: "https://www.christianitytoday.com/ct/2022/july-august/crypto-missions-ministry-fundraising-blockchain.html",
-                link2: "https://www.lausanne.org/content/blockchain-and-the-future-of-mission-giving"
-            },
-            "J": {
-                title: "Gen Z Conversions",
-                description: "Youth-focused campaigns leveraging TikTok/Reels with AI-personalized gospel content.",
-                wiki: "https://en.wikipedia.org/wiki/Generation_Z",
-                link1: "https://www.christianitytoday.com/ct/2023/july-web-only/gen-z-evangelism-tiktok-social-media.html",
-                link2: "https://missionexus.org/reaching-gen-z-through-digital-evangelism/"
-            },
-            "K": {
-                title: "Social Media Integration",
-                description: "Automated missionary chatbots on WhatsApp/Telegram in majority-Muslim countries.",
-                wiki: "https://en.wikipedia.org/wiki/Christian_missionary",
-                link1: "https://www.christianitytoday.com/ct/2023/may-web-only/chatbots-evangelism-missions-ai-christian.html",
-                link2: "https://www.lausanne.org/content/networking/digital-discipleship-in-muslim-contexts"
-            }
-        };
+        let nodeData = {};
+
+        // Load data from external file
+        fetch('data.txt')
+            .then(response => response.text())
+            .then(text => {
+                const lines = text.split('\n');
+                lines.forEach(line => {
+                    if (line.trim()) {
+                        const [id, title, description, wiki, link1, link2] = line.split('|');
+                        nodeData[id] = { title, description, wiki, link1, link2 };
+                    }
+                });
+                addNodeClickHandlers();
+            })
+            .catch(err => console.error('Error loading data:', err));
 
         // Add click handlers after Mermaid renders
         function addNodeClickHandlers() {
-            // Wait a moment for Mermaid to finish rendering
-            setTimeout(() => {
-                const nodes = document.querySelectorAll('.node');
-                nodes.forEach(node => {
-                    const nodeId = node.id.replace(/^flowchart-/, '').replace(/-[0-9]+$/, '');
-                    if (nodeData[nodeId]) {
-                        node.style.cursor = 'pointer';
-                        node.addEventListener('click', () => {
-                            const data = nodeData[nodeId];
-                            document.getElementById('modal-title').textContent = data.title;
-                            document.getElementById('modal-description').textContent = data.description;
-                            document.getElementById('wiki-link').href = data.wiki;
-                            document.getElementById('wiki-link').textContent = 'Wikipedia: ' + data.title;
-                            document.getElementById('link1').href = data.link1;
-                            document.getElementById('link1').textContent = 'Article: ' + new URL(data.link1).hostname.replace('www.', '');
-                            document.getElementById('link2').href = data.link2;
-                            document.getElementById('link2').textContent = 'Report: ' + new URL(data.link2).hostname.replace('www.', '');
-                            modal.style.display = "block";
-                        });
-                    }
-                });
-            }, 500);
+            const nodes = document.querySelectorAll('.node');
+            nodes.forEach(node => {
+                const nodeId = node.id.replace(/^flowchart-/, '').replace(/-[0-9]+$/, '');
+                if (nodeData[nodeId]) {
+                    node.style.cursor = 'pointer';
+                    node.addEventListener('click', () => {
+                        const data = nodeData[nodeId];
+                        document.getElementById('modal-title').textContent = data.title;
+                        document.getElementById('modal-description').textContent = data.description;
+                        document.getElementById('wiki-link').href = data.wiki;
+                        document.getElementById('wiki-link').textContent = 'Wikipedia: ' + data.title;
+                        document.getElementById('link1').href = data.link1;
+                        document.getElementById('link1').textContent = 'Article: ' + new URL(data.link1).hostname.replace('www.', '');
+                        document.getElementById('link2').href = data.link2;
+                        document.getElementById('link2').textContent = 'Report: ' + new URL(data.link2).hostname.replace('www.', '');
+                        modal.style.display = "block";
+                    });
+                }
+            });
         }
-
-        // Initialize click handlers when Mermaid is done
-        document.addEventListener('DOMContentLoaded', () => {
-            const observer = new MutationObserver(addNodeClickHandlers);
-            observer.observe(document.getElementById('flowchart'), { childList: true, subtree: true });
-        });
 
         // Close modal
         span.onclick = function() {

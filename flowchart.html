@@ -202,31 +202,37 @@
                     node.style.cursor = 'pointer';
                     node.addEventListener('click', () => {
                         const data = nodeData[nodeId];
-                        document.getElementById('modal-title').textContent = data.title;
-                        document.getElementById('modal-description').textContent = data.description;
-                        
-                        // Clear and rebuild links
-                        const linksContainer = document.getElementById('links-container');
-                        linksContainer.innerHTML = '<h3>Learn More:</h3>';
-                        
-                        // Add all links dynamically
-                        data.links.forEach((link, index) => {
-                            if (link.trim()) {
-                                try {
-                                    const url = new URL(link);
-                                    const a = document.createElement('a');
-                                    a.href = link;
-                                    a.target = '_blank';
-                                    a.textContent = `${index === 0 ? 'Wikipedia' : 'Resource ' + index}: ${url.hostname.replace('www.', '')}`;
-                                    linksContainer.appendChild(a);
-                                } catch (e) {
-                                    console.error('Invalid URL:', link);
-                                }
-                            }
-                        });
-                        
-                        modal.style.display = "block";
-                    });
+                        node.addEventListener('click', () => {
+            const data = nodeData[nodeId];
+            document.getElementById('modal-title').textContent = data.title;
+            document.getElementById('modal-description').textContent = data.description;
+            
+            // Clear previous links
+            const linksContainer = document.getElementById('links-container');
+            linksContainer.innerHTML = '<h3>Learn More:</h3>';
+            
+            // Add ALL links dynamically
+            data.links.forEach((link, index) => {
+                if (link.trim()) {
+                    const a = document.createElement('a');
+                    a.href = link;
+                    a.target = '_blank';
+                    
+                    // Label first link as Wikipedia, others as Resource
+                    a.textContent = `${index === 0 ? 'Wikipedia' : 'Resource ' + index}: ${new URL(link).hostname.replace('www.', '')}`;
+                    
+                    linksContainer.appendChild(a);
+                    linksContainer.appendChild(document.createElement('br'));
+                }
+            });
+            
+            modal.style.display = "block";
+        });
+
+        // [Rest of the script remains the same]
+    </script>
+</body>
+</html>
                 }
             });
         }

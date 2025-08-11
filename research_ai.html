@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protestant Missionary Tech Network</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        #flowchart {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        #info-panel {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 200px;
+        }
+        .node {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .node:hover {
+            opacity: 0.8;
+        }
+        .link {
+            color: #0066cc;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #3498db;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Protestant Missionary Technology Network</h1>
+    <div id="flowchart"></div>
+    <div id="info-panel">
+        <h2 id="info-title">Click any node to learn more</h2>
+        <div id="info-description"></div>
+        <div id="info-links" class="hidden">
+            <h3>Learn More:</h3>
+            <ul id="links-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Node data with descriptions and links
+            const nodeData = {
+                'A': {
+                    title: 'Korean Christian Research Labs',
+                    description: 'Cutting-edge R&D centers funded by Korean megachurches to develop evangelical technologies.',
+                    links: [
+                        {name: 'Wikipedia: Christianity in Korea', url: 'https://en.wikipedia.org/wiki/Christianity_in_Korea'},
+                        {name: 'Korea Research Institute for Missions', url: 'https://www.krim.org'},
+                        {name: 'Korean megachurches and technology', url: 'https://www.christianitytoday.com/ct/2020/february-web-only/korea-christianity-yoido-full-gospel-church-technology.html'}
+                    ]
+                },
+                'B': {
+                    title: 'Bible Translation AI',
+                    description: 'AI systems for rapid Bible translation into minority languages (e.g., Nabak, Kurdish dialects).',
+                    links: [
+                        {name: 'Wikipedia: Bible translations', url: 'https://en.wikipedia.org/wiki/Bible_translations'},
+                        {name: 'AI Bible translation projects', url: 'https://slator.com/ai-machine-translation/united-bible-societies-ai-for-scripture-translation/'},
+                        {name: 'Wycliffe Bible Translators', url: 'https://www.wycliffe.org'}
+                    ]
+                },
+                // Add all other nodes following the same pattern
+                'C': {
+                    title: 'Digital Evangelism Tools',
+                    description: 'Software suite for online proselytization, including analytics for targeting unreached groups.',
+                    links: [
+                        {name: 'Wikipedia: Digital evangelism', url: 'https://en.wikipedia.org/wiki/Digital_evangelism'},
+                        {name: 'Digital missions strategies', url: 'https://www.missionfrontiers.org/issue/article/digital-strategies-for-reaching-the-unreached'},
+                        {name: 'Joshua Project digital tools', url: 'https://joshuaproject.net'}
+                    ]
+                },
+                'D': {
+                    title: 'Real-Time Language AI',
+                    description: 'Live translation apps used by missionaries in multilingual fieldwork (e.g., Amazon tribes).',
+                    links: [
+                        {name: 'Wikipedia: Machine translation', url: 'https://en.wikipedia.org/wiki/Machine_translation'},
+                        {name: 'Faith-based translation tech', url: 'https://www.christianitytoday.com/ct/2023/march-web-only/bible-translation-ai-chatgpt-artificial-intelligence.html'},
+                        {name: 'Google AI for endangered languages', url: 'https://blog.google/outreach-initiatives/accessibility/1000-languages-initiative/'}
+                    ]
+                },
+                'E': {
+                    title: 'North Korean Dialect Support',
+                    description: 'Covert NLP models tailored to Northern dialects for underground Bible distribution.',
+                    links: [
+                        {name: 'Wikipedia: Christianity in North Korea', url: 'https://en.wikipedia.org/wiki/Christianity_in_North_Korea'},
+                        {name: 'Bible smuggling methods', url: 'https://www.opendoorsusa.org/christian-persecution/stories/north-korea-smuggling-bibles/'},
+                        {name: 'Korean language technology', url: 'https://www.koreatimes.co.kr/www/tech/2023/04/419_348552.html'}
+                    ]
+                }
+                // Continue with remaining nodes...
+            };
+
+            // Add click handlers after diagram renders
+            const observer = new MutationObserver(function() {
+                document.querySelectorAll('.node').forEach(node => {
+                    const nodeId = node.id.replace('flowchart-', '').replace('-title', '');
+                    if (nodeData[nodeId]) {
+                        node.style.cursor = 'pointer';
+                        node.addEventListener('click', function() {
+                            const data = nodeData[nodeId];
+                            document.getElementById('info-title').textContent = data.title;
+                            document.getElementById('info-description').innerHTML = `<p>${data.description}</p>`;
+                            
+                            const linksList = document.getElementById('links-list');
+                            linksList.innerHTML = '';
+                            data.links.forEach(link => {
+                                const li = document.createElement('li');
+                                li.innerHTML = `<a href="${link.url}" target="_blank" class="link">${link.name}</a>`;
+                                linksList.appendChild(li);
+                            });
+                            
+                            document.getElementById('info-links').classList.remove('hidden');
+                        });
+                    }
+                });
+            });
+
+            observer.observe(document.body, { childList: true, subtree: true });
+
+            // Insert the flowchart
+            document.getElementById('flowchart').innerHTML = `
+                <div class="mermaid">
+                    flowchart TD
+                        A[Korean Christian Research Labs] --> B[Bible Translation AI]
+                        A --> C[Digital Evangelism Tools]
+                        B --> D[Real-Time Language AI]
+                        B --> E[North Korean Dialect Support]
+                        C --> F[VR Prayer Apps]
+                        C --> G[Algorithmic Scripture Targeting]
+                        D --> H[Underground USB Bibles]
+                        E --> I[Sanction Circumvention]
+                        F --> J[Gen Z Conversions]
+                        G --> K[Social Media Integration]
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>

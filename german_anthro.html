@@ -92,6 +92,11 @@
             border-top: 1px dashed #ddd;
             padding-top: 10px;
         }
+        
+        /* Ensure Mermaid nodes are clickable */
+        .mermaid .node {
+            cursor: pointer !important;
+        }
     </style>
 </head>
 <body>
@@ -307,11 +312,17 @@ flowchart TD
     </div>
 
     <script>
-        // Initialize Mermaid
+        // Initialize Mermaid with callback
         mermaid.initialize({
             startOnLoad: true,
             securityLevel: 'loose',
-            flowchart: { useMaxWidth: false, htmlLabels: true }
+            flowchart: { 
+                useMaxWidth: false,
+                htmlLabels: true
+            },
+            callback: function() {
+                initializeNodeHandlers();
+            }
         });
         
         // Zoom functionality
@@ -351,35 +362,41 @@ flowchart TD
         
         // Initialize node click handlers
         function initializeNodeHandlers() {
-            const nodes = document.querySelectorAll('.node');
-            
-            nodes.forEach(node => {
-                node.style.cursor = 'pointer';
+            // Wait a bit more to ensure rendering is complete
+            setTimeout(() => {
+                const nodes = document.querySelectorAll('.mermaid .node, .mermaid .node rect, .mermaid .node polygon');
                 
-                node.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const nodeId = node.id;
-                    const contentDiv = document.getElementById(`data-${nodeId}`);
+                nodes.forEach(node => {
+                    // Find the parent node element if we clicked on a sub-element
+                    let targetNode = node;
+                    while (targetNode && !targetNode.classList.contains('node')) {
+                        targetNode = targetNode.parentElement;
+                    }
                     
-                    if (contentDiv) {
-                        document.getElementById('popup-title').textContent = contentDiv.dataset.title;
-                        document.getElementById('popup-body').innerHTML = contentDiv.innerHTML;
-                        document.getElementById('popup-source').textContent = `Source: ${contentDiv.dataset.source}`;
-                        popup.style.display = 'flex';
+                    if (targetNode) {
+                        targetNode.style.cursor = 'pointer';
+                        
+                        targetNode.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const nodeId = targetNode.id;
+                            const contentDiv = document.getElementById(`data-${nodeId}`);
+                            
+                            if (contentDiv) {
+                                document.getElementById('popup-title').textContent = contentDiv.dataset.title;
+                                document.getElementById('popup-body').innerHTML = contentDiv.innerHTML;
+                                document.getElementById('popup-source').textContent = `Source: ${contentDiv.dataset.source}`;
+                                popup.style.display = 'flex';
+                            }
+                        });
                     }
                 });
-            });
+            }, 500); // Additional delay to ensure complete rendering
         }
         
-        // Wait for Mermaid rendering
-        const observer = new MutationObserver(() => {
-            if (document.querySelector('.mermaid svg')) {
-                observer.disconnect();
-                initializeNodeHandlers();
-            }
+        // Fallback initialization if callback doesn't fire
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(initializeNodeHandlers, 1000);
         });
-        
-        observer.observe(document.body, { childList: true, subtree: true });
     </script>
 </body>
 </html>

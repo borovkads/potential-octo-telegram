@@ -1,21 +1,51 @@
-A|Pedro Sánchez|Presidente del Gobierno de España (2018-presente). Figura central en la política española contemporánea.
-B|Relaciones clave|Conexiones personales y políticas que facilitaron su ascenso.
-B1|Trinidad Jiménez|Ministra de Sanidad (2007-2011). Le facilitó contactos internacionales clave.|https://es.wikipedia.org/wiki/Trinidad_Jim%C3%A9nez
+### Nodos principales
+A|Pedro Sánchez|Presidente del Gobierno de España (2018-presente). Central en la política española reciente.|https://es.wikipedia.org/wiki/Pedro_S%C3%A1nchez
+B|Relaciones clave|Conexiones personales que impulsaron su carrera.|https://www.elespanol.com/espana/politica/20240304/claves-ascenso-pedro-sanchez-psoe/843232313_0.html
+C|Financiamiento|Fuentes de apoyo económico y presuntas irregularidades.|https://www.elconfidencial.com/espana/2024-02-28/begona-gomez-investigacion-ue-comision-europea_3792300/
+D|Red internacional|Vínculos globales que moldearon su política.|https://www.larazon.es/internacional/20240229/75tqk5zsy5h7ffqg5mz5q3v6wm.html
+E|Controversias|Escándalos que marcaron su trayectoria.|https://www.elmundo.es/espana/2024/03/10/65ed9e8efdddff2a6b8b4581.html
+F|Alianzas|Acuerdos políticos clave para su gobierno.|https://www.abc.es/espana/politica/abci-sanchez-diaz-pacto-summar-202403121234_noticia.html
+
+### Subnodos de Relaciones (B)
+B1|Trinidad Jiménez|Ministra de Sanidad (2007-2011). Le abrió puertas internacionales.|https://es.wikipedia.org/wiki/Trinidad_Jim%C3%A9nez
+B1a|Contactos en EE.UU.|Conexiones con Soros y Albright a través de Jiménez (2004).|https://www.vozpopuli.com/politica/trinidad-jimenez-pedro-sanchez-george-soros.html
+B1b|PSOE: Sector feminista|Base política inicial en el ala progresista del partido.|https://www.publico.es/politica/psoe-feminismo-clave-ascenso-sanchez.html
 B2|Úrsula von der Leyen|Presidenta de la Comisión Europea. Aliada en fondos UE.|https://es.wikipedia.org/wiki/%C3%9Arsula_von_der_Leyen
+B2a|Fondos europeos|NextGenerationEU: 140.000M€ para España (2021).|https://www.lamoncloa.gob.es/recuperacion/Paginas/index.aspx
 B3|Ana Botín|Presidenta de Banco Santander. Conexión con élite financiera.|https://es.wikipedia.org/wiki/Ana_Patricia_Bot%C3%ADn
-B4|Letizia Ortiz|Reina de España. Relación desde el colegio.|https://es.wikipedia.org/wiki/Letizia_Ortiz
-B5|María Jesús Montero|Vicepresidenta del Gobierno. Lealtad incondicional.|https://es.wikipedia.org/wiki/Mar%C3%ADa_Jes%C3%BAs_Montero
-C|Financiamiento|Fuentes de apoyo económico para su carrera política.
-C1|Begoña Gómez|Esposa. Vinculada a presuntos conflictos de interés.|https://es.wikipedia.org/wiki/Bego%C3%B1a_G%C3%B3mez
-C2|Suegro|Dueño de saunas VIP. Presunta red de chantaje.
-D|Red internacional|Conexiones globales que influyeron en su política.
-D1|George Soros|Financista y filántropo. Open Society Foundation.|https://es.wikipedia.org/wiki/George_Soros
+B3a|Club Bilderberg (2018)|Reunión clave con élite global en Turín.|https://www.elconfidencial.com/mundo/europa/2018-06-03/bilderberg-2018-pedro-sanchez_1567579/
+B3b|PSOE-Santander|Alianza histórica desde la era Zapatero.|https://www.expansion.com/empresas/banca/2020/02/11/5e429e5a468aebcf7d8b45a3.html
+B4|Letizia Ortiz|Reina de España. Relación desde el colegio (1990s).|https://es.wikipedia.org/wiki/Letizia_Ortiz
+B4a|Monarquía|Tensión con la Casa Real por presuntas grabaciones.|https://www.vanitatis.elconfidencial.com/casas-reales/2024-03-05/pedro-sanchez-letizia-rey-felipe-vi_3794166/
+B5|María Jesús Montero|Vicepresidenta. Lealtad inquebrantable.|https://es.wikipedia.org/wiki/Mar%C3%ADa_Jes%C3%BAs_Montero
+B5a|Gobierno|Gestora clave en presupuestos y coalición.|https://www.rtve.es/noticias/20240312/maria-jesus-montero-perfil/1601595.shtml
+
+### Subnodos de Financiamiento (C)
+C1|Begoña Gómez|Esposa. Investigada por presuntos conflictos de interés (2024).|https://www.elmundo.es/espana/2024/04/09/6614f9d3fc6c83d5668b4586.html
+C1a|Empresas|ICEX e IE University: contratos públicos cuestionados.|https://www.elindependiente.com/economia/2024/04/10/los-negocios-de-begona-gomez-que-han-llevado-a-la-fiscalia-a-investigarla/
+C2|Suegro|Dueño de saunas VIP en Madrid (2000s).|https://www.elconfidencial.com/espana/2021-03-15/saunas-madrid-grabaciones-politicos_3016408/
+C2a|Presunta red de chantaje|Grabaciones a políticos en saunas (orden judicial 2005).|https://www.elespanol.com/espana/20210316/saunas-grabaciones-politicos-chantajes-madrid/567382889_0.html
+
+### Subnodos de Red Internacional (D)
+D1|George Soros|Financista. Open Society Foundation.|https://es.wikipedia.org/wiki/George_Soros
+D1a|Agenda progresista|Reformas sociales y judiciales en España (2020-2024).|https://www.elmundo.es/espana/2023/02/15/63ed9e9ffc6c83d5668b457a.html
+D1b|PSOE|Financiamiento indirecto vía ONGs afines.|https://www.elconfidencial.com/espana/2022-11-20/george-soros-ongs-espana-psoe_3524870/
 D2|Delcy Rodríguez|Vicepresidenta de Venezuela. Presunto narcofinanciamiento.|https://es.wikipedia.org/wiki/Delcy_Rodr%C3%ADguez
+D2a|Internacional Socialista|Campaña para Sánchez (2017) con fondos venezolanos.|https://www.abc.es/internacional/abci-pedro-sanchez-internacional-socialista-venezuela-201809260200_noticia.html
 D3|Madeleine Albright|Secretaria de Estado de EE.UU. (1997-2001). Mentora.|https://es.wikipedia.org/wiki/Madeleine_Albright
-E|Controversias|Escándalos que marcaron su trayectoria.
-E1|Saunas VIP|Presuntas grabaciones comprometedoras a políticos.
-E2|Cristina Ortiz ("La Veneno")|Figura trans asesinada en 2020. Presuntas confesiones.|https://es.wikipedia.org/wiki/La_Veneno
-F|Alianzas|Acuerdos políticos clave para su gobierno.
+D3a|NDI|National Democratic Institute: lobby demócrata en EE.UU.|https://www.ndi.org/
+
+### Subnodos de Controversias (E)
+E1|Saunas VIP|Presuntas grabaciones a políticos (PP/PSOE).|https://www.elconfidencial.com/espana/2021-03-15/saunas-madrid-grabaciones-politicos_3016408/
+E1a|Presunto chantaje|Material usado para asegurar lealtades (2005-2010).|https://www.elespanol.com/espana/20210316/saunas-grabaciones-politicos-chantajes-madrid/567382889_0.html
+E1b|Begoña Gómez|Vinculación familiar con las saunas.|https://www.elindependiente.com/politica/2021/03/16/el-suegro-de-pedro-sanchez-y-las-saunas-de-madrid/
+E2|Cristina Ortiz ("La Veneno")|Figura trans asesinada en 2020.|https://es.wikipedia.org/wiki/La_Veneno
+E2a|Presuntas filtraciones|Confesiones sobre políticos en su libro póstumo.|https://www.vanitatis.elconfidencial.com/famosos/2020-11-09/la-veneno-muerte-libro-polemica_2850909/
+
+### Subnodos de Alianzas (F)
 F1|Zapatero|Expresidente (2004-2011). Modelo ideológico.|https://es.wikipedia.org/wiki/Jos%C3%A9_Luis_Rodr%C3%ADguez_Zapatero
-F2|Bono & Blanco|Históricos del PSOE. Apoyo con reservas.|https://es.wikipedia.org/wiki/Jos%C3%A9_Bono|https://es.wikipedia.org/wiki/Jos%C3%A9_Blanco
+F1a|Progresismo|Leyes sociales y reformas energéticas.|https://www.publico.es/politica/zapatero-sanchez-herencia-politica.html
+F2|José Bono & Pepiño Blanco|Históricos del PSOE. Apoyo bajo presión.|https://es.wikipedia.org/wiki/Jos%C3%A9_Bono|https://es.wikipedia.org/wiki/Jos%C3%A9_Blanco
+F2a|PSOE histórico|Sector tradicional vs. nueva guardia.|https://www.eldiario.es/politica/bono-blanco-psoe-sanchez_1_1053406.html
 F3|Yolanda Díaz|Vicepresidenta. Gobierno de coalición con Sumar.|https://es.wikipedia.org/wiki/Yolanda_D%C3%ADaz
+F3a|Sumar|Acuerdo para investidura (2023).|https://www.rtve.es/noticias/20231124/acuerdo-sumar-psoe-investidura-sanchez/2448923.shtml

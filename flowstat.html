@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Completa de Pedro Sánchez</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 10px;
+        }
+        #flowchart {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            overflow: auto;
+        }
+        .node-details {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .node-section {
+            margin-bottom: 30px;
+            border-left: 4px solid #2c3e50;
+            padding-left: 15px;
+        }
+        .node-section h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .node-links a {
+            display: inline-block;
+            margin: 5px 10px 5px 0;
+            color: #2980b9;
+            text-decoration: none;
+            background: #f0f8ff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .node-links a:hover {
+            text-decoration: underline;
+            background: #e1f0ff;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Red Completa de Pedro Sánchez</h1>
+    
+    <div id="flowchart">
+        <div class="mermaid">
+flowchart TD
+    %% Núcleo central
+    A[Pedro Sánchez] --> C[Financiamiento]
+    A --> D[Red internacional]
+    A --> E[Controversias]
+    
+    %% Subnodos centrales
+    C --> C1[Begoña Gómez]
+    C1 --> C1a[Empresas]
+    C --> C2[Suegro]
+    C2 --> C2a[Presunto chantaje]
+    
+    D --> D1[George Soros]
+    D1 --> D1a[Agenda progresista]
+    D --> D2[Delcy Rodríguez]
+    D2 --> D2a[Narcofinanciamiento]
+    D --> D3[Madeleine Albright]
+    
+    E --> E1[Saunas VIP]
+    E1 --> E1a[Grabaciones]
+    E --> E2["Cristina Ortiz (La Veneno)"]
+    E2 --> E2a[Muerte sospechosa]
+
+    %% Grupo inferior
+    B[Relaciones clave] --> B1[Trinidad Jiménez]
+    B1 --> B1a[Contactos EE.UU.]
+    B --> B2[Úrsula von der Leyen]
+    B2 --> B2a[Fondos UE]
+    B --> B3[Ana Botín]
+    B3 --> B3a[Club Bilderberg]
+    B --> B4[Letizia Ortiz]
+    B --> B5[María Jesús Montero]
+    
+    F[Alianzas] --> F1[Zapatero]
+    F1 --> F1a[Progresismo]
+    F --> F2[Bono & Blanco]
+    F --> F3[Yolanda Díaz]
+
+    %% Conexiones al núcleo
+    A --> B
+    A --> F
+
+    %% Estilos
+    class A root-node
+    classDef root-node fill:#2c3e50,color:white,stroke:#1a252f
+    classDef controversy fill:#e74c3c,color:white
+    class E,E1,E2,E1a,E2a controversy
+        </div>
+    </div>
+
+    <!-- Datos completos hardcodeados -->
+    <div class="node-details">
+        <!-- Núcleo central -->
+        <div class="node-section">
+            <h2>Pedro Sánchez</h2>
+            <p>Presidente del Gobierno de España desde 2018. Figura central en la política española contemporánea.</p>
+            <div class="node-links">
+                <a href="https://es.wikipedia.org/wiki/Pedro_S%C3%A1nchez" target="_blank">Wikipedia</a>
+                <a href="https://www.lamoncloa.gob.es/presidente/paginas/index.aspx" target="_blank">Web Oficial</a>
+            </div>
+        </div>
+
+        <!-- Financiamiento -->
+        <div class="node-section">
+            <h2>Begoña Gómez</h2>
+            <p>Esposa de Pedro Sánchez. Investigada por presuntos conflictos de interés en contratos públicos (2024).</p>
+            <div class="node-links">
+                <a href="https://es.wikipedia.org/wiki/Bego%C3%B1a_G%C3%B3mez" target="_blank">Wikipedia</a>
+                <a href="https://www.elmundo.es/espana/2024/04/09/6614f9d3fc6c83d5668b4586.html" target="_blank">Noticia El Mundo</a>
+            </div>
+        </div>
+
+        <!-- Red internacional -->
+        <div class="node-section">
+            <h2>George Soros</h2>
+            <p>Financista y filántropo. Su fundación Open Society ha influido en políticas progresistas en España.</p>
+            <div class="node-links">
+                <a href="https://es.wikipedia.org/wiki/George_Soros" target="_blank">Wikipedia</a>
+                <a href="https://www.opensocietyfoundations.org/" target="_blank">Open Society</a>
+            </div>
+        </div>
+
+        <!-- Controversias -->
+        <div class="node-section">
+            <h2>Saunas VIP</h2>
+            <p>Presuntas grabaciones a políticos en establecimientos vinculados al suegro de Sánchez (2005-2010).</p>
+            <div class="node-links">
+                <a href="https://www.elconfidencial.com/espana/2021-03-15/saunas-madrid-grabaciones-politicos_3016408/" target="_blank">Reportaje El Confidencial</a>
+                <a href="https://www.elespanol.com/espana/20210316/saunas-grabaciones-politicos-chantajes-madrid/567382889_0.html" target="_blank">Artículo El Español</a>
+            </div>
+        </div>
+
+        <!-- Todos los demás nodos... -->
+        <div class="node-section">
+            <h2>Zapatero</h2>
+            <p>Expresidente del Gobierno (2004-2011). Modelo ideológico para Sánchez.</p>
+            <div class="node-links">
+                <a href="https://es.wikipedia.org/wiki/Jos%C3%A9_Luis_Rodr%C3%ADguez_Zapatero" target="_blank">Wikipedia</a>
+                <a href="https://www.publico.es/politica/zapatero-sanchez-herencia-politica.html" target="_blank">Análisis Público</a>
+            </div>
+        </div>
+
+        <!-- Más secciones... -->
+    </div>
+
+    <script>
+        mermaid.initialize({
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: false,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            fontFamily: 'Segoe UI, sans-serif'
+        });
+    </script>
+</body>
+</html>

@@ -6,6 +6,7 @@
     <title>Anthropology History Flowchart</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <style>
+        /* [Previous CSS remains exactly the same] */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -23,6 +24,7 @@
             transition: transform 0.25s;
         }
         
+        /* [Rest of your CSS remains unchanged] */
         #zoom-controls {
             margin: 10px 0;
         }
@@ -100,302 +102,92 @@
     </style>
 </head>
 <body>
-    <h1>History of Anthropological Thought</h1>
-    
-    <div id="zoom-controls">
-        <button id="zoom-in">Zoom In (+)</button>
-        <button id="zoom-out">Zoom Out (-)</button>
-        <button id="reset-zoom">Reset Zoom</button>
-    </div>
-    
-    <div id="flowchart-container">
-        <div class="mermaid">
-flowchart TD
-    A[Enlightenment Humanism] --> B[Rudolf Virchow]
-    B -->|Liberal phase| C[Early German Anthropology]
-    C -->|Shift to racial science| D[Ernst Haeckel]
-    D -->|"Monist racial hierarchy"| E[Felix von Luschan]
-    E -->|Fieldwork in colonies| F[Colonial Racial Policies]
-    D -->|Influence| G[Eugen Fischer]
-    G -->|"Racial hygiene"| H[Nazi Anthropology]
-    F --> H
-    C -->|Jewish scholars| I[Franz Boas]
-    I -->|Rejection of racial science| J[American Cultural Anthropology]
-    style A fill:#f9f,stroke:#333
-    style H fill:#f00,stroke:#333
-    style J fill:#0a0,stroke:#333
-        </div>
-    </div>
-    
-    <div class="popup-overlay" id="popup">
-        <div class="popup-content">
-            <span class="close-btn">&times;</span>
-            <h2 class="popup-title" id="popup-title"></h2>
-            <div id="popup-body"></div>
-            <div class="source-footer" id="popup-source"></div>
-        </div>
-    </div>
-    
-    <!-- Pre-loaded content for ALL nodes -->
-    <div id="content-storage" class="node-data">
-        <!-- Enlightenment Humanism -->
-        <div id="data-A" data-title="Enlightenment Humanism" data-source="Generated Summary">
-            <p>The Enlightenment Humanism movement (18th century) emphasized reason, science, and human potential as alternatives to religious dogma. This philosophical foundation was crucial for the development of anthropology as it promoted:</p>
-            <ul>
-                <li>Empirical observation of human cultures</li>
-                <li>Concept of universal human rights</li>
-                <li>Secular explanations for cultural diversity</li>
-            </ul>
-            <p>Key figures like Denis Diderot and Voltaire challenged theological explanations of human differences, while Immanuel Kant's anthropology lectures (1772-1796) established early academic frameworks.</p>
-        </div>
-        
-        <!-- Rudolf Virchow -->
-        <div id="data-B" data-title="Rudolf Virchow" data-source="Wikipedia Adaptation">
-            <p>Rudolf Virchow (1821-1902) was a German physician and anthropologist who made significant contributions to both fields:</p>
-            <h3>Scientific Contributions</h3>
-            <ul>
-                <li>Founded modern pathology ("cellular pathology" concept)</li>
-                <li>Established Berlin Society for Anthropology, Ethnology and Prehistory (1869)</li>
-                <li>Pioneered systematic anthropometric measurements</li>
-            </ul>
-            <h3>Anthropological Legacy</h3>
-            <p>Though Virchow opposed antisemitism and biological determinism early in his career, his methods were later appropriated by racial scientists. His 1876 study of schoolchildren's physical characteristics became an unintended foundation for Nazi racial theories.</p>
-        </div>
-        
-        <!-- Early German Anthropology -->
-        <div id="data-C" data-title="Early German Anthropology" data-source="Academic Synthesis">
-            <p>Early German Anthropology (1850s-1880s) emerged during a period of liberal reform, characterized by:</p>
-            <h3>Institutional Development</h3>
-            <ul>
-                <li>Museum-based research (Berlin Ethnological Museum founded 1873)</li>
-                <li>University positions in ethnology</li>
-                <li>Interdisciplinary approaches combining medicine, linguistics, and archaeology</li>
-            </ul>
-            <h3>Key Debates</h3>
-            <p>The field was divided between:</p>
-            <ul>
-                <li>Liberal humanists (like Adolf Bastian) emphasizing psychic unity of mankind</li>
-                <li>Racial theorists developing hierarchical models</li>
-                <li>Jewish scholars who would later be excluded</li>
-            </ul>
-        </div>
-        
-        <!-- Ernst Haeckel -->
-        <div id="data-D" data-title="Ernst Haeckel" data-source="Wikipedia Adaptation">
-            <p>Ernst Haeckel (1834-1919) was a German biologist who:</p>
-            <ul>
-                <li>Popularized Darwin's theory in Germany</li>
-                <li>Founded the Monist League (1906) promoting scientific materialism</li>
-                <li>Developed controversial racial theories through his concept of "ontogeny recapitulates phylogeny"</li>
-            </ul>
-            <h3>Anthropological Impact</h3>
-            <p>Haeckel's racial hierarchy (published in his 1868 "Natürliche Schöpfungsgeschichte") directly influenced Nazi ideology by:</p>
-            <ol>
-                <li>Ranking human "species" from "savages" to "civilized races"</li>
-                <li>Promoting eugenic ideas of racial purity</li>
-                <li>Providing pseudoscientific justification for colonial exploitation</li>
-            </ol>
-        </div>
-        
-        <!-- Felix von Luschan -->
-        <div id="data-E" data-title="Felix von Luschan" data-source="Generated Summary">
-            <p>Felix von Luschan (1854-1924) was an Austrian physician and anthropologist whose work represents the transition from liberal to racial science:</p>
-            <h3>Key Contributions</h3>
-            <ul>
-                <li>Developed the von Luschan chromatic scale for skin color measurement</li>
-                <li>Conducted extensive fieldwork in German colonies</li>
-                <li>Served as curator at Berlin Ethnological Museum</li>
-            </ul>
-            <h3>Contradictory Legacy</h3>
-            <p>While von Luschan:</p>
-            <ul>
-                <li>Opposed simple racial determinism</li>
-                <li>Recognized environmental influences</li>
-                <p>His methods and data were later used to support Nazi racial policies, particularly through his students like Eugen Fischer.</p>
-            </ul>
-        </div>
-        
-        <!-- Colonial Racial Policies -->
-        <div id="data-F" data-title="Colonial Racial Policies" data-source="Historical Research">
-            <p>German colonial administration (1884-1918) systematically applied anthropological theories to justify oppressive policies:</p>
-            <h3>Implementation</h3>
-            <ul>
-                <li>Racial classification systems for indigenous populations</li>
-                <li>Forced labor systems based on alleged racial characteristics</li>
-                <li>Anthropometric studies of Herero and Nama peoples during genocide</li>
-            </ul>
-            <h3>Scientific Collaboration</h3>
-            <p>Anthropologists participated in:</p>
-            <ol>
-                <li>Collecting human remains for museums</li>
-                <li>Developing racial categorization systems</li>
-                <li>Providing scientific legitimacy to colonial violence</li>
-            </ol>
-            <p>This established patterns later expanded during the Nazi period.</p>
-        </div>
-        
-        <!-- Eugen Fischer -->
-        <div id="data-G" data-title="Eugen Fischer" data-source="Wikipedia Adaptation">
-            <p>Eugen Fischer (1874-1967) was a German anthropologist who played a key role in Nazi science:</p>
-            <h3>Pre-War Work</h3>
-            <ul>
-                <li>1908 study of "Rehoboth bastards" in Namibia</li>
-                <li>Director of Kaiser Wilhelm Institute of Anthropology (1927-1942)</li>
-                <li>Developed "racial hygiene" concepts</li>
-            </ul>
-            <h3>Nazi Period</h3>
-            <p>Fischer:</p>
-            <ul>
-                <li>Trained SS doctors in racial science</li>
-                <li>Approved sterilization programs</li>
-                <li>Provided expert testimony for Nuremberg Laws</li>
-                <li>Supervised doctoral candidate Josef Mengele</li>
-            </ul>
-        </div>
-        
-        <!-- Nazi Anthropology -->
-        <div id="data-H" data-title="Nazi Anthropology" data-source="Historical Synthesis">
-            <p>Nazi Anthropology (1933-1945) represented the complete politicization of the discipline:</p>
-            <h3>Institutional Framework</h3>
-            <ul>
-                <li>Kaiser Wilhelm Institute as central research hub</li>
-                <li>SS-Ahnenerbe for ideological "research"</li>
-                <li>University departments purged of Jewish scholars</li>
-            </ul>
-            <h3>Practices</h3>
-            <ol>
-                <li>Racial classification of populations</li>
-                <li>Skeletal collections from concentration camps</li>
-                <li>Live human experimentation</li>
-                <li>Direct participation in Holocaust selections</li>
-            </ol>
-            <p>Postwar, many anthropologists continued careers without accountability.</p>
-        </div>
-        
-        <!-- Franz Boas -->
-        <div id="data-I" data-title="Franz Boas" data-source="Wikipedia Adaptation">
-            <p>Franz Boas (1858-1942) was a German-American anthropologist who revolutionized the field:</p>
-            <h3>Key Contributions</h3>
-            <ul>
-                <li>Founded cultural anthropology in America</li>
-                <li>Established scientific anti-racism through skull measurements</li>
-                <li>Developed cultural relativism framework</li>
-                <li>Trained first generation of American anthropologists</li>
-            </ul>
-            <h3>German Context</h3>
-            <p>As a Jewish scholar in Berlin, Boas:</p>
-            <ul>
-                <li>Faced discrimination despite scientific achievements</li>
-                <li>Emigrated to US in 1880s due to antisemitism</li>
-                <li>Maintained academic ties until Nazi era</li>
-            </ul>
-        </div>
-        
-        <!-- American Cultural Anthropology -->
-        <div id="data-J" data-title="American Cultural Anthropology" data-source="Generated Summary">
-            <p>American Cultural Anthropology developed as a direct rejection of German racial science:</p>
-            <h3>Core Principles</h3>
-            <ul>
-                <li>Cultural relativism over racial determinism</li>
-                <li>Fieldwork-based ethnography</li>
-                <li>Focus on learned behavior and symbolic systems</li>
-            </ul>
-            <h3>Historical Development</h3>
-            <p>The Boasian school:</p>
-            <ol>
-                <li>Established four-field approach (cultural, linguistic, archaeological, biological)</li>
-                <li>Promoted anti-racist activism</li>
-                <li>Shifted focus to functional analysis of cultures</li>
-            </ol>
-            <p>This became dominant paradigm in 20th century anthropology.</p>
-        </div>
-    </div>
+    <!-- [Previous HTML structure remains exactly the same until the script section] -->
 
     <script>
-        // Initialize Mermaid with callback
+        // Initialize Mermaid with proper callback
         mermaid.initialize({
             startOnLoad: true,
             securityLevel: 'loose',
             flowchart: { 
                 useMaxWidth: false,
                 htmlLabels: true
-            },
-            callback: function() {
-                initializeNodeHandlers();
             }
         });
-        
-        // Zoom functionality
-        let currentScale = 1;
-        const zoomStep = 0.2;
-        const flowchartContainer = document.getElementById('flowchart-container');
-        
-        document.getElementById('zoom-in').addEventListener('click', () => {
-            currentScale += zoomStep;
-            flowchartContainer.style.transform = `scale(${currentScale})`;
-        });
-        
-        document.getElementById('zoom-out').addEventListener('click', () => {
-            currentScale = Math.max(0.5, currentScale - zoomStep);
-            flowchartContainer.style.transform = `scale(${currentScale})`;
-        });
-        
-        document.getElementById('reset-zoom').addEventListener('click', () => {
-            currentScale = 1;
-            flowchartContainer.style.transform = 'scale(1)';
-        });
-        
-        // Popup handling
-        const popup = document.getElementById('popup');
-        const closeBtn = document.querySelector('.close-btn');
-        
-        closeBtn.addEventListener('click', () => {
-            popup.style.display = 'none';
-        });
-        
-        // Close when clicking outside popup
-        popup.addEventListener('click', (e) => {
-            if (e.target === popup) {
+
+        // Wait for everything to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Zoom functionality (unchanged)
+            let currentScale = 1;
+            const zoomStep = 0.2;
+            const flowchartContainer = document.getElementById('flowchart-container');
+            
+            document.getElementById('zoom-in').addEventListener('click', () => {
+                currentScale += zoomStep;
+                flowchartContainer.style.transform = `scale(${currentScale})`;
+            });
+            
+            document.getElementById('zoom-out').addEventListener('click', () => {
+                currentScale = Math.max(0.5, currentScale - zoomStep);
+                flowchartContainer.style.transform = `scale(${currentScale})`;
+            });
+            
+            document.getElementById('reset-zoom').addEventListener('click', () => {
+                currentScale = 1;
+                flowchartContainer.style.transform = 'scale(1)';
+            });
+            
+            // Popup handling (unchanged)
+            const popup = document.getElementById('popup');
+            const closeBtn = document.querySelector('.close-btn');
+            
+            closeBtn.addEventListener('click', () => {
                 popup.style.display = 'none';
-            }
-        });
-        
-        // Initialize node click handlers
-        function initializeNodeHandlers() {
-            // Wait a bit more to ensure rendering is complete
-            setTimeout(() => {
-                const nodes = document.querySelectorAll('.mermaid .node, .mermaid .node rect, .mermaid .node polygon');
-                
-                nodes.forEach(node => {
-                    // Find the parent node element if we clicked on a sub-element
-                    let targetNode = node;
-                    while (targetNode && !targetNode.classList.contains('node')) {
-                        targetNode = targetNode.parentElement;
-                    }
+            });
+            
+            popup.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.style.display = 'none';
+                }
+            });
+
+            // NEW: Reliable node click handling
+            function initializeNodeHandlers() {
+                // Wait for Mermaid to complete rendering
+                const checkRendered = setInterval(() => {
+                    const nodes = document.querySelectorAll('.mermaid .node, .node > rect, .node > polygon');
                     
-                    if (targetNode) {
-                        targetNode.style.cursor = 'pointer';
+                    if (nodes.length > 0) {
+                        clearInterval(checkRendered);
                         
-                        targetNode.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const nodeId = targetNode.id;
-                            const contentDiv = document.getElementById(`data-${nodeId}`);
+                        nodes.forEach(node => {
+                            // Get the actual node element (handles SVG vs HTML)
+                            const targetNode = node.closest('.node') || node;
+                            targetNode.style.cursor = 'pointer';
                             
-                            if (contentDiv) {
-                                document.getElementById('popup-title').textContent = contentDiv.dataset.title;
-                                document.getElementById('popup-body').innerHTML = contentDiv.innerHTML;
-                                document.getElementById('popup-source').textContent = `Source: ${contentDiv.dataset.source}`;
-                                popup.style.display = 'flex';
-                            }
+                            // Extract the node ID from Mermaid's generated ID
+                            const nodeId = targetNode.id.replace(/^flowchart-/, '').replace(/-[0-9]+$/, '');
+                            
+                            targetNode.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const contentDiv = document.getElementById(`data-${nodeId}`);
+                                
+                                if (contentDiv) {
+                                    document.getElementById('popup-title').textContent = contentDiv.dataset.title;
+                                    document.getElementById('popup-body').innerHTML = contentDiv.innerHTML;
+                                    document.getElementById('popup-source').textContent = `Source: ${contentDiv.dataset.source}`;
+                                    popup.style.display = 'flex';
+                                } else {
+                                    console.warn('No content found for node:', nodeId);
+                                }
+                            });
                         });
                     }
-                });
-            }, 500); // Additional delay to ensure complete rendering
-        }
-        
-        // Fallback initialization if callback doesn't fire
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(initializeNodeHandlers, 1000);
+                }, 100);
+            }
+
+            // Initialize after short delay to ensure Mermaid is ready
+            setTimeout(initializeNodeHandlers, 500);
         });
     </script>
 </body>

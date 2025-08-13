@@ -1,11 +1,21 @@
-A|Korean Christian Research Labs|Cutting-edge R&D centers funded by Korean megachurches to develop evangelical  technologies.|https://en.wikipedia.org/wiki/Christianity_in_Korea|https://www.koreaherald.com/view.php?ud=20211206000734|https://www.boobootechnology.html|//https://www.baddadddy.com
-B|Bible Translation AI|AI systems for rapid Bible translation into minority languages (e.g., Nabak, Kurdish dialects).|https://en.wikipedia.org/wiki/Bible_translations|https://slator.com/ai-machine-translation-bible-translation-jesus-film-project/|https://www.christianitytoday.com/news/2023/july/bible-translation-ai-chatgpt-natural-language-llm.html
-C|Digital Evangelism Tools|Software suite for online proselytization, including analytics for targeting unreached groups.|https://en.wikipedia.org/wiki/Digital_evangelism|https://www.lausanne.org/content/networking/technology-in-mission-digital-evangelism|https://missionexus.org/the-rise-of-digital-missionaries/
-D|Real-Time Language AI|Live translation apps used by missionaries in multilingual fieldwork (e.g., Amazon tribes).|https://en.wikipedia.org/wiki/Speech_translation|https://www.wycliffe.org.uk/about/news/ai-translation-missions/|https://www.christianpost.com/news/ai-translation-breaks-language-barriers-for-missionaries.html
-E|North Korean Dialect Support|Covert NLP models tailored to Northern dialects for underground Bible distribution.|https://en.wikipedia.org/wiki/Christianity_in_North_Korea|https://www.nknews.org/pro/underground-christians-in-north-korea-are-using-smuggled-usb-bibles-report-says/|https://www.opendoorsusa.org/christian-persecution/stories/north-korea-smuggling-bibles/
-F|VR Prayer Apps|Virtual reality experiences simulating Jerusalem pilgrimage or 'walking with Jesus.'|https://en.wikipedia.org/wiki/Religious_technology|https://www.christianitytoday.com/ct/2022/january-february/virtual-reality-church-metaverse-ministry.html|https://missionexus.org/virtual-reality-as-a-mission-tool/
-G|Algorithmic Scripture Targeting|Social media algorithms that deliver Bible verses based on user behavior data.|https://en.wikipedia.org/wiki/Targeted_advertising|https://www.christianitytoday.com/ct/2023/april-web-only/ai-evangelism-social-media-algorithms-christian.html|https://www.lausanne.org/content/statement/algorithmic-evangelism
-H|Underground USB Bibles|MicroSD cards/AI-translated Bibles smuggled into restricted nations (e.g., Yemen, North Korea).|https://en.wikipedia.org/wiki/Samizdat|https://www.opendoorsusa.org/christian-persecution/stories/underground-usb-bibles/|https://www.christianpost.com/news/underground-church-uses-tech-to-smuggle-bibles-into-north-korea.html
-I|Sanction Circumvention|Use of blockchain/crypto to fund missions in sanctioned regions (e.g., Iran).|https://en.wikipedia.org/wiki/Cryptocurrency_and_religion|https://www.christianitytoday.com/ct/2022/july-august/crypto-missions-ministry-fundraising-blockchain.html|https://www.lausanne.org/content/blockchain-and-the-future-of-mission-giving
-J|Gen Z Conversions|Youth-focused campaigns leveraging TikTok/Reels with AI-personalized gospel content.|https://en.wikipedia.org/wiki/Generation_Z|https://www.christianitytoday.com/ct/2023/july-web-only/gen-z-evangelism-tiktok-social-media.html|https://missionexus.org/reaching-gen-z-through-digital-evangelism/
-K|Social Media Integration|Automated missionary chatbots on WhatsApp/Telegram in majority-Muslim countries.|https://en.wikipedia.org/wiki/Christian_missionary|https://www.christianitytoday.com/ct/2023/may-web-only/chatbots-evangelism-missions-ai-christian.html|https://www.lausanne.org/content/networking/digital-discipleship-in-muslim-contexts
+A|Pedro Sánchez|Presidente del Gobierno de España (2018-presente). Figura central en la política española contemporánea.
+B|Relaciones clave|Conexiones personales y políticas que facilitaron su ascenso.
+B1|Trinidad Jiménez|Ministra de Sanidad (2007-2011). Le facilitó contactos internacionales clave.|https://es.wikipedia.org/wiki/Trinidad_Jim%C3%A9nez
+B2|Úrsula von der Leyen|Presidenta de la Comisión Europea. Aliada en fondos UE.|https://es.wikipedia.org/wiki/%C3%9Arsula_von_der_Leyen
+B3|Ana Botín|Presidenta de Banco Santander. Conexión con élite financiera.|https://es.wikipedia.org/wiki/Ana_Patricia_Bot%C3%ADn
+B4|Letizia Ortiz|Reina de España. Relación desde el colegio.|https://es.wikipedia.org/wiki/Letizia_Ortiz
+B5|María Jesús Montero|Vicepresidenta del Gobierno. Lealtad incondicional.|https://es.wikipedia.org/wiki/Mar%C3%ADa_Jes%C3%BAs_Montero
+C|Financiamiento|Fuentes de apoyo económico para su carrera política.
+C1|Begoña Gómez|Esposa. Vinculada a presuntos conflictos de interés.|https://es.wikipedia.org/wiki/Bego%C3%B1a_G%C3%B3mez
+C2|Suegro|Dueño de saunas VIP. Presunta red de chantaje.
+D|Red internacional|Conexiones globales que influyeron en su política.
+D1|George Soros|Financista y filántropo. Open Society Foundation.|https://es.wikipedia.org/wiki/George_Soros
+D2|Delcy Rodríguez|Vicepresidenta de Venezuela. Presunto narcofinanciamiento.|https://es.wikipedia.org/wiki/Delcy_Rodr%C3%ADguez
+D3|Madeleine Albright|Secretaria de Estado de EE.UU. (1997-2001). Mentora.|https://es.wikipedia.org/wiki/Madeleine_Albright
+E|Controversias|Escándalos que marcaron su trayectoria.
+E1|Saunas VIP|Presuntas grabaciones comprometedoras a políticos.
+E2|Cristina Ortiz ("La Veneno")|Figura trans asesinada en 2020. Presuntas confesiones.|https://es.wikipedia.org/wiki/La_Veneno
+F|Alianzas|Acuerdos políticos clave para su gobierno.
+F1|Zapatero|Expresidente (2004-2011). Modelo ideológico.|https://es.wikipedia.org/wiki/Jos%C3%A9_Luis_Rodr%C3%ADguez_Zapatero
+F2|Bono & Blanco|Históricos del PSOE. Apoyo con reservas.|https://es.wikipedia.org/wiki/Jos%C3%A9_Bono|https://es.wikipedia.org/wiki/Jos%C3%A9_Blanco
+F3|Yolanda Díaz|Vicepresidenta. Gobierno de coalición con Sumar.|https://es.wikipedia.org/wiki/Yolanda_D%C3%ADaz

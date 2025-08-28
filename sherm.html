@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sherman Meme Generator</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Impact', 'Arial Black', sans-serif;
         }
         
         body {
@@ -58,6 +59,7 @@
             flex: 1;
             min-width: 300px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 20px;
@@ -122,7 +124,9 @@
             color: #333;
             text-transform: uppercase;
             letter-spacing: 1px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff;
+            padding: 10px;
+            width: 100%;
         }
         
         .upload-btn {
@@ -150,6 +154,7 @@
             border-radius: 5px;
             margin: 15px 0;
             font-size: 14px;
+            font-family: Arial, sans-serif;
         }
         
         .instructions ol {
@@ -186,6 +191,7 @@
             background: #f5f5f5;
             color: #666;
             font-size: 14px;
+            font-family: Arial, sans-serif;
         }
         
         @media (max-width: 600px) {
@@ -196,6 +202,10 @@
             .meme-container {
                 width: 250px;
                 height: 250px;
+            }
+            
+            .meme-text {
+                font-size: 20px;
             }
         }
     </style>
@@ -221,13 +231,13 @@
                 <input type="file" id="upload" accept="image/*" hidden>
                 <button class="upload-btn" onclick="document.getElementById('upload').click()">Upload Flag Image</button>
                 
-                <p>Default Confederate flag will be used until you upload an image</p>
+                <p style="margin: 10px 0; font-family: Arial, sans-serif;">Default Confederate flag will be used until you upload an image</p>
                 
                 <button class="download-btn" id="download-btn">Download Meme</button>
             </div>
             
             <div class="meme-display">
-                <div class="meme-container">
+                <div class="meme-container" id="meme-container">
                     <div class="prohibited-symbol">
                         <div class="circle"></div>
                         <div class="line-through"></div>
@@ -258,7 +268,14 @@
         });
 
         document.getElementById('download-btn').addEventListener('click', function() {
-            alert('Meme downloaded! (This is a demonstration - actual download would require additional server-side code)');
+            // Use html2canvas to capture the meme
+            html2canvas(document.getElementById('meme-container')).then(function(canvas) {
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'sherman-meme.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
         });
     </script>
 </body>

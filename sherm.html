@@ -65,6 +65,14 @@
             padding: 20px;
         }
         
+        #meme-capture {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            padding: 10px;
+        }
+        
         .meme-container {
             position: relative;
             width: 300px;
@@ -237,16 +245,18 @@
             </div>
             
             <div class="meme-display">
-                <div class="meme-container" id="meme-container">
-                    <div class="prohibited-symbol">
-                        <div class="circle"></div>
-                        <div class="line-through"></div>
+                <div id="meme-capture">
+                    <div class="meme-container">
+                        <div class="prohibited-symbol">
+                            <div class="circle"></div>
+                            <div class="line-through"></div>
+                        </div>
+                        <div class="flag-container">
+                            <img id="flag-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHg9IjEyMCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiMwMDI0N2QiLz48cmVjdCB4PSIxMjAiIHdpZHRoPSIxMjAiIGhlaWdodD0iMjAwIiBmaWxsPSIjYmYwYTMwIi8+PHBvbHlnb24gZmlsbD0iIzAwMjQ3ZCIgcG9pbnRzPSIwLDAgMTIwLDAgMCwxMDAgMTIwLDEwMCAwLDIwMCAxMjAsMjAwIi8+PHN2ZyB4PSIxMjAiIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIj48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSIxMCIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iMTQwIiByPSIxMCIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjEyMCIgY3k9IjEwMCIgcj0iMTAiIGZpbGw9IiNmZmYiLz48L3N2Zz48L3N2Zz4=" alt="Flag">
+                        </div>
                     </div>
-                    <div class="flag-container">
-                        <img id="flag-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHg9IjEyMCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiMwMDI0N2QiLz48cmVjdCB4PSIxMjAiIHdpZHRoPSIxMjAiIGhlaWdodD0iMjAwIiBmaWxsPSIjYmYwYTMwIi8+PHBvbHlnb24gZmlsbD0iIzAwMjQ3ZCIgcG9pbnRzPSIwLDAgMTIwLDAgMCwxMDAgMTIwLDEwMCAwLDIwMCAxMjAsMjAwIi8+PHN2ZyB4PSIxMjAiIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIj48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSIxMCIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iMTQwIiByPSIxMCIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjEyMCIgY3k9IjEwMCIgcj0iMTAiIGZpbGw9IiNmZmYiLz48L3N2Zz48L3N2Zz4=" alt="Flag">
-                    </div>
+                    <div class="meme-text">sherman didn't go far enough</div>
                 </div>
-                <div class="meme-text">sherman didn't go far enough</div>
             </div>
         </div>
         
@@ -268,8 +278,8 @@
         });
 
         document.getElementById('download-btn').addEventListener('click', function() {
-            // Use html2canvas to capture the meme
-            html2canvas(document.getElementById('meme-container')).then(function(canvas) {
+            // Use html2canvas to capture the meme including the text
+            html2canvas(document.getElementById('meme-capture')).then(function(canvas) {
                 // Create download link
                 const link = document.createElement('a');
                 link.download = 'sherman-meme.png';

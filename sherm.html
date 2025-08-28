@@ -1,108 +1,265 @@
-Sherman Meme
-
-I'll create an HTML meme with the elements you requested. Here's a complete solution:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sherman Meme</title>
+    <title>Sherman Meme Generator</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #f0f0f0;
-            margin: 0;
-            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #d32f2f;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .meme-creator {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+        
+        .controls {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px;
+        }
+        
+        .meme-display {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
         
         .meme-container {
-            text-align: center;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            width: 300px;
+            height: 300px;
         }
         
         .prohibited-symbol {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 20px;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
         }
         
         .circle {
             width: 100%;
             height: 100%;
-            background-color: #ff0000;
+            border: 15px solid #d32f2f;
             border-radius: 50%;
             position: absolute;
         }
         
-        .stars-and-bars {
-            position: absolute;
-            width: 80%;
-            height: 60%;
-            top: 20%;
-            left: 10%;
-            background: 
-                linear-gradient(to bottom, 
-                    #00247d 0%, #00247d 28.57%,
-                    white 28.57%, white 42.86%,
-                    #00247d 42.86%, #00247d 57.14%,
-                    white 57.14%, white 71.43%,
-                    #00247d 71.43%, #00247d 100%);
-        }
-        
-        .stars-and-bars::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 40%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 50% 50%, 
-                    white 0%, white 4%, 
-                    #bf0a30 4%, #bf0a30 10%, 
-                    transparent 10%) 
-                50% 50% / 20% 20% repeat;
-            background-size: 20% 20%;
-        }
-        
         .line-through {
             position: absolute;
-            width: 120%;
+            width: 130%;
             height: 15px;
-            background-color: #ff0000;
+            background-color: #d32f2f;
             top: 50%;
-            left: -10%;
+            left: -15%;
             transform: translateY(-50%) rotate(-45deg);
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         }
         
-        .text {
+        .flag-container {
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            overflow: hidden;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f0f0f0;
+        }
+        
+        #flag-image {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+        }
+        
+        .meme-text {
+            text-align: center;
+            margin-top: 20px;
             font-size: 24px;
             font-weight: bold;
             color: #333;
-            margin-top: 15px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .upload-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .upload-btn:hover {
+            background: #b71c1c;
+        }
+        
+        .instructions {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .download-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            background: #388e3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .download-btn:hover {
+            background: #2e7d32;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: #f5f5f5;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 600px) {
+            .meme-creator {
+                flex-direction: column;
+            }
+            
+            .meme-container {
+                width: 250px;
+                height: 250px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="meme-container">
-        <div class="prohibited-symbol">
-            <div class="circle"></div>
-            <div class="stars-and-bars"></div>
-            <div class="line-through"></div>
+    <div class="container">
+        <header>
+            <h1>Sherman Meme Generator</h1>
+            <p>Create your own "Sherman didn't go far enough" meme</p>
+        </header>
+        
+        <div class="meme-creator">
+            <div class="controls">
+                <div class="instructions">
+                    <h3>Instructions:</h3>
+                    <ol>
+                        <li>Click the button below to upload a flag image</li>
+                        <li>The image will be placed inside the prohibited symbol</li>
+                        <li>Download your meme when you're satisfied</li>
+                    </ol>
+                </div>
+                
+                <input type="file" id="upload" accept="image/*" hidden>
+                <button class="upload-btn" onclick="document.getElementById('upload').click()">Upload Flag Image</button>
+                
+                <p>Default Confederate flag will be used until you upload an image</p>
+                
+                <button class="download-btn" id="download-btn">Download Meme</button>
+            </div>
+            
+            <div class="meme-display">
+                <div class="meme-container">
+                    <div class="prohibited-symbol">
+                        <div class="circle"></div>
+                        <div class="line-through"></div>
+                    </div>
+                    <div class="flag-container">
+                        <img id="flag-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHg9IjEyMCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiMwMDI0N2QiLz48cmVjdCB4PSIxMjAiIHdpZHRoPSIxMjAiIGhlaWdodD0iMjAwIiBmaWxsPSIjYmYwYTMwIi8+PHBvbHlnb24gZmlsbD0iIzAwMjQ3ZCIgcG9pbnRzPSIwLDAgMTIwLDAgMCwxMDAgMTIwLDEwMCAwLDIwMCAxMjAsMjAwIi8+PHN2ZyB4PSIxMjAiIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIj48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSIxMCIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iMTQwIiByPSIxMCIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjEyMCIgY3k9IjEwMCIgcj0iMTAiIGZpbGw9IiNmZmYiLz48L3N2Zz48L3N2Zz4=" alt="Flag">
+                    </div>
+                </div>
+                <div class="meme-text">sherman didn't go far enough</div>
+            </div>
         </div>
-        <div class="text">sherman didn't go far enough</div>
+        
+        <footer>
+            <p>Upload your own flag image to customize this meme</p>
+        </footer>
     </div>
+
+    <script>
+        document.getElementById('upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('flag-image').src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('download-btn').addEventListener('click', function() {
+            alert('Meme downloaded! (This is a demonstration - actual download would require additional server-side code)');
+        });
+    </script>
 </body>
 </html>

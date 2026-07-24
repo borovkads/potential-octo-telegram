@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cork Board Diagrammer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    #app { width: 100%; height: 100%; position: relative; }
+
+    #toolbar {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 10px; z-index: 1000;
+      background: rgba(255,255,255,0.92); padding: 8px 16px; border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15); backdrop-filter: blur(6px);
+    }
+    #toolbar button {
+      padding: 8px 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;
+      transition: transform 0.1s, background 0.2s; white-space: nowrap;
+    }
+    #toolbar button:hover { transform: translateY(-1px); }
+    #btnAddNote { background: #fbbf24; color: #451a03; }
+    #btnExplode { background: #60a5fa; color: #0c1e3d; }
+    #btnClear { background: #f87171; color: #450a0a; }
+
+    #zoomIndicator {
+      position: fixed; bottom: 16px; right: 16px; z-index: 1000;
+      background: rgba(0,0,0,0.7); color: #fff; padding: 6px 12px; border-radius: 8px;
+      font-size: 13px; font-variant-numeric: tabular-nums; pointer-events: none;
+    }
+
+    #board {
+      width: 100%; height: 100%; overflow: hidden; cursor: grab;
+      background: #8b5a2b;
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.06) 1px, transparent 1px),
+        radial-gradient(circle at 80% 80%, rgba(0,0,0,0.08) 1px, transparent 1px),
+        url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+      background-blend-mode: multiply, multiply, normal;
+    }
+    #board:active { cursor: grabbing; }
+
+    #panContainer {
+      position: absolute; top: 0; left: 0; width: 0; height: 0; transform-origin: 0 0;
+      will-change: transform;
+    }
+
+    #strings {
+      position: absolute; top: 0; left: 0; width: 100000px; height: 100000px;
+      pointer-events: none; overflow: visible; z-index: 0;
+    }
+    #strings path {
+      stroke: #dc2626; stroke-width: 2; fill: none; stroke-linecap: round;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+      marker-end: url(#arrowhead);
+    }
+    #strings text {
+      font-size: 11px; fill: #374151; font-family: 'Segoe UI', sans-serif;
+      text-anchor: middle; dominant-baseline: middle;
+      background: rgba(255,255,255,0.8); paint-order: stroke; stroke: rgba(255,255,255,0.8); stroke-width: 3px;
+    }
+
+    #pinsContainer { position: absolute; top: 0; left: 0; z-index: 1; }
+
+    .pin {
+      position: absolute; cursor: grab; user-select: none;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; font-size: 13px; line-height: 1.3;
+      box-shadow: 2px 4px 12px rgba(0,0,0,0.25);
+      transition: box-shadow 0.2s, outline 0.15s;
+      padding: 10px 14px; min-width: 80px; min-height: 40px;
+    }
+    .pin:active { cursor: grabbing; }
+    .pin.selected { outline: 3px solid #2563eb; outline-offset: 3px; z-index: 10; }
+
+    .pin-note {
+      background: #fef08a; color: #422006;
+      width: 160px; min-height: 120px; padding: 24px 14px 14px;
+      font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+      font-size: 14px; line-height: 1.4;
+      clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 0 100%);
+    }
+    .pin-note::before {
+      content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+      width: 14px; height: 14px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ef4444, #991b1b);
+      box-shadow: 1px 2px 4px rgba(0,0,0,0.3);
+    }
+    .pin-note[contenteditable="true"] { cursor: text; }
+    .pin-note[contenteditable="true"]:active { cursor: text; }
+
+    .pin-styled { font-weight: 600; color: #1f2937; border: 2px solid rgba(0,0,0,0.15); }
+    .shape-rect { border-radius: 4px; }
+    .shape-rounded { border-radius: 20px; }
+    .shape-diamond {
+      transform: rotate(45deg); width: 100px; height: 100px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .shape-diamond .diamond-inner { transform: rotate(-45deg); width: 100%; pointer-events: none; }
+    .shape-circle { border-radius: 50%; width: 100px; height: 100px; aspect-ratio: 1 / 1; }
+    .shape-cylinder { border-radius: 4px 4px 20px 20px; }
+    .shape-odd { border-radius: 4px; }
+
+    #modalOverlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    #modalOverlay.visible { opacity: 1; pointer-events: auto; }
+    #modal {
+      background: #fff; padding: 24px; border-radius: 16px; width: 90%; max-width: 700px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 12px;
+    }
+    #modal h3 { font-size: 18px; color: #111827; }
+    #mermaidInput {
+      width: 100%; min-height: 300px; padding: 12px; border-radius: 8px;
+      border: 1px solid #d1d5db; font-family: monospace; font-size: 12px; resize: vertical;
+      background: #f9fafb; color: #111827; line-height: 1.4;
+    }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+    .modal-actions button { padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    #btnRender { background: #10b981; color: #fff; }
+    #btnCancel { background: #e5e7eb; color: #374151; }
+  </style>
+<base target="_blank">
+</head>
+<body>
+  <div id="app">
+    <div id="toolbar">
+      <button id="btnAddNote">📌 Add Note</button>
+      <button id="btnExplode">🧩 Explode Diagram</button>
+      <button id="btnClear">🗑️ Clear All</button>
+    </div>
+    <div id="zoomIndicator">100%</div>
+    <div id="board">
+      <div id="panContainer">
+        <svg id="strings" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626" />
+            </marker>
+          </defs>
+        </svg>
+        <div id="pinsContainer"></div>
+      </div>
+    </div>
+    <div id="modalOverlay" class="hidden">
+      <div id="modal">
+        <h3>Paste Mermaid Code</h3>
+        <textarea id="mermaidInput" placeholder="graph TD
+A[Start] --> B[End]"></textarea>
+        <div class="modal-actions">
+          <button id="btnRender">Render</button>
+          <button id="btnCancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    let scale = 1;
+    let panX = 0, panY = 0;
+    let isPanning = false;
+    let panStartX = 0, panStartY = 0;
+    let selectedPinId = null;
+    let dragPin = null;
+    let dragOffsetX = 0, dragOffsetY = 0;
+    let lastPinId = 0;
+    let lastConnId = 0;
+
+    const pins = [];
+    const connections = [];
+
+    const board = document.getElementById('board');
+    const panContainer = document.getElementById('panContainer');
+    const pinsContainer = document.getElementById('pinsContainer');
+    const stringsSvg = document.getElementById('strings');
+    const zoomIndicator = document.getElementById('zoomIndicator');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const mermaidInput = document.getElementById('mermaidInput');
+
+    function updateTransform() {
+      panContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+      zoomIndicator.textContent = Math.round(scale * 100) + '%';
+    }
+
+    function toBoardSpace(clientX, clientY) {
+      const rect = board.getBoundingClientRect();
+      return {
+        x: (clientX - rect.left - panX) / scale,
+        y: (clientY - rect.top - panY) / scale
+      };
+    }
+
+    function getPinCenter(pin) {
+      return {
+        x: pin.x + pin.width / 2,
+        y: pin.y + pin.height / 2
+      };
+    }
+
+    function updateConnectionsForPin(pinId) {
+      connections.forEach(conn => {
+        if (conn.fromId === pinId || conn.toId === pinId) {
+          const fromPin = pins.find(p => p.id === conn.fromId);
+          const toPin = pins.find(p => p.id === conn.toId);
+          if (fromPin && toPin) {
+            const c1 = getPinCenter(fromPin);
+            const c2 = getPinCenter(toPin);
+            const midX = (c1.x + c2.x) / 2;
+            const midY = (c1.y + c2.y) / 2;
+            const cp1x = c1.x + (c2.x - c1.x) * 0.5;
+            const cp1y = c1.y;
+            const cp2x = c2.x - (c2.x - c1.x) * 0.5;
+            const cp2y = c2.y;
+            conn.pathElement.setAttribute('d', `M ${c1.x} ${c1.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${c2.x} ${c2.y}`);
+            if (conn.labelElement) {
+              conn.labelElement.setAttribute('x', midX);
+              conn.labelElement.setAttribute('y', midY - 8);
+            }
+          }
+        }
+      });
+    }
+
+    function createConnection(fromId, toId, label) {
+      const fromPin = pins.find(p => p.id === fromId);
+      const toPin = pins.find(p => p.id === toId);
+      if (!fromPin || !toPin || fromId === toId) return;
+      if (connections.some(c => (c.fromId === fromId && c.toId === toId) || (c.fromId === toId && c.toId === fromId))) return;
+
+      const c1 = getPinCenter(fromPin);
+      const c2 = getPinCenter(toPin);
+      const midX = (c1.x + c2.x) / 2;
+      const midY = (c1.y + c2.y) / 2;
+      const cp1x = c1.x + (c2.x - c1.x) * 0.5;
+      const cp1y = c1.y;
+      const cp2x = c2.x - (c2.x - c1.x) * 0.5;
+      const cp2y = c2.y;
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', `M ${c1.x} ${c1.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${c2.x} ${c2.y}`);
+      stringsSvg.appendChild(path);
+
+      let labelEl = null;
+      if (label) {
+        labelEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        labelEl.setAttribute('x', midX);
+        labelEl.setAttribute('y', midY - 8);
+        labelEl.textContent = label;
+        stringsSvg.appendChild(labelEl);
+      }
+
+      const conn = { id: ++lastConnId, fromId, toId, pathElement: path, labelElement: labelEl, label };
+      connections.push(conn);
+    }
+
+    function removeAll() {
+      pinsContainer.innerHTML = '';
+      const defs = stringsSvg.querySelector('defs');
+      stringsSvg.innerHTML = '';
+      if (defs) stringsSvg.appendChild(defs);
+      pins.length = 0;
+      connections.length = 0;
+      selectedPinId = null;
+    }
+
+    function selectPin(id) {
+      pins.forEach(p => p.el.classList.toggle('selected', p.id === id));
+      selectedPinId = id;
+    }
+
+    function deselectAll() {
+      pins.forEach(p => p.el.classList.remove('selected'));
+      selectedPinId = null;
+    }
+
+    function makePinBase(x, y, w, h) {
+      const el = document.createElement('div');
+      el.className = 'pin';
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      if (w) el.style.width = w + 'px';
+      if (h) el.style.height = h + 'px';
+      pinsContainer.appendChild(el);
+
+      const rect = el.getBoundingClientRect();
+      const pin = {
+        id: ++lastPinId,
+        el,
+        x, y,
+        width: w || rect.width,
+        height: h || rect.height,
+        text: '',
+        type: 'styled'
+      };
+      pins.push(pin);
+
+      el.addEventListener('pointerdown', e => {
+        if (el.isContentEditable && document.activeElement === el) return;
+        e.stopPropagation();
+        dragPin = pin;
+        const bs = toBoardSpace(e.clientX, e.clientY);
+        dragOffsetX = bs.x - pin.x;
+        dragOffsetY = bs.y - pin.y;
+        el.setPointerCapture(e.pointerId);
+      });
+
+      el.addEventListener('pointerup', e => {
+        e.stopPropagation();
+        dragPin = null;
+        el.releasePointerCapture(e.pointerId);
+      });
+
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        if (dragPin) { dragPin = null; return; }
+        if (selectedPinId === null) {
+          selectPin(pin.id);
+        } else if (selectedPinId === pin.id) {
+          deselectAll();
+        } else {
+          createConnection(selectedPinId, pin.id, '');
+          deselectAll();
+        }
+      });
+
+      return pin;
+    }
+
+    function createNotePin(x, y, text) {
+      const pin = makePinBase(x, y);
+      pin.type = 'note';
+      pin.text = text || 'New note';
+      pin.el.classList.add('pin-note');
+      pin.el.textContent = pin.text;
+      pin.el.contentEditable = true;
+
+      pin.el.addEventListener('input', () => {
+        pin.text = pin.el.textContent;
+        const r = pin.el.getBoundingClientRect();
+        pin.width = r.width / scale;
+        pin.height = r.height / scale;
+        updateConnectionsForPin(pin.id);
+      });
+
+      pin.el.addEventListener('focus', () => { dragPin = null; });
+      return pin;
+    }
+
+    function createStyledPin(x, y, text, shape, color, w, h) {
+      const pin = makePinBase(x, y, w, h);
+      pin.type = 'styled';
+      pin.text = text;
+      pin.el.classList.add('pin-styled');
+
+      const shapeClass = shape === 'circle' ? 'shape-circle'
+        : shape === 'diamond' ? 'shape-diamond'
+        : shape === 'rounded' ? 'shape-rounded'
+        : shape === 'cylinder' ? 'shape-cylinder'
+        : shape === 'odd' ? 'shape-odd'
+        : 'shape-rect';
+      pin.el.classList.add(shapeClass);
+
+      if (shape === 'diamond') {
+        const inner = document.createElement('div');
+        inner.className = 'diamond-inner';
+        inner.textContent = text;
+        pin.el.appendChild(inner);
+      } else {
+        pin.el.textContent = text;
+      }
+
+      if (color) {
+        pin.el.style.backgroundColor = color;
+        const hex = color.replace('#', '');
+        const r = parseInt(hex.substr(0,2), 16) || 0;
+        const g = parseInt(hex.substr(2,2), 16) || 0;
+        const b = parseInt(hex.substr(4,2), 16) || 0;
+        const brightness = (r*299 + g*587 + b*114) / 1000;
+        if (brightness < 128) pin.el.style.color = '#fff';
+      }
+      return pin;
+    }
+
+    board.addEventListener('pointerdown', e => {
+      if (e.target.closest('.pin')) return;
+      isPanning = true;
+      panStartX = e.clientX - panX;
+      panStartY = e.clientY - panY;
+      board.setPointerCapture(e.pointerId);
+      deselectAll();
+    });
+
+    window.addEventListener('pointermove', e => {
+      if (isPanning) {
+        panX = e.clientX - panStartX;
+        panY = e.clientY - panStartY;
+        updateTransform();
+      }
+      if (dragPin) {
+        const bs = toBoardSpace(e.clientX, e.clientY);
+        dragPin.x = bs.x - dragOffsetX;
+        dragPin.y = bs.y - dragOffsetY;
+        dragPin.el.style.left = dragPin.x + 'px';
+        dragPin.el.style.top = dragPin.y + 'px';
+        updateConnectionsForPin(dragPin.id);
+      }
+    });
+
+    window.addEventListener('pointerup', e => {
+      if (isPanning) {
+        isPanning = false;
+        board.releasePointerCapture(e.pointerId);
+      }
+      dragPin = null;
+    });
+
+    board.addEventListener('wheel', e => {
+      e.preventDefault();
+      const zoomIntensity = 0.001;
+      const oldScale = scale;
+      const newScale = Math.min(Math.max(scale - e.deltaY * zoomIntensity, 0.1), 5);
+
+      const rect = board.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      panX = mouseX - (mouseX - panX) * (newScale / oldScale);
+      panY = mouseY - (mouseY - panY) * (newScale / oldScale);
+      scale = newScale;
+      updateTransform();
+    }, { passive: false });
+
+    document.getElementById('btnAddNote').addEventListener('click', () => {
+      const rect = board.getBoundingClientRect();
+      const bs = toBoardSpace(rect.width / 2, rect.height / 2);
+      createNotePin(bs.x - 80, bs.y - 60, 'New note');
+    });
+
+    document.getElementById('btnExplode').addEventListener('click', () => {
+      modalOverlay.classList.add('visible');
+      mermaidInput.focus();
+    });
+
+    document.getElementById('btnClear').addEventListener('click', removeAll);
+
+    document.getElementById('btnCancel').addEventListener('click', () => {
+      modalOverlay.classList.remove('visible');
+    });
+
+    document.getElementById('btnRender').addEventListener('click', async () => {
+      const code = mermaidInput.value.trim();
+      if (!code) return;
+      modalOverlay.classList.remove('visible');
+      await explodeDiagram(code);
+    });
+
+    mermaid.initialize({ startOnLoad: false, theme: 'base', useMaxWidth: false });
+
+    function normalizeLabel(label) {
+      return label.replace(/\s+/g, ' ').trim().toLowerCase();
+    }
+
+    function parseMermaid(code) {
+      const nodes = {};
+      const edges = [];
+      const labelToId = {};
+      const classDefs = {};
+      const classAssignments = {};
+
+      const lines = code.split('
+');
+      for (let line of lines) {
+        line = line.trim();
+        if (!line || line.startsWith('%%')) continue;
+
+        const classDefMatch = line.match(/^classDef\s+(\w+)\s+(.+)$/i);
+        if (classDefMatch) {
+          classDefs[classDefMatch[1]] = classDefMatch[2];
+          continue;
+        }
+
+        const classAssignMatch = line.match(/^class\s+([\w,\s]+)\s+(\w+)$/i);
+        if (classAssignMatch) {
+          const ids = classAssignMatch[1].split(',').map(s => s.trim());
+          const className = classAssignMatch[2];
+          ids.forEach(id => { classAssignments[id] = className; });
+          continue;
+        }
+
+        const styleMatch = line.match(/^style\s+(\w+)\s+(.*?)(?:;|$)/i);
+        if (styleMatch) {
+          const id = styleMatch[1];
+          const props = styleMatch[2];
+          const fillMatch = props.match(/fill:([^;\s]+)/i);
+          if (fillMatch && nodes[id]) {
+            nodes[id].color = fillMatch[1];
+          }
+          continue;
+        }
+
+        const nodeDefMatch = line.match(/^(\w+)\s*(?:([\(\[\{\/\(])\s*([^\]\)\}\/]*)\s*([\)\]\}\/\)])\s*)?(?:::(\w+))?/);
+        if (nodeDefMatch && !line.includes('-->') && !line.startsWith('class')) {
+          const id = nodeDefMatch[1];
+          const open = nodeDefMatch[2];
+          const labelText = nodeDefMatch[3] || id;
+          const close = nodeDefMatch[4];
+          const className = nodeDefMatch[5] || classAssignments[id];
+
+          let shape = 'rect';
+          if (open === '(' && close === ')') shape = 'rounded';
+          if (open === '{' && close === '}') shape = 'diamond';
+          if (open === '(' && line.includes('((') && line.includes('))')) shape = 'circle';
+          if (open === '/' && close === '/') shape = 'cylinder';
+          if (open === '[' && close === ']' && line.includes('[\')) shape = 'odd';
+
+          let color = null;
+          if (className && classDefs[className]) {
+            const fillMatch = classDefs[className].match(/fill:([^,\s]+)/i);
+            if (fillMatch) color = fillMatch[1];
+          }
+
+          nodes[id] = { id, label: labelText.trim() || id, shape, color, className };
+          labelToId[normalizeLabel(labelText.trim() || id)] = id;
+          continue;
+        }
+
+        const edgeMatch = line.match(/^(\w+)\s*-->?\s*(?:\|([^|]*)\|)?\s*(\w+)/);
+        if (edgeMatch) {
+          edges.push({ from: edgeMatch[1], to: edgeMatch[3], label: edgeMatch[2] || '' });
+          if (!nodes[edgeMatch[1]]) {
+            const cn = classAssignments[edgeMatch[1]];
+            let col = null;
+            if (cn && classDefs[cn]) {
+              const fm = classDefs[cn].match(/fill:([^,\s]+)/i);
+              if (fm) col = fm[1];
+            }
+            nodes[edgeMatch[1]] = { id: edgeMatch[1], label: edgeMatch[1], shape: 'rect', color: col, className: cn };
+            labelToId[normalizeLabel(edgeMatch[1])] = edgeMatch[1];
+          }
+          if (!nodes[edgeMatch[3]]) {
+            const cn = classAssignments[edgeMatch[3]];
+            let col = null;
+            if (cn && classDefs[cn]) {
+              const fm = classDefs[cn].match(/fill:([^,\s]+)/i);
+              if (fm) col = fm[1];
+            }
+            nodes[edgeMatch[3]] = { id: edgeMatch[3], label: edgeMatch[3], shape: 'rect', color: col, className: cn };
+            labelToId[normalizeLabel(edgeMatch[3])] = edgeMatch[3];
+          }
+        }
+      }
+
+      return { nodes, edges, labelToId, classDefs, classAssignments };
+    }
+
+    async function explodeDiagram(code) {
+      const parsed = parseMermaid(code);
+      if (!Object.keys(parsed.nodes).length) return;
+
+      let result = null;
+      try {
+        result = await extractSvgData(code, parsed);
+      } catch (e) {
+        console.warn('SVG extraction failed, using fallback layout', e);
+      }
+
+      if (!result || !result.positions || Object.keys(result.positions).length === 0) {
+        result = { positions: applyHierarchicalLayout(parsed), sizes: {} };
+      }
+
+      const pinMap = {};
+      for (const id in parsed.nodes) {
+        const n = parsed.nodes[id];
+        const pos = result.positions[id] || { x: 0, y: 0 };
+        const size = result.sizes[id] || { width: 140, height: 50 };
+        const pin = createStyledPin(pos.x, pos.y, n.label, n.shape, n.color, size.width, size.height);
+        pinMap[id] = pin;
+      }
+
+      for (const edge of parsed.edges) {
+        const fromPin = pinMap[edge.from];
+        const toPin = pinMap[edge.to];
+        if (fromPin && toPin) {
+          createConnection(fromPin.id, toPin.id, edge.label);
+        }
+      }
+
+      const allX = Object.values(result.positions).map(p => p.x);
+      const allY = Object.values(result.positions).map(p => p.y);
+      const allW = Object.values(result.sizes).map(s => s.width);
+      const allH = Object.values(result.sizes).map(s => s.height);
+      const minX = Math.min(...allX);
+      const maxX = Math.max(...allX.map((x, i) => x + (allW[i] || 140)));
+      const minY = Math.min(...allY);
+      const maxY = Math.max(...allY.map((y, i) => y + (allH[i] || 50)));
+      const cx = (minX + maxX) / 2;
+      const cy = (minY + maxY) / 2;
+      const rect = board.getBoundingClientRect();
+      scale = Math.min(rect.width / (maxX - minX + 100), rect.height / (maxY - minY + 100), 1);
+      panX = rect.width / 2 - cx * scale;
+      panY = rect.height / 2 - cy * scale;
+      updateTransform();
+    }
+
+    async function extractSvgData(code, parsed) {
+      const hidden = document.createElement('div');
+      hidden.style.position = 'absolute';
+      hidden.style.left = '-9999px';
+      hidden.style.top = '-9999px';
+      hidden.style.width = '5000px';
+      hidden.style.height = '5000px';
+      document.body.appendChild(hidden);
+
+      const id = 'mermaid-' + Date.now();
+      hidden.innerHTML = `<div class="mermaid" id="${id}">${code}</div>`;
+      await mermaid.run({ nodes: [document.getElementById(id)] });
+
+      const svg = hidden.querySelector('svg');
+      if (!svg) { document.body.removeChild(hidden); return null; }
+
+      const positions = {};
+      const sizes = {};
+
+      const groups = svg.querySelectorAll('.node');
+      for (const g of groups) {
+        const idAttr = g.getAttribute('id');
+        if (!idAttr) continue;
+
+        let nodeId = idAttr.replace(/^flowchart-/, '').replace(/-\d+$/, '').replace(/-$/, '');
+
+        const textEl = g.querySelector('text');
+        const label = textEl ? normalizeLabel(textEl.textContent) : '';
+        let matchedId = parsed.labelToId[label] || parsed.labelToId[label.replace(/\s/g, '')];
+
+        if (!matchedId && parsed.nodes[nodeId]) matchedId = nodeId;
+        if (!matchedId) {
+          const key = Object.keys(parsed.nodes).find(k => k.toLowerCase() === nodeId.toLowerCase());
+          if (key) matchedId = key;
+        }
+        if (!matchedId) continue;
+
+        const transform = g.getAttribute('transform');
+        let x = 0, y = 0;
+        if (transform) {
+          const m = transform.match(/translate\(([^,]+)[,\s]+([^)]+)\)/);
+          if (m) { x = parseFloat(m[1]); y = parseFloat(m[2]); }
+        }
+
+        const rectEl = g.querySelector('rect, polygon, circle, ellipse');
+        let w = 140, h = 50;
+        if (rectEl) {
+          const rw = rectEl.getAttribute('width');
+          const rh = rectEl.getAttribute('height');
+          if (rw) w = parseFloat(rw);
+          if (rh) h = parseFloat(rh);
+        }
+        try {
+          const bbox = g.getBBox();
+          if (bbox.width > 0) w = bbox.width;
+          if (bbox.height > 0) h = bbox.height;
+        } catch(e) {}
+
+        positions[matchedId] = { x: x - w/2, y: y - h/2 };
+        sizes[matchedId] = { width: w, height: h };
+      }
+
+      document.body.removeChild(hidden);
+      return Object.keys(positions).length ? { positions, sizes } : null;
+    }
+
+    function applyHierarchicalLayout(parsed) {
+      const positions = {};
+      const visited = new Set();
+      const children = {};
+      for (const id in parsed.nodes) children[id] = [];
+      for (const e of parsed.edges) {
+        if (children[e.from]) children[e.from].push(e.to);
+      }
+
+      const roots = Object.keys(parsed.nodes).filter(id => !parsed.edges.some(e => e.to === id));
+      const queue = [];
+      const depthMap = {};
+
+      for (const r of roots) {
+        queue.push({ id: r, depth: 0 });
+        depthMap[r] = 0;
+      }
+      if (!roots.length) {
+        const first = Object.keys(parsed.nodes)[0];
+        queue.push({ id: first, depth: 0 });
+        depthMap[first] = 0;
+      }
+
+      while (queue.length) {
+        const { id, depth } = queue.shift();
+        if (visited.has(id)) continue;
+        visited.add(id);
+        for (const child of children[id] || []) {
+          if (!visited.has(child)) {
+            depthMap[child] = Math.max(depthMap[child] || 0, depth + 1);
+            queue.push({ id: child, depth: depth + 1 });
+          }
+        }
+      }
+
+      const depthGroups = {};
+      for (const id in depthMap) {
+        const d = depthMap[id];
+        if (!depthGroups[d]) depthGroups[d] = [];
+        depthGroups[d].push(id);
+      }
+
+      const spacingX = 220;
+      const spacingY = 180;
+      for (const d in depthGroups) {
+        const group = depthGroups[d];
+        const totalWidth = (group.length - 1) * spacingX;
+        group.forEach((id, i) => {
+          positions[id] = {
+            x: i * spacingX - totalWidth / 2,
+            y: parseInt(d) * spacingY
+          };
+        });
+      }
+
+      return positions;
+    }
+
+    updateTransform();
+
+    const mafiaCode = `graph TD
+    %% Style definitions
+    classDef albanian fill:#f9d5e5,stroke:#333,stroke-width:2px;
+    classDef yugoslav fill:#d5e8d4,stroke:#333,stroke-width:2px;
+    classDef dutch fill:#dae8fc,stroke:#333,stroke-width:2px;
+    classDef italy fill:#e1d5e7,stroke:#333,stroke-width:2px;
+    classDef ecuador fill:#fff2cc,stroke:#333,stroke-width:2px;
+    classDef turkey fill:#f8cecc,stroke:#333,stroke-width:2px;
+    classDef mexico fill:#ffd966,stroke:#333,stroke-width:2px;
+
+    %% SOUTH AMERICAN SUPPLY HUB
+    SouthAmerica[South America Cocaine Supply]:::ecuador
+    LosChoneros[Los Choneros Ecuadorian Gang]:::ecuador
+    EcuadorPorts[Ecuadorian Ports and Police]:::ecuador
+    Sinaloa[Sinaloa Cartel Mexico]:::mexico
+
+    %% ALBANIAN KINGPINS - KOMPANIA BELLO
+    Rexhepi[Dritan Rexhepi - Kompania Bello]:::albanian
+    Dizdari[Eldi Dizdari - Kompania Bello]:::albanian
+    Azemi[Remzi Azemi - Rexhepi Assistant]:::albanian
+    KompaniaBello[Kompania Bello Organization]:::albanian
+
+    %% ALBANIAN KINGPINS - GJIKA NETWORK
+    Gjika[Dritan Gjika - Rexhepi Successor]:::albanian
+    Cherres[Ruben Cherres - Gjika Partner]:::albanian
+
+    %% DUTCH AND INTERNATIONAL
+    Leijdekkers[Jos Leijdekkers - Bolle Jos]:::dutch
+    Mocro[Mocro Mafia]:::dutch
+    ElBallouti[Othman El Ballouti]:::dutch
+    BelgianList[Belgian Most Wanted List]:::dutch
+
+    %% ITALIAN MAFIA
+    Ndrangheta[Ndrangheta Calabrian Mafia]:::italy
+    Bilacaj[Saimir Bilacaj - Albanian Intermediary]:::albanian
+    Gulli[Antonio Gulli - Ndrangheta Member]:::italy
+    Flachi[Davide Flachi - Comasina Boss]:::italy
+    GioiaTauro[Gioia Tauro Port Italy]:::italy
+
+    %% FORMER YUGOSLAV BALKAN CARTELS
+    Saric[Darko Saric - Serbian-Montenegrin]:::yugoslav
+    Sagolj[Zdravko Sagolj - Bosnian Ex-General]:::yugoslav
+    Kavac[Kavac Clan Montenegro]:::yugoslav
+    Skaljari[Skaljari Clan Montenegro]:::yugoslav
+    BalkanCartel[Balkan Cartel Network]:::yugoslav
+
+    %% EUROPEAN HUBS
+    TurkeyHub[Turkey - Transit and Laundering]:::turkey
+    DubaiHub[Dubai - Finance and Safe Haven]:::turkey
+    SierraLeone[Sierra Leone - Safe Haven]:::turkey
+    Antwerp[Antwerp Port Belgium]:::dutch
+    Valencia[Valencia Port Spain]:::dutch
+    EuropeMarkets[European Cocaine Markets]:::dutch
+
+    %% EDGES: KOMPANIA BELLO STRUCTURE
+    Rexhepi -- Co-Leader --> KompaniaBello
+    Dizdari -- Co-Leader --> KompaniaBello
+    Rexhepi -- Assistant --> Azemi
+    KompaniaBello -- Federal Alliance --> Ndrangheta
+
+    %% EDGES: REXHEPI - SOUTH AMERICA
+    SouthAmerica -- Supply --> Rexhepi
+    Rexhepi -- Alliance --> LosChoneros
+    LosChoneros -- Armed Wing of --> Sinaloa
+    Rexhepi -- Infiltrated --> EcuadorPorts
+
+    %% EDGES: SUCCESSION REXHEPI TO GJIKA
+    Rexhepi -- Successor in Ecuador --> Gjika
+    Rexhepi -- Same Neighborhood --> Gjika
+    Gjika -- Partner --> Cherres
+    Gjika -- Infiltrated --> EcuadorPorts
+
+    %% EDGES: NDRANGHETA CONNECTIONS
+    Ndrangheta -- Intermediary --> Bilacaj
+    Bilacaj -- Partner --> Gulli
+    Bilacaj -- Linked to --> Flachi
+    Flachi -- Man of Honor Status --> Bilacaj
+    Ndrangheta -- Controls --> GioiaTauro
+    GioiaTauro -- Entry Point --> EuropeMarkets
+
+    %% EDGES: BALKAN CARTEL CONNECTIONS
+    Saric -- Part of --> BalkanCartel
+    Kavac -- Part of --> BalkanCartel
+    Skaljari -- Part of --> BalkanCartel
+    Sagolj -- Part of --> BalkanCartel
+    KompaniaBello -- Part of --> BalkanCartel
+    Kavac -- Rivalry over 200kg --> Skaljari
+    Skaljari -- Connected to --> Ndrangheta
+    Kavac -- Connected to --> Ndrangheta
+    Saric -- Pioneered Route --> TurkeyHub
+    Sagolj -- Ecuador Shipment --> EcuadorPorts
+
+    %% EDGES: DUTCH AND SUPER CARTEL
+    Leijdekkers -- Linked to --> Mocro
+    Leijdekkers -- Same List --> ElBallouti
+    KompaniaBello -- Same List --> Leijdekkers
+    Rexhepi -- Same List --> Leijdekkers
+    BelgianList -- Includes --> KompaniaBello
+    BelgianList -- Includes --> Leijdekkers
+    BelgianList -- Includes --> ElBallouti
+
+    %% EDGES: LOGISTICAL HUBS
+    TurkeyHub -- Laundering --> Leijdekkers
+    TurkeyHub -- Arrested --> Rexhepi
+    TurkeyHub -- Laundering --> Gjika
+    DubaiHub -- Base --> Dizdari
+    DubaiHub -- Arrested --> Gjika
+    SierraLeone -- Base --> Leijdekkers
+    Antwerp -- Entry Point --> EuropeMarkets
+    Valencia -- Entry Point --> EuropeMarkets
+    Antwerp -- Used by --> KompaniaBello
+    Valencia -- Dispute Origin --> Kavac
+
+    %% EDGES: INFERRED ECOSYSTEM TIES
+    KompaniaBello -- Shared Route --> Gjika
+    BalkanCartel -- Cooperate and Compete --> KompaniaBello
+    Ndrangheta -- Distributes --> EuropeMarkets`;
+
+    setTimeout(() => {
+      explodeDiagram(mafiaCode);
+    }, 1500);
+  })();
+  </script>
+</body>
+</html>

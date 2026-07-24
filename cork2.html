@@ -121,11 +121,6 @@
   }
   #modal-footer button.primary { background: #2b6cb0; border-color: #2b6cb0; }
   #modal-footer button:hover { filter: brightness(1.15); }
-  #hidden-mermaid {
-    position: fixed; top: -9999px; left: -9999px;
-    pointer-events: none;
-    opacity: 0;
-  }
 </style>
 </head>
 <body>
@@ -156,8 +151,6 @@
   </div>
 </div>
 
-<div id="hidden-mermaid"></div>
-
 <script type="module">
 import mermaid from 'https://esm.sh/mermaid@11';
 
@@ -185,7 +178,6 @@ const statusEl = document.getElementById('status');
 const zoomInd = document.getElementById('zoom-indicator');
 const modalOverlay = document.getElementById('modal-overlay');
 const mermaidInput = document.getElementById('mermaid-input');
-const hiddenMermaid = document.getElementById('hidden-mermaid');
 
 // ===== DEFAULT DATA =====
 const defaultMermaid = `graph TD
@@ -299,13 +291,6 @@ function screenToWorld(sx, sy) {
   };
 }
 
-function worldToScreen(wx, wy) {
-  return {
-    x: wx * state.camera.zoom + state.camera.x,
-    y: wy * state.camera.zoom + state.camera.y
-  };
-}
-
 // ===== PIN MANAGEMENT =====
 function createPin(x, y, text, style = {}, shape = 'rect') {
   const id = 'pin-' + state.nextPinId++;
@@ -380,16 +365,6 @@ function createPin(x, y, text, style = {}, shape = 'rect') {
   return pinObj;
 }
 
-function removePin(id) {
-  const idx = state.pins.findIndex(p => p.id === id);
-  if (idx === -1) return;
-  const pin = state.pins[idx];
-  pin.el.remove();
-  state.pins.splice(idx, 1);
-  state.connections = state.connections.filter(c => c.from !== id && c.to !== id);
-  renderConnections();
-}
-
 function clearAll() {
   state.pins.forEach(p => p.el.remove());
   state.pins = [];
@@ -409,7 +384,6 @@ function renderConnections() {
   svg.innerHTML = '';
   if (state.connections.length === 0) return;
 
-  // Define arrowhead
   const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
   const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
   marker.setAttribute('id', 'arrowhead');
@@ -495,19 +469,13 @@ function parseMermaid(code) {
 
     const cdMatch = line.match(classDefRegex);
     if (cdMatch) {
-      const name = cdMatch[1];
-      const styles = parseStyleString(cdMatch[2]);
-      classDefs[name] = styles;
+      classDefs[cdMatch[1]] = parseStyleString(cdMatch[2]);
       return;
     }
 
     const edgeMatch = line.match(edgeRegex);
     if (edgeMatch) {
-      edges.push({
-        from: edgeMatch[2],
-        to: edgeMatch[5],
-        label: edgeMatch[4].trim()
-      });
+      edges.push({ from: edgeMatch[2], to: edgeMatch[5], label: edgeMatch[4].trim() });
       return;
     }
 
@@ -537,8 +505,7 @@ function parseMermaid(code) {
 
 function parseStyleString(str) {
   const styles = {};
-  const parts = str.split(',');
-  parts.forEach(part => {
+  str.split(',').forEach(part => {
     const [key, val] = part.split(':');
     if (key && val) {
       const k = key.trim();
@@ -551,199 +518,90 @@ function parseStyleString(str) {
   return styles;
 }
 
-// ===== MERMAID RENDER & EXTRACT =====
-async function renderMermaidAndExtract(code, parsedNodes) {
-  setStatus('Rendering Mermaid diagram...');
-  hiddenMermaid.innerHTML = '';
+// ===== HIERARCHICAL LAYOUT (pure JS, no SVG extraction) =====
+function computeLayout(nodes, edges) {
+  const nodeIds = new Set(nodes.map(n => n.id));
+  const children = {};
+  const parents = {};
+  const inDegree = {};
 
-  const id = 'mermaid-' + Date.now();
-  try {
-    const { svg } = await mermaid.render(id, code);
-    hiddenMermaid.innerHTML = svg;
-
-    // Force layout/reflow so getBBox works
-    const svgEl = hiddenMermaid.querySelector('svg');
-    if (!svgEl) throw new Error('No SVG generated');
-
-    // Make sure SVG has size for measurement
-    svgEl.style.width = '1px';
-    svgEl.style.height = '1px';
-
-    // Small delay to ensure browser has laid out the SVG
-    await new Promise(r => requestAnimationFrame(r));
-    await new Promise(r => setTimeout(r, 50));
-
-    setStatus('Extracting node positions from SVG...');
-    const positions = extractPositionsFromSvg(svgEl, parsedNodes);
-    console.log('Extracted positions:', positions);
-    return positions;
-  } catch (err) {
-    console.warn('Mermaid SVG extraction failed:', err);
-    setStatus('SVG extraction failed, using fallback layout');
-    return null;
-  }
-}
-
-function extractPositionsFromSvg(svgEl, parsedNodes) {
-  const positions = {};
-  const nodeLabelMap = {};
-  parsedNodes.forEach(n => { nodeLabelMap[n.label] = n.id; });
-
-  // Mermaid v11 uses g.node or g with class containing 'node'
-  const nodeGroups = svgEl.querySelectorAll('g.node, g[class*="node"]');
-  console.log('Found', nodeGroups.length, 'node groups in SVG');
-
-  nodeGroups.forEach(g => {
-    // Try to get label text from various possible elements
-    let labelText = '';
-    const labelEl = g.querySelector('.nodeLabel, .label, text, span');
-    if (labelEl) {
-      labelText = labelEl.textContent.trim();
-    }
-
-    // Try to extract original node ID from the group ID
-    // Mermaid v11 IDs often look like: flowchart-NodeID-xxx or just NodeID
-    let nodeId = null;
-    const gid = g.id || g.getAttribute('data-id') || '';
-
-    // Check if any parsed node ID is a substring of the SVG group ID
-    for (const n of parsedNodes) {
-      if (gid.includes(n.id) || gid === n.id) {
-        nodeId = n.id;
-        break;
-      }
-    }
-
-    // Fallback: match by label text
-    if (!nodeId && labelText && nodeLabelMap[labelText]) {
-      nodeId = nodeLabelMap[labelText];
-    }
-
-    if (!nodeId) {
-      console.log('Could not match SVG node:', gid, 'label:', labelText);
-      return;
-    }
-
-    // Get transform
-    const transform = g.getAttribute('transform') || '';
-    let tx = 0, ty = 0;
-    const transMatch = transform.match(/translate\(([^,\s]+)[,\s]+([^)]+)\)/);
-    if (transMatch) {
-      tx = parseFloat(transMatch[1]);
-      ty = parseFloat(transMatch[2]);
-    }
-
-    // Get bounding box for size
-    let bbox = { x: 0, y: 0, width: 80, height: 40 };
-    try {
-      const b = g.getBBox();
-      if (b.width > 0 && b.height > 0) {
-        bbox = b;
-      }
-    } catch (e) {
-      // getBBox can fail in some contexts
-    }
-
-    positions[nodeId] = {
-      x: tx + bbox.x + bbox.width / 2,
-      y: ty + bbox.y + bbox.height / 2,
-      width: bbox.width,
-      height: bbox.height
-    };
+  nodes.forEach(n => {
+    children[n.id] = [];
+    parents[n.id] = [];
+    inDegree[n.id] = 0;
   });
 
-  return positions;
-}
+  edges.forEach(e => {
+    if (nodeIds.has(e.from) && nodeIds.has(e.to)) {
+      children[e.from].push(e.to);
+      parents[e.to].push(e.from);
+      inDegree[e.to]++;
+    }
+  });
 
-// ===== FALLBACK LAYOUTS =====
-function treeFallbackLayout(nodes, edges) {
-  const positions = {};
-  const visited = new Set();
+  // Longest-path layering via Kahn's algorithm
   const levels = {};
-  const children = {};
-
-  nodes.forEach(n => { children[n.id] = []; levels[n.id] = 0; });
-  edges.forEach(e => { children[e.from].push(e.to); });
-
-  // Find all root nodes (no incoming edges)
-  const hasParent = new Set();
-  edges.forEach(e => hasParent.add(e.to));
-
   const queue = [];
   nodes.forEach(n => {
-    if (!hasParent.has(n.id)) {
+    if (inDegree[n.id] === 0) {
       queue.push(n.id);
-      visited.add(n.id);
+      levels[n.id] = 0;
     }
   });
 
-  // If no roots found (cycle), pick first node
+  // If no roots (shouldn't happen with valid DAG, but handle cycles)
   if (queue.length === 0 && nodes.length > 0) {
     queue.push(nodes[0].id);
-    visited.add(nodes[0].id);
+    levels[nodes[0].id] = 0;
+    inDegree[nodes[0].id] = 0;
   }
 
-  let levelIdx = 0;
+  const processed = new Set();
   while (queue.length > 0) {
-    const size = queue.length;
-    for (let i = 0; i < size; i++) {
-      const id = queue.shift();
-      levels[id] = levelIdx;
-      (children[id] || []).forEach(child => {
-        if (!visited.has(child)) {
-          visited.add(child);
-          queue.push(child);
-        }
-      });
-    }
-    levelIdx++;
+    const id = queue.shift();
+    processed.add(id);
+    const currentLevel = levels[id];
+    children[id].forEach(child => {
+      inDegree[child]--;
+      levels[child] = Math.max(levels[child] !== undefined ? levels[child] : 0, currentLevel + 1);
+      if (inDegree[child] === 0) {
+        queue.push(child);
+      }
+    });
   }
 
-  // Handle any unvisited nodes (disconnected components or cycles) - put them in last level
+  // Handle any unprocessed nodes (cycles or disconnected)
   nodes.forEach(n => {
-    if (!visited.has(n.id)) {
-      levels[n.id] = levelIdx;
-      visited.add(n.id);
+    if (!processed.has(n.id)) {
+      levels[n.id] = levels[n.id] !== undefined ? levels[n.id] : 0;
     }
   });
 
-  // Assign positions per level
-  const levelNodes = {};
+  // Group by level
+  const levelMap = {};
   nodes.forEach(n => {
     const lv = levels[n.id];
-    if (!levelNodes[lv]) levelNodes[lv] = [];
-    levelNodes[lv].push(n.id);
+    if (!levelMap[lv]) levelMap[lv] = [];
+    levelMap[lv].push(n.id);
   });
 
+  // Assign positions
+  const positions = {};
   const spacingX = 260;
-  const spacingY = 200;
+  const spacingY = 180;
+  const levelKeys = Object.keys(levelMap).map(Number).sort((a, b) => a - b);
 
-  Object.keys(levelNodes).sort((a,b) => a-b).forEach(lv => {
-    const ids = levelNodes[lv];
+  levelKeys.forEach(lv => {
+    const ids = levelMap[lv];
     const count = ids.length;
     ids.forEach((id, idx) => {
       positions[id] = {
         x: (idx - (count - 1) / 2) * spacingX,
-        y: parseInt(lv) * spacingY
+        y: lv * spacingY
       };
     });
   });
 
-  return positions;
-}
-
-function gridFallbackLayout(nodes) {
-  const positions = {};
-  const cols = Math.ceil(Math.sqrt(nodes.length));
-  const spacing = 260;
-  nodes.forEach((n, i) => {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    positions[n.id] = {
-      x: (col - (cols - 1) / 2) * spacing,
-      y: row * spacing
-    };
-  });
   return positions;
 }
 
@@ -760,44 +618,28 @@ async function explodeDiagram(code) {
 
   clearAll();
 
-  let positions = await renderMermaidAndExtract(code, parsed.nodes);
+  setStatus('Computing layout...');
+  const positions = computeLayout(parsed.nodes, parsed.edges);
 
-  // Check if we got enough valid positions
-  const validPositions = positions ? Object.keys(positions).filter(k => {
-    const p = positions[k];
-    return p && p.width > 0 && p.height > 0;
-  }) : [];
-
-  if (!positions || validPositions.length < parsed.nodes.length * 0.5) {
-    console.log('Using tree fallback layout. Valid SVG positions:', validPositions.length, 'of', parsed.nodes.length);
-    positions = treeFallbackLayout(parsed.nodes, parsed.edges);
-  }
-
-  // Ensure every node has a position
-  parsed.nodes.forEach(n => {
-    if (!positions[n.id]) {
-      positions[n.id] = { x: 0, y: 0, width: 140, height: 60 };
-    }
-  });
-
-  setStatus('Creating pins...');
+  // Debug: verify positions are spread out
+  const xs = Object.values(positions).map(p => p.x);
+  const ys = Object.values(positions).map(p => p.y);
+  console.log('Layout range — x:', Math.min(...xs), 'to', Math.max(...xs), '| y:', Math.min(...ys), 'to', Math.max(...ys));
 
   // Center the diagram
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   parsed.nodes.forEach(n => {
     const pos = positions[n.id];
-    const w = pos.width || 140;
-    const h = pos.height || 60;
-    minX = Math.min(minX, pos.x - w/2);
-    minY = Math.min(minY, pos.y - h/2);
-    maxX = Math.max(maxX, pos.x + w/2);
-    maxY = Math.max(maxY, pos.y + h/2);
+    minX = Math.min(minX, pos.x - 80);
+    minY = Math.min(minY, pos.y - 30);
+    maxX = Math.max(maxX, pos.x + 80);
+    maxY = Math.max(maxY, pos.y + 30);
   });
 
   const centerX = (minX + maxX) / 2;
   const centerY = (minY + maxY) / 2;
 
-  // Build a map from node ID to pin ID for connections
+  // Build map from node ID to pin ID for connections
   const nodeIdToPinId = {};
 
   parsed.nodes.forEach(n => {
@@ -809,7 +651,7 @@ async function explodeDiagram(code) {
     nodeIdToPinId[n.id] = pin.id;
   });
 
-  // Create connections using node ID mapping
+  // Create connections
   parsed.edges.forEach(e => {
     const fromPinId = nodeIdToPinId[e.from];
     const toPinId = nodeIdToPinId[e.to];
@@ -821,8 +663,8 @@ async function explodeDiagram(code) {
   // Auto-zoom to fit
   const vpW = viewport.clientWidth;
   const vpH = viewport.clientHeight;
-  const diagW = maxX - minX + 300;
-  const diagH = maxY - minY + 200;
+  const diagW = maxX - minX + 200;
+  const diagH = maxY - minY + 150;
   const fitZoom = Math.min(vpW / diagW, vpH / diagH, 1.5);
   state.camera.zoom = Math.max(0.2, Math.min(fitZoom, 2));
   state.camera.x = vpW / 2;
@@ -864,7 +706,6 @@ document.getElementById('btn-render').addEventListener('click', async () => {
   await explodeDiagram(code);
 });
 
-// Close modal on overlay click
 modalOverlay.addEventListener('click', (e) => {
   if (e.target === modalOverlay) modalOverlay.classList.remove('open');
 });
@@ -924,12 +765,7 @@ viewport.addEventListener('wheel', (e) => {
   updateCamera();
 }, { passive: false });
 
-// Keyboard shortcuts
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Delete' || e.key === 'Backspace') {
-    const active = document.activeElement;
-    if (active && active.isContentEditable) return;
-  }
   if (e.key === 'Escape') {
     modalOverlay.classList.remove('open');
   }

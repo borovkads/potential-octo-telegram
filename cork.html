@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ThreadBoard</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js">
+    </script>
+    <style>
+        /* ── Reset & Layout ── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: #3d2b1f;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Toolbar ── */
+        .toolbar {
+            background: rgba(60, 40, 20, 0.9);
+            padding: 8px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 2px solid #5a3f2b;
+            flex-shrink: 0;
+            z-index: 10;
+            flex-wrap: wrap;
+            min-height: 48px;
+        }
+        .toolbar button {
+            background: #d4b48c;
+            border: none;
+            padding: 5px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #2d1e12;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .toolbar button:hover {
+            background: #e8cfb0;
+            transform: scale(1.02);
+        }
+        .toolbar .explode-btn {
+            background: #d35400;
+            color: #fff;
+        }
+        .toolbar .explode-btn:hover {
+            background: #e67e22;
+        }
+        .toolbar .clear-btn {
+            background: #a93226;
+            color: #fff;
+        }
+        .toolbar .clear-btn:hover {
+            background: #c0392b;
+        }
+        .toolbar .status {
+            color: #ecd6b0;
+            font-size: 0.8rem;
+            margin-left: auto;
+            background: #2d1e12;
+            padding: 3px 14px;
+            border-radius: 30px;
+            border: 1px solid #7a5f44;
+            white-space: nowrap;
+            max-width: 45vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ── Board ── */
+        #board {
+            flex: 1;
+            position: relative;
+            background: #c8a27b;
+            background-image:
+                radial-gradient(circle at 20% 30%, #b58d66 2px, transparent 2px),
+                radial-gradient(circle at 80% 70%, #b58d66 2px, transparent 2px),
+                radial-gradient(circle at 40% 90%, #b58d66 2px, transparent 2px);
+            background-size: 60px 60px, 80px 80px, 70px 70px;
+            overflow: hidden;
+            cursor: default;
+            touch-action: none;
+            min-height: 0;
+        }
+        #board::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(45deg,
+                    rgba(0, 0, 0, 0.03) 0px, rgba(0, 0, 0, 0.03) 4px,
+                    transparent 4px, transparent 8px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Pan Container ── */
+        #panContainer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            will-change: transform;
+            pointer-events: none;
+            transform-origin: 0 0;
+            z-index: 1;
+        }
+        #panContainer>* {
+            pointer-events: auto;
+        }
+
+        /* ── Strings SVG ── */
+        #strings {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        #strings line {
+            stroke: #d42a2a;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+        }
+        .temp-string {
+            stroke: #ff6666;
+            stroke-width: 2;
+            stroke-dasharray: 6 4;
+        }
+
+        /* ── Pins Container ── */
+        #pinsContainer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 3;
+        }
+        #pinsContainer .pin {
+            pointer-events: auto;
+        }
+
+        /* ── Pin Base ── */
+        .pin {
+            position: absolute;
+            cursor: grab;
+            user-select: none;
+            transition: box-shadow 0.15s;
+            z-index: 5;
+            touch-action: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.3;
+            padding: 8px;
+            word-break: break-word;
+            min-width: 60px;
+            min-height: 40px;
+        }
+        .pin:hover {
+            z-index: 6;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+        .pin.dragging {
+            cursor: grabbing;
+            z-index: 20;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            transition: none;
+        }
+        .pin .pinhead {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 30% 30%, #e03a3a, #a02020);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            border: 1px solid #7a2a2a;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* ── Sticky Note ── */
+        .pin.note {
+            background: #fef9e8;
+            border-left: 3px solid #f0dbb0;
+            border-radius: 4px 4px 12px 12px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35), inset 0 -2px 0 rgba(0, 0, 0, 0.05);
+            padding: 14px 12px 8px 12px;
+            min-width: 120px;
+            min-height: 80px;
+            transform: rotate(var(--rot, 0deg));
+        }
+        .pin.note .text {
+            margin-top: 6px;
+            outline: none;
+            min-height: 40px;
+            background: transparent;
+            border: none;
+            width: 100%;
+            resize: none;
+            font: inherit;
+            color: #1f1a14;
+            padding: 0;
+            overflow: hidden;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .pin.note .text:focus {
+            background: #fffbe6;
+        }
+
+        /* ── Styled Node ── */
+        .pin.styled {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 2px solid #333;
+            font-weight: 500;
+            color: #111;
+            background: #e8e8e8;
+            min-width: 80px;
+            min-height: 50px;
+            padding: 12px 16px;
+            border-radius: 4px;
+            transform: rotate(0deg);
+        }
+        .pin.styled.rectangle {
+            border-radius: 4px;
+        }
+        .pin.styled.rounded {
+            border-radius: 20px;
+        }
+        .pin.styled.diamond {
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            border-radius: 0;
+            border: none;
+            min-width: 80px;
+            min-height: 80px;
+            padding: 20px;
+        }
+        .pin.styled.circle {
+            border-radius: 50%;
+            min-width: 80px;
+            min-height: 80px;
+            padding: 20px;
+        }
+        .pin.styled .pinhead {
+            display: none;
+        }
+        .pin.styled .label {
+            pointer-events: none;
+        }
+        .pin.styled.dragging {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ── HUD ── */
+        .hint {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 20, 10, 0.8);
+            color: #e6d5b8;
+            padding: 5px 16px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid #7a5f44;
+            pointer-events: none;
+            z-index: 30;
+            white-space: nowrap;
+        }
+        .zoom-indicator {
+            position: absolute;
+            bottom: 74px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            pointer-events: none;
+            z-index: 25;
+            backdrop-filter: blur(4px);
+            border: 1px solid #7a5f44;
+        }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 12, 6, 0.7);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #f5efe7;
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            border: 1px solid #b59578;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .modal-box h2 {
+            font-size: 1.4rem;
+            color: #2d1e12;
+        }
+        .modal-box p {
+            color: #4a3728;
+            font-size: 0.95rem;
+            margin-top: -4px;
+        }
+        .modal-box textarea {
+            width: 100%;
+            height: 200px;
+            background: #fffdf8;
+            border: 2px solid #c8b09a;
+            border-radius: 12px;
+            padding: 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            color: #1f1a14;
+            outline: none;
+        }
+        .modal-box textarea:focus {
+            border-color: #a05030;
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15);
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            margin-top: 4px;
+        }
+        .modal-actions button {
+            padding: 8px 22px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-actions .btn-secondary {
+            background: #d4c0b0;
+            color: #2d1e12;
+        }
+        .modal-actions .btn-secondary:hover {
+            background: #c0ab98;
+        }
+        .modal-actions .btn-primary {
+            background: #d35400;
+            color: #fff;
+        }
+        .modal-actions .btn-primary:hover {
+            background: #e67e22;
+        }
+        .modal-actions .btn-clipboard {
+            background: #3b5998;
+            color: #fff;
+        }
+        .modal-actions .btn-clipboard:hover {
+            background: #4c70b0;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 700px) {
+            .toolbar {
+                gap: 5px;
+                padding: 5px 10px;
+                min-height: 40px;
+            }
+            .toolbar button {
+                font-size: 0.7rem;
+                padding: 4px 10px;
+            }
+            .toolbar .status {
+                font-size: 0.65rem;
+                padding: 2px 10px;
+                margin-left: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .modal-box {
+                padding: 16px;
+            }
+            .modal-box textarea {
+                height: 140px;
+            }
+            .hint {
+                font-size: 0.65rem;
+                padding: 3px 12px;
+                bottom: 14px;
+            }
+            .zoom-indicator {
+                bottom: 58px;
+                right: 10px;
+                font-size: 0.65rem;
+                padding: 2px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <button id="addNoteBtn">📌 Add Note</button>
+        <button id="explodeBtn" class="explode-btn">🧩 Explode Diagram</button>
+        <button id="clearAllBtn" class="clear-btn">🗑️ Clear All</button>
+        <span class="status" id="statusBar">Ready – click a pin, then another to connect</span>
+    </div>
+
+    <div id="board">
+        <div id="panContainer">
+            <svg id="strings"></svg>
+            <div id="pinsContainer"></div>
+        </div>
+        <div class="hint" id="hint">Drag pins · Click to connect · Scroll to zoom</div>
+        <div class="zoom-indicator" id="zoomIndicator">100%</div>
+    </div>
+
+    <div class="modal-overlay" id="importModal">
+        <div class="modal-box">
+            <h2>🧩 Explode Diagram</h2>
+            <p>Paste your Mermaid code below.</p>
+            <textarea id="mermaidInput" spellcheck="false" placeholder="Paste your Mermaid code here…"></textarea>
+            <div class="modal-actions">
+                <button class="btn-clipboard" id="modalPasteBtn">📋 Paste</button>
+                <button class="btn-secondary" id="modalCancelBtn">Cancel</button>
+                <button class="btn-primary" id="modalExplodeBtn">🚀 Explode</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  SETUP
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: 'base',
+                themeVariables: {
+                    background: '#ffffff',
+                    primaryColor: '#c0392b',
+                    primaryBorderColor: '#7a2a2a',
+                    lineColor: '#d42a2a',
+                    fontSize: '14px',
+                },
+                flowchart: { useMaxWidth: false },
+                securityLevel: 'loose',
+            });
+
+            const board = document.getElementById('board');
+            const panContainer = document.getElementById('panContainer');
+            const pinsContainer = document.getElementById('pinsContainer');
+            const stringsSvg = document.getElementById('strings');
+            const statusBar = document.getElementById('statusBar');
+            const zoomIndicator = document.getElementById('zoomIndicator');
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  STATE
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            let pins = [];
+            let connections = [];
+            let nextPinId = 1;
+            let nextConnId = 1;
+            let selectedPinId = null;
+            let tempLine = null;
+            let dragData = null;
+
+            // Pan & Zoom
+            let panX = 0,
+                panY = 0;
+            let scale = 1;
+            const MIN_SCALE = 0.2;
+            const MAX_SCALE = 3;
+            let isPanning = false;
+            let panStartX = 0,
+                panStartY = 0;
+            let panStartPanX = 0,
+                panStartPanY = 0;
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  TRANSFORM
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            function updateTransform() {
+                panContainer.style.transform = 'translate(' + panX + 'px, ' + panY + 'px) scale(' + scale + ')';
+                zoomIndicator.textContent = Math.round(scale * 100) + '%';
+            }
+
+            function screenToWorld(cx, cy) {
+                const r = panContainer.getBoundingClientRect();
+                return {
+                    x: (cx - r.left) / scale,
+                    y: (cy - r.top) / scale,
+                };
+            }
+
+            function getPinCenter(el) {
+                const r = el.getBoundingClientRect();
+                const pr = panContainer.getBoundingClientRect();
+                return {
+                    x: (r.left + r.width / 2 - pr.left) / scale,
+                    y: (r.top + r.height / 2 - pr.top) / scale,
+                };
+            }
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  STRINGS
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            function renderStrings() {
+                stringsSvg.querySelectorAll('line:not(.temp-string)').forEach(l => l.remove());
+                connections.forEach(c => {
+                    const f = pins.find(p => p.id === c.fromId);
+                    const t = pins.find(p => p.id === c.toId);
+                    if (!f || !t) return;
+                    const fp = getPinCenter(f.el);
+                    const tp = getPinCenter(t.el);
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', fp.x);
+                    line.setAttribute('y1', fp.y);
+                    line.setAttribute('x2', tp.x);
+                    line.setAttribute('y2', tp.y);
+                    line.dataset.connId = c.id;
+                    stringsSvg.appendChild(line);
+                    c.lineElement = line;
+                });
+            }
+
+            function updateAllStrings() {
+                connections.forEach(c => {
+                    const f = pins.find(p => p.id === c.fromId);
+                    const t = pins.find(p => p.id === c.toId);
+                    if (!f || !t || !c.lineElement) return;
+                    const fp = getPinCenter(f.el);
+                    const tp = getPinCenter(t.el);
+                    c.lineElement.setAttribute('x1', fp.x);
+                    c.lineElement.setAttribute('y1', fp.y);
+                    c.lineElement.setAttribute('x2', tp.x);
+                    c.lineElement.setAttribute('y2', tp.y);
+                });
+                if (tempLine && selectedPinId !== null) {
+                    const f = pins.find(p => p.id === selectedPinId);
+                    if (f) {
+                        const fp = getPinCenter(f.el);
+                        tempLine.setAttribute('x1', fp.x);
+                        tempLine.setAttribute('y1', fp.y);
+                    }
+                }
+            }
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  PIN CREATION
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            function createNotePin(x, y, text) {
+                text = text || 'New idea…';
+                const el = document.createElement('div');
+                el.className = 'pin note';
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+                el.style.setProperty('--rot', (Math.random() - 0.5) * 4 + 'deg');
+
+                const head = document.createElement('div');
+                head.className = 'pinhead';
+                el.appendChild(head);
+
+                const ta = document.createElement('div');
+                ta.className = 'text';
+                ta.contentEditable = true;
+                ta.textContent = text;
+                el.appendChild(ta);
+
+                const id = nextPinId++;
+                el.dataset.pinId = id;
+                pinsContainer.appendChild(el);
+
+                ta.addEventListener('mousedown', e => e.stopPropagation());
+                ta.addEventListener('click', e => e.stopPropagation());
+
+                const obj = { id, el, x, y, text, type: 'note' };
+                pins.push(obj);
+                attachEvents(el, id);
+                ta.addEventListener('input', () => { obj.text = ta.textContent; });
+
+                renderStrings();
+                updateAllStrings();
+                return obj;
+            }
+
+            function createStyledPin(x, y, label, shape, bgColor) {
+                shape = shape || 'rectangle';
+                bgColor = bgColor || '#e8e8e8';
+                const el = document.createElement('div');
+                el.className = 'pin styled ' + shape;
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+                el.style.backgroundColor = bgColor;
+
+                const ld = document.createElement('div');
+                ld.className = 'label';
+                ld.textContent = label || 'Node';
+                el.appendChild(ld);
+
+                const id = nextPinId++;
+                el.dataset.pinId = id;
+                pinsContainer.appendChild(el);
+
+                const obj = { id, el, x, y, text: label, type: 'styled', shape, bgColor };
+                pins.push(obj);
+                attachEvents(el, id);
+
+                renderStrings();
+                updateAllStrings();
+                return obj;
+            }
+
+            function attachEvents(el, id) {
+                el.addEventListener('mousedown', onPinMouseDown);
+                el.addEventListener('touchstart', onPinTouchStart, { passive: false });
+                el.addEventListener('click', onPinClick);
+            }
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  PIN INTERACTIONS
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            function onPinClick(e) {
+                e.stopPropagation();
+                const el = e.currentTarget;
+                const id = parseInt(el.dataset.pinId);
+                const pin = pins.find(p => p.id === id);
+                if (!pin) return;
+
+                if (selectedPinId !== null && selectedPinId !== id) {
+                    addConnection(selectedPinId, id);
+                    clearSelection();
+                    statusBar.textContent = 'Connected!';
+                    setTimeout(() => { statusBar.textContent = 'Click a pin → click another to connect'; }, 1200);
+                    return;
+                }
+
+                if (selectedPinId === id) {
+                    clearSelection();
+                    statusBar.textContent = 'Deselected';
+                    setTimeout(() => { statusBar.textContent = 'Click a pin → click another to connect'; }, 500);
+                } else {
+                    clearSelection();
+                    selectedPinId = id;
+                    pin.el.style.outline = '3px solid #ff4444';
+                    pin.el.style.outlineOffset = '2px';
+                    statusBar.textContent = 'Selected – click another pin to connect.';
+
+                    if (!tempLine) {
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('class', 'temp-string');
+                        stringsSvg.appendChild(line);
+                        tempLine = line;
+                        const c = getPinCenter(pin.el);
+                        tempLine.setAttribute('x1', c.x);
+                        tempLine.setAttribute('y1', c.y);
+                        tempLine.setAttribute('x2', c.x);
+                        tempLine.setAttribute('y2', c.y);
+                    }
+                    document.addEventListener('mousemove', onTempMove);
+                    document.addEventListener('touchmove', onTempTouch, { passive: false });
+                }
+            }
+
+            function onTempMove(e) {
+                if (!tempLine || selectedPinId === null) return;
+                const w = screenToWorld(e.clientX, e.clientY);
+                tempLine.setAttribute('x2', w.x);
+                tempLine.setAttribute('y2', w.y);
+            }
+
+            function onTempTouch(e) {
+                e.preventDefault();
+                if (!tempLine || selectedPinId === null) return;
+                const t = e.touches[0];
+                const w = screenToWorld(t.clientX, t.clientY);
+                tempLine.setAttribute('x2', w.x);
+                tempLine.setAttribute('y2', w.y);
+            }
+
+            function clearSelection() {
+                if (selectedPinId !== null) {
+                    const p = pins.find(p => p.id === selectedPinId);
+                    if (p) { p.el.style.outline = '';
+                        p.el.style.outlineOffset = ''; }
+                    selectedPinId = null;
+                }
+                if (tempLine) { tempLine.remove();
+                    tempLine = null; }
+                document.removeEventListener('mousemove', onTempMove);
+                document.removeEventListener('touchmove', onTempTouch);
+            }
+
+            function addConnection(fromId, toId) {
+                const exists = connections.some(c =>
+                    (c.fromId === fromId && c.toId === toId) ||
+                    (c.fromId === toId && c.toId === fromId)
+                );
+                if (exists) return;
+                connections.push({ id: nextConnId++, fromId, toId, lineElement: null });
+                renderStrings();
+            }
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  DRAG
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            function onPinMouseDown(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const el = e.currentTarget;
+                const id = parseInt(el.dataset.pinId);
+                const pin = pins.find(p => p.id === id);
+                if (!pin) return;
+                const w = screenToWorld(e.clientX, e.clientY);
+                dragData = { pinId: id, offsetX: w.x - pin.x, offsetY: w.y - pin.y, el };
+                el.classList.add('dragging');
+                document.addEventListener('mousemove', onDragMove);
+                document.addEventListener('mouseup', onDragEnd);
+            }
+
+            function onPinTouchStart(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const t = e.touches[0];
+                const el = e.currentTarget;
+                const id = parseInt(el.dataset.pinId);
+                const pin = pins.find(p => p.id === id);
+                if (!pin) return;
+                const w = screenToWorld(t.clientX, t.clientY);
+                dragData = { pinId: id, offsetX: w.x - pin.x, offsetY: w.y - pin.y, el };
+                el.classList.add('dragging');
+                document.addEventListener('touchmove', onDragTouch, { passive: false });
+                document.addEventListener('touchend', onDragEnd);
+            }
+
+            function onDragMove(e) {
+                if (!dragData) return;
+                const w = screenToWorld(e.clientX, e.clientY);
+                movePin(dragData.pinId, w.x - dragData.offsetX, w.y - dragData.offsetY);
+            }
+
+            function onDragTouch(e) {
+                e.preventDefault();
+                if (!dragData) return;
+                const t = e.touches[0];
+                const w = screenToWorld(t.clientX, t.clientY);
+                movePin(dragData.pinId, w.x - dragData.offsetX, w.y - dragData.offsetY);
+            }
+
+            function onDragEnd() {
+                if (dragData) { dragData.el.classList.remove('dragging');
+                    dragData = null; }
+                document.removeEventListener('mousemove', onDragMove);
+                document.removeEventListener('mouseup', onDragEnd);
+                document.removeEventListener('touchmove', onDragTouch);
+                document.removeEventListener('touchend', onDragEnd);
+            }
+
+            function movePin(id, x, y) {
+                const pin = pins.find(p => p.id === id);
+                if (!pin) return;
+                pin.el.style.left = x + 'px';
+                pin.el.style.top = y + 'px';
+                pin.x = x;
+                pin.y = y;
+                updateAllStrings();
+            }
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  PAN
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            function startPan(e) {
+                if (e.target.closest('.pin')) return;
+                if (e.target.closest('.toolbar') || e.target.closest('.modal-overlay')) return;
+                isPanning = true;
+                const cx = e.clientX || (e.touches && e.touches[0].clientX);
+                const cy = e.clientY || (e.touches && e.touches[0].clientY);
+                panStartX = cx;
+                panStartY = cy;
+                panStartPanX = panX;
+                panStartPanY = panY;
+                board.style.cursor = 'grabbing';
+                e.preventDefault();
+            }
+
+            function movePan(e) {
+                if (!isPanning) return;
+                const cx = e.clientX || (e.touches && e.touches[0].clientX);
+                const cy = e.clientY || (e.touches && e.touches[0].clientY);
+                panX = panStartPanX + (cx - panStartX);
+                panY = panStartPanY + (cy - panStartY);
+                updateTransform();
+            }
+
+            function endPan() {
+                if (isPanning) { isPanning = false;
+                    board.style.cursor = 'default'; }
+            }
+
+            board.addEventListener('mousedown', startPan);
+            document.addEventListener('mousemove', movePan);
+            document.addEventListener('mouseup', endPan);
+            board.addEventListener('touchstart', startPan, { passive: false });
+            document.addEventListener('touchmove', movePan, { passive: false });
+            document.addEventListener('touchend', endPan);
+            document.addEventListener('touchcancel', endPan);
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  ZOOM
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            board.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                const ns = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale + delta));
+                if (ns === scale) return;
+                const rect = board.getBoundingClientRect();
+                const ratio = ns / scale;
+                panX = (e.clientX - rect.left) * (1 - ratio) + ratio * panX;
+                panY = (e.clientY - rect.top) * (1 - ratio) + ratio * panY;
+                scale = ns;
+                updateTransform();
+                updateAllStrings();
+            }, { passive: false });
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  CLEAR
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            function clearAll() {
+                pins.forEach(p => p.el.remove());
+                pins = [];
+                connections = [];
+                stringsSvg.querySelectorAll('line').forEach(l => l.remove());
+                clearSelection();
+                statusBar.textContent = 'Board cleared';
+                setTimeout(() => { statusBar.textContent = 'Click a pin → click another to connect'; }, 1000);
+            }
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  MERMAID PARSER
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            function parseMermaid(text) {
+                const nodeMap = new Map();
+                const styleMap = new Map();
+
+                const styleRegex = /style\s+(\w+)\s+(.*?)(?=;|$)/g;
+                let m;
+                while ((m = styleRegex.exec(text)) !== null) {
+                    const id = m[1];
+                    const s = m[2];
+                    const fill = s.match(/fill\s*:\s*([^;,]+)/);
+                    const stroke = s.match(/stroke\s*:\s*([^;,]+)/);
+                    const style = {};
+                    if (fill) style.fill = fill[1].trim();
+                    if (stroke) style.stroke = stroke[1].trim();
+                    styleMap.set(id, style);
+                }
+
+                const idRegex = /(\w+)\s*\[([^\]]+)\]/g;
+                const parenRegex = /(\w+)\s*\(([^\)]+)\)/g;
+                const diamondRegex = /(\w+)\s*\{([^\}]+)\}/g;
+                const circleRegex = /(\w+)\s*\(\(([^\)]+)\)\)/g;
+
+                while ((m = idRegex.exec(text)) !== null) {
+                    nodeMap.set(m[1], { label: m[2].trim(), shape: 'rectangle' });
+                }
+                while ((m = parenRegex.exec(text)) !== null) {
+                    if (!nodeMap.has(m[1])) {
+                        nodeMap.set(m[1], { label: m[2].trim(), shape: 'rounded' });
+                    }
+                }
+                while ((m = diamondRegex.exec(text)) !== null) {
+                    nodeMap.set(m[1], { label: m[2].trim(), shape: 'diamond' });
+                }
+                while ((m = circleRegex.exec(text)) !== null) {
+                    nodeMap.set(m[1], { label: m[2].trim(), shape: 'circle' });
+                }
+
+                const plainRegex = /(\w+)/g;
+                while ((m = plainRegex.exec(text)) !== null) {
+                    const id = m[1];
+                    if (['graph', 'TD', 'LR', 'BT', 'RL', 'TB', 'flowchart', 'subgraph', 'end', 'and', 'or', 'yes', 'no']
+                        .includes(id.toLowerCase())) continue;
+                    if (!nodeMap.has(id)) {
+                        nodeMap.set(id, { label: id, shape: 'rectangle' });
+                    }
+                }
+
+                styleMap.forEach((style, id) => {
+                    if (nodeMap.has(id)) {
+                        nodeMap.get(id).style = style;
+                    }
+                });
+
+                const edges = [];
+                const edgeRegex = /(\w+)\s*--+>\s*(\w+)/g;
+                while ((m = edgeRegex.exec(text)) !== null) {
+                    edges.push({ from: m[1], to: m[2] });
+                }
+                const dashRegex = /(\w+)\s*---+\s*(\w+)/g;
+                while ((m = dashRegex.exec(text)) !== null) {
+                    if (!edges.some(e => e.from === m[1] && e.to === m[2])) {
+                        edges.push({ from: m[1], to: m[2] });
+                    }
+                }
+                const compactRegex = /(\w+)--+>(\w+)/g;
+                while ((m = compactRegex.exec(text)) !== null) {
+                    if (!edges.some(e => e.from === m[1] && e.to === m[2])) {
+                        edges.push({ from: m[1], to: m[2] });
+                    }
+                }
+
+                return { nodeMap, edges };
+            }
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  HIERARCHICAL LAYOUT (fallback)
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            function applyHierarchicalLayout(pinList, edgeList, spacingX, spacingY) {
+                spacingX = spacingX || 220;
+                spacingY = spacingY || 180;
+                if (pinList.length === 0) return;
+
+                const out = new Map();
+                const inc = new Map();
+                pinList.forEach(p => { out.set(p.id, []);
+                    inc.set(p.id, []); });
+                edgeList.forEach(e => {
+                    if (out.has(e.fromId) && out.has(e.toId)) {
+                        out.get(e.fromId).push(e.toId);
+                        inc.get(e.toId).push(e.fromId);
+                    }
+                });
+
+                const roots = pinList.filter(p => inc.get(p.id).length === 0);
+                const rootIds = roots.length > 0 ? roots.map(p => p.id) : [pinList[0].id];
+
+                const depth = new Map();
+                pinList.forEach(p => depth.set(p.id, 0));
+                const q = [];
+                const vis = new Set();
+                rootIds.forEach(id => { depth.set(id, 0);
+                    q.push(id);
+                    vis.add(id); });
+
+                while (q.length > 0) {
+                    const cur = q.shift();
+                    (out.get(cur) || []).forEach(child => {
+                        if (!vis.has(child)) {
+                            vis.add(child);
+                            depth.set(child, depth.get(cur) + 1);
+                            q.push(child);
+                        }
+                    });
+                }
+                pinList.forEach(p => { if (!vis.has(p.id)) depth.set(p.id, 0); });
+
+                const layers = new Map();
+                pinList.forEach(p => {
+                    const d = depth.get(p.id);
+                    if (!layers.has(d)) layers.set(d, []);
+                    layers.get(d).push(p);
+                });
+                const sorted = Array.from(layers.keys()).sort((a, b) => a - b);
+
+                sorted.forEach((key, idx) => {
+                    const nodes = layers.get(key);
+                    nodes.sort((a, b) => a.id - b.id);
+                    const count = nodes.length;
+                    const total = (count - 1) * spacingX;
+                    const start = -total / 2;
+                    nodes.forEach((node, i) => {
+                        node._lx = start + i * spacingX;
+                        node._ly = idx * spacingY;
+                    });
+                });
+
+                let minX = Infinity,
+                    maxX = -Infinity,
+                    minY = Infinity,
+                    maxY = -Infinity;
+                pinList.forEach(p => {
+                    if (p._lx < minX) minX = p._lx;
+                    if (p._lx > maxX) maxX = p._lx;
+                    if (p._ly < minY) minY = p._ly;
+                    if (p._ly > maxY) maxY = p._ly;
+                });
+                const gw = maxX - minX + spacingX;
+                const gh = maxY - minY + spacingY;
+                const pr = panContainer.getBoundingClientRect();
+                const ox = (pr.width / scale - gw) / 2 - minX;
+                const oy = (pr.height / scale - gh) / 2 - minY;
+
+                pinList.forEach(p => {
+                    const nx = p._lx + ox;
+                    const ny = p._ly + oy;
+                    p.el.style.left = nx + 'px';
+                    p.el.style.top = ny + 'px';
+                    p.x = nx;
+                    p.y = ny;
+                });
+                pinList.forEach(p => { delete p._lx;
+                    delete p._ly; });
+                updateAllStrings();
+            }
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  EXPLODE
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            async function explodeDiagram(text) {
+                try {
+                    statusBar.textContent = '⏳ Exploding…';
+
+                    const { nodeMap, edges } = parseMermaid(text);
+                    if (nodeMap.size === 0) {
+                        statusBar.textContent = '❌ No nodes found.';
+                        return false;
+                    }
+
+                    const labelMap = new Map();
+                    const idMap = new Map();
+                    nodeMap.forEach((data, id) => {
+                        idMap.set(id, data);
+                        const norm = data.label.trim().replace(/\s+/g, ' ');
+                        if (!labelMap.has(norm)) {
+                            labelMap.set(norm, { ...data, id });
+                        }
+                    });
+
+                    const { svg } = await mermaid.render('explode', text);
+
+                    const hidden = document.createElement('div');
+                    hidden.style.cssText =
+                        'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1000;opacity:0;overflow:hidden;';
+                    document.body.appendChild(hidden);
+                    hidden.innerHTML = svg;
+
+                    const svgEl = hidden.querySelector('svg');
+                    const svgRect = svgEl.getBoundingClientRect();
+                    const groups = svgEl.querySelectorAll('g.node, g.cluster');
+                    const extracted = [];
+
+                    groups.forEach((group) => {
+                        const shape = group.querySelector('rect, ellipse, polygon');
+                        if (!shape) return;
+
+                        const textEl = group.querySelector('text');
+                        let label = '';
+                        if (textEl) {
+                            let content = '';
+                            textEl.childNodes.forEach(child => {
+                                if (child.nodeType === Node.TEXT_NODE) content += child.textContent;
+                                else if (child.nodeType === Node.ELEMENT_NODE && child.tagName === 'tspan') {
+                                    content += child.textContent;
+                                }
+                            });
+                            label = content.trim().replace(/\s+/g, ' ');
+                        }
+                        if (!label) {
+                            let id = group.id.replace(/^explode-/, '').replace(/^flowchart-/, '').replace(/^node-/,
+                            '');
+                            if (id && isNaN(id)) label = id;
+                        }
+                        if (!label) return;
+
+                        const tr = group.getAttribute('transform') || '';
+                        const tm = tr.match(/translate\(([^,]+),\s*([^)]+)\)/);
+                        let tx = 0,
+                            ty = 0;
+                        if (tm) {
+                            tx = parseFloat(tm[1]);
+                            ty = parseFloat(tm[2]);
+                        } else {
+                            const r = shape.getBoundingClientRect();
+                            tx = r.left - svgRect.left;
+                            ty = r.top - svgRect.top;
+                        }
+
+                        let nodeData = labelMap.get(label);
+                        if (!nodeData) {
+                            const lower = label.toLowerCase();
+                            for (let [k, v] of labelMap) {
+                                if (k.toLowerCase() === lower) { nodeData = v; break; }
+                            }
+                        }
+                        if (!nodeData) {
+                            let id = group.id.replace(/^explode-/, '').replace(/^flowchart-/, '').replace(/^node-/,
+                            '');
+                            nodeData = idMap.get(id);
+                        }
+
+                        let shapeType = 'rectangle';
+                        let bgColor = '#e8e8e8';
+                        if (nodeData) {
+                            shapeType = nodeData.shape || 'rectangle';
+                            if (nodeData.style && nodeData.style.fill) bgColor = nodeData.style.fill;
+                        } else {
+                            if (shape.tagName === 'ellipse') shapeType = 'circle';
+                            else if (shape.tagName === 'polygon') shapeType = 'diamond';
+                            else {
+                                const rx = parseFloat(shape.getAttribute('rx') || 0);
+                                const ry = parseFloat(shape.getAttribute('ry') || 0);
+                                if (rx > 10 || ry > 10) shapeType = 'rounded';
+                            }
+                            const fill = shape.getAttribute('fill');
+                            if (fill && fill !== 'none') bgColor = fill;
+                        }
+
+                        const bbox = shape.getBBox ? shape.getBBox() : { width: 80, height: 50 };
+                        extracted.push({
+                            label,
+                            shape: shapeType,
+                            bgColor,
+                            x: tx,
+                            y: ty,
+                            w: bbox.width || 80,
+                            h: bbox.height || 50,
+                            origId: nodeData ? nodeData.id : null,
+                        });
+                    });
+
+                    document.body.removeChild(hidden);
+
+                    if (extracted.length === 0) {
+                        statusBar.textContent = '⚠️ No nodes extracted. Using fallback.';
+                        return fallbackStyled(text);
+                    }
+
+                    let minX = Infinity,
+                        maxX = -Infinity,
+                        minY = Infinity,
+                        maxY = -Infinity;
+                    extracted.forEach(p => {
+                        if (p.x < minX) minX = p.x;
+                        if (p.x + p.w > maxX) maxX = p.x + p.w;
+                        if (p.y < minY) minY = p.y;
+                        if (p.y + p.h > maxY) maxY = p.y + p.h;
+                    });
+                    const tw = maxX - minX;
+                    const th = maxY - minY;
+                    const pr = panContainer.getBoundingClientRect();
+                    const ox = (pr.width / scale - tw) / 2 - minX;
+                    const oy = (pr.height / scale - th) / 2 - minY;
+
+                    clearSelection();
+                    const labelToPin = new Map();
+
+                    extracted.forEach(p => {
+                        const px = p.x + ox;
+                        const py = p.y + oy;
+                        const pin = createStyledPin(px, py, p.label, p.shape, p.bgColor);
+                        labelToPin.set(p.label, pin.id);
+                        if (p.origId) labelToPin.set(p.origId, pin.id);
+                    });
+
+                    let connected = 0;
+                    edges.forEach(e => {
+                        let from = labelToPin.get(e.from);
+                        let to = labelToPin.get(e.to);
+                        if (!from) {
+                            for (let [k, v] of labelToPin) {
+                                if (k.toLowerCase() === e.from.toLowerCase()) { from = v; break; }
+                            }
+                        }
+                        if (!to) {
+                            for (let [k, v] of labelToPin) {
+                                if (k.toLowerCase() === e.to.toLowerCase()) { to = v; break; }
+                            }
+                        }
+                        if (from && to) {
+                            if (!connections.some(c => (c.fromId === from && c.toId === to) || (c.fromId === to &&
+                                    c.toId === from))) {
+                                connections.push({ id: nextConnId++, fromId: from, toId: to, lineElement: null });
+                                connected++;
+                            }
+                        }
+                    });
+
+                    renderStrings();
+                    updateAllStrings();
+                    statusBar.textContent = '🧩 Exploded ' + extracted.length + ' nodes, ' + connected + ' strings.';
+                    setTimeout(() => { statusBar.textContent = 'Click a pin → click another to connect'; }, 3000);
+                    return true;
+
+                } catch (err) {
+                    console.error(err);
+                    statusBar.textContent = '❌ Error: ' + err.message + '. Using fallback.';
+                    return fallbackStyled(text);
+                }
+            }
+
+            function fallbackStyled(text) {
+                const { nodeMap, edges } = parseMermaid(text);
+                if (nodeMap.size === 0) return false;
+                clearSelection();
+
+                const idMap = new Map();
+                nodeMap.forEach((data, id) => {
+                    const shape = data.shape || 'rectangle';
+                    let bg = '#e8e8e8';
+                    if (data.style && data.style.fill) bg = data.style.fill;
+                    const pin = createStyledPin(0, 0, data.label || id, shape, bg);
+                    idMap.set(id, pin.id);
+                });
+
+                let connected = 0;
+                edges.forEach(e => {
+                    const from = idMap.get(e.from);
+                    const to = idMap.get(e.to);
+                    if (from && to) {
+                        if (!connections.some(c => (c.fromId === from && c.toId === to) || (c.fromId === to &&
+                                c.toId === from))) {
+                            connections.push({ id: nextConnId++, fromId: from, toId: to, lineElement: null });
+                            connected++;
+                        }
+                    }
+                });
+
+                const all = pins;
+                const elist = connections.map(c => ({ fromId: c.fromId, toId: c.toId }));
+                applyHierarchicalLayout(all, elist);
+                statusBar.textContent = '⚠️ Used hierarchical layout (' + nodeMap.size + ' nodes, ' + connected +
+                    ' strings).';
+                setTimeout(() => { statusBar.textContent = 'Click a pin → click another to connect'; }, 3000);
+                return true;
+            }
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  MODAL
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            const modal = document.getElementById('importModal');
+            const input = document.getElementById('mermaidInput');
+            const explodeBtn = document.getElementById('modalExplodeBtn');
+            const cancelBtn = document.getElementById('modalCancelBtn');
+            const pasteBtn = document.getElementById('modalPasteBtn');
+
+            function openModal() {
+                modal.classList.add('active');
+                input.value = '';
+                input.focus();
+                if (!input.value) {
+                    input.value =
+                        'graph TD\n    A[Start] --> B[Process]\n    B --> C{Is valid?}\n    C -->|Yes| D[Save]\n    C -->|No| E[Error]';
+                }
+                input.select();
+            }
+
+            function closeModal() {
+                modal.classList.remove('active');
+            }
+
+            document.getElementById('explodeBtn').addEventListener('click', openModal);
+            cancelBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+            explodeBtn.addEventListener('click', async () => {
+                const text = input.value.trim();
+                if (!text) { statusBar.textContent = '⚠️ Please paste some Mermaid code.'; return; }
+                const ok = await explodeDiagram(text);
+                if (ok) closeModal();
+            });
+
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    explodeBtn.click();
+                }
+                if (e.key === 'Escape') closeModal();
+            });
+
+            pasteBtn.addEventListener('click', async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    input.value = text;
+                    statusBar.textContent = '📋 Pasted!';
+                    setTimeout(() => { statusBar.textContent = 'Click a pin → click another to connect'; }, 1500);
+                } catch (_) {
+                    statusBar.textContent = '⚠️ Permission denied. Use Ctrl+V.';
+                    input.focus();
+                    setTimeout(() => { statusBar.textContent = 'Click a pin → click another to connect'; }, 2500);
+                }
+            });
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  TOOLBAR
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            document.getElementById('addNoteBtn').addEventListener('click', () => {
+                const r = board.getBoundingClientRect();
+                const cx = (r.width / 2 - panX) / scale;
+                const cy = (r.height / 2 - panY) / scale;
+                createNotePin(cx - 80 + Math.random() * 160, cy - 60 + Math.random() * 120, '');
+            });
+
+            document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+
+            board.addEventListener('click', function(e) {
+                if (!e.target.closest('.pin')) {
+                    clearSelection();
+                    statusBar.textContent = 'Deselected';
+                    setTimeout(() => { statusBar.textContent = 'Click a pin → click another to connect'; }, 500);
+                }
+            });
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  INIT – create sample pins
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            function initBoard() {
+                try {
+                    const r = board.getBoundingClientRect();
+                    if (r.width === 0 || r.height === 0) {
+                        // Board not ready – try again
+                        setTimeout(initBoard, 50);
+                        return;
+                    }
+                    const cx = (r.width / 2 - panX) / scale;
+                    const cy = (r.height / 2 - panY) / scale;
+
+                    const p1 = createNotePin(cx - 160, cy - 40, 'Suspect A\n– at the scene');
+                    const p2 = createNotePin(cx + 80, cy - 90, 'Phone records\n– 22:15 call');
+                    const p3 = createNotePin(cx - 60, cy + 120, 'CCTV footage\n– car matches');
+
+                    setTimeout(() => {
+                        addConnection(p1.id, p2.id);
+                        addConnection(p2.id, p3.id);
+                        renderStrings();
+                        updateAllStrings();
+                    }, 50);
+
+                    statusBar.textContent = 'Ready! Click a pin → click another to connect';
+                    console.log('ThreadBoard initialised with', pins.length, 'pins.');
+                } catch (err) {
+                    console.error('Init error:', err);
+                    statusBar.textContent = '⚠️ Error loading. Check console.';
+                }
+            }
+
+            // Wait for DOM to be fully ready
+            if (document.readyState === 'complete') {
+                setTimeout(initBoard, 100);
+            } else {
+                window.addEventListener('load', function() {
+                    setTimeout(initBoard, 100);
+                });
+            }
+
+            window.addEventListener('resize', updateAllStrings);
+            updateTransform();
+
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            //  DEBUG
+            // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            console.log('ThreadBoard loaded. Board:', board);
+
+        })();
+    </script>
+</body>
+</html>

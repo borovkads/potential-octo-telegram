@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prairie Watch — SD Parapolitical Research</title>
+<style>
+:root{--a:#f59e0b;--a2:#ef4444;--p:#1e293b;--b:#334155}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;min-height:100vh}
+.h{text-align:center;padding:20px;border-bottom:2px solid var(--a)}
+.h h1{color:var(--a);margin:0;font-size:26px}
+.h p{color:#94a3b8;margin:6px 0 0;font-size:13px}
+.tabs{display:flex;gap:4px;padding:12px 20px 0;border-bottom:1px solid var(--b);overflow-x:auto}
+.tab{padding:8px 16px;background:0 0;border:0;color:#94a3b8;cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:var(--a);border-bottom-color:var(--a)}
+.panel{display:none;padding:20px;max-width:1100px;margin:0 auto}
+.panel.active{display:block}
+.card{background:var(--p);border:1px solid var(--b);border-radius:10px;padding:16px;margin-bottom:12px}
+.card h3{color:var(--a);margin:0 0 10px;font-size:15px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.tag{display:inline-block;padding:3px 8px;border-radius:12px;font-size:10px;font-weight:600;margin:2px}
+.tpol{background:#dc2626;color:#fff}.tfin{background:#16a34a;color:#fff}.tlob{background:#7c3aed;color:#fff}
+.tjud{background:#2563eb;color:#fff}.tagr{background:#65a30d;color:#fff}.tener{background:#ca8a04;color:#fff}
+.row{display:flex;align-items:center;justify-content:space-between;padding:10px;background:#0f172a;border-radius:6px;margin-bottom:6px;border:1px solid var(--b);cursor:pointer}
+.row:hover{border-color:var(--a)}
+.srch{width:100%;padding:10px;background:#0f172a;border:1px solid var(--b);border-radius:6px;color:#e2e8f0;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{padding:5px 12px;background:#0f172a;border:1px solid var(--b);border-radius:16px;font-size:11px;cursor:pointer}
+.chip.active{background:var(--a);color:#0f172a;border-color:var(--a)}
+.timeline{position:relative;padding-left:20px}
+.timeline::before{content:'';position:absolute;left:5px;top:0;bottom:0;width:2px;background:var(--b)}
+.ti{position:relative;margin-bottom:16px;padding-left:14px}
+.ti::before{content:'';position:absolute;left:-19px;top:3px;width:8px;height:8px;border-radius:50%;background:var(--a);border:2px solid #0f172a}
+.td{font-size:11px;color:var(--a);font-weight:600}
+.tc{font-size:13px;color:#cbd5e1;margin-top:3px}
+.btn{padding:6px 14px;background:var(--a);color:#0f172a;border:0;border-radius:5px;font-weight:600;cursor:pointer;font-size:12px}
+.btn2{background:0 0;border:1px solid var(--b);color:#94a3b8}
+.doc{background:#0f172a;border:1px solid var(--b);border-radius:6px;padding:12px;font-family:monospace;font-size:11px;color:#94a3b8;max-height:400px;overflow-y:auto;white-space:pre-wrap}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modalc{background:var(--p);border:1px solid var(--b);border-radius:14px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:20px;position:relative}
+.modalc .x{position:absolute;top:12px;right:14px;background:0 0;border:0;color:#94a3b8;font-size:18px;cursor:pointer}
+.board{display:grid;grid-template-columns:240px 1fr;gap:12px;height:calc(100vh - 180px)}
+.side{background:var(--p);border-radius:10px;padding:12px;border:1px solid var(--b);overflow-y:auto}
+.canv{background:#0f172a;border-radius:10px;border:1px solid var(--b);position:relative;overflow:hidden}
+.pin{position:absolute;width:120px;background:var(--p);border:1px solid var(--b);border-radius:6px;padding:8px;font-size:11px;cursor:move;box-shadow:0 3px 10px rgba(0,0,0,.4);user-select:none}
+.pin b{color:var(--a);display:block;font-size:10px;text-transform:uppercase;margin-bottom:3px}
+.pin .del{position:absolute;top:2px;right:4px;color:#64748b;cursor:pointer}
+.note{background:#0f172a;border-left:3px solid var(--a);padding:10px 12px;margin-bottom:8px;border-radius:0 6px 6px 0}
+.nd{font-size:10px;color:#64748b;margin-bottom:3px}
+.nt{font-size:12px;color:#cbd5e1}
+.statg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.stbox{background:#0f172a;padding:10px;border-radius:6px;text-align:center;border:1px solid var(--b)}
+.stn{font-size:18px;font-weight:700;color:var(--a)}
+.stl{font-size:10px;color:#94a3b8;margin-top:2px}
+</style>
+</head>
+<body>
+
+<div class="h"><h1>🔍 PRAIRIE WATCH</h1><p>SD Power Structures & Financial Networks</p></div>
+
+<div class="tabs">
+<button class="tab active" onclick="sw('dash',this)">📊 Dashboard</button>
+<button class="tab" onclick="sw('ent',this)">🏛️ Entities</button>
+<button class="tab" onclick="sw('net',this)">🕸️ Network</button>
+<button class="tab" onclick="sw('time',this)">📅 Timeline</button>
+<button class="tab" onclick="sw('docs',this)">📄 Documents</button>
+<button class="tab" onclick="sw('inv',this)">🎯 Board</button>
+<button class="tab" onclick="sw('leads',this)">💡 Leads</button>
+</div>
+
+<div id="dash" class="panel active">
+<div class="g2">
+<div class="card"><h3>⚡ Alerts</h3>
+<div class="row" onclick="det('sdgf')"><div><b>SD Investment Council</b><div style="font-size:11px;color:#94a3b8">$18.2B portfolio — PE opacity concerns</div><span class="tag tfin">Sovereign</span> <span class="tag tener">Energy</span></div><span style="color:var(--a2)">⚠️</span></div>
+<div class="row" onclick="det('pierre-lobby')"><div><b>Pierre Lobby Consolidation</b><div style="font-size:11px;color:#94a3b8">3 firms control 68% of lobbying</div><span class="tag tlob">Lobbying</span></div><span style="color:var(--a2)">⚠️</span></div>
+<div class="row" onclick="det('mcm')"><div><b>Rounds Family Network</b><div style="font-size:11px;color:#94a3b8">Senator → Banking → DC lobbying</div><span class="tag tpol">Federal</span> <span class="tag tfin">Banking</span></div><span style="color:var(--a)">👁️</span></div>
+</div>
+<div class="card"><h3>📈 Metrics</h3>
+<div class="statg"><div class="stbox"><div class="stn">$4.1B</div><div class="stl">Dark Money</div></div><div class="stbox"><div class="stn">247</div><div class="stl">Entities</div></div><div class="stbox"><div class="stn">89</div><div class="stl">Active Leads</div></div><div class="stbox"><div class="stn">1,432</div><div class="stl">Documents</div></div><div class="stbox"><div class="stn">56</div><div class="stl">Dynasties</div></div><div class="stbox"><div class="stn">12</div><div class="stl">Cross-State</div></div></div>
+</div>
+</div>
+<div class="g2">
+<div class="card"><h3>🌾 Sectors</h3>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Agriculture/Ethanol</span><span style="color:var(--a)">34%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:34%;height:100%;background:#65a30d"></div></div></div>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Financial/Trusts</span><span style="color:var(--a)">28%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:28%;height:100%;background:#16a34a"></div></div></div>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Energy/Utilities</span><span style="color:var(--a)">19%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:19%;height:100%;background:#ca8a04"></div></div></div>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Healthcare</span><span style="color:var(--a)">12%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:12%;height:100%;background:#ea580c"></div></div></div>
+</div>
+<div class="card"><h3>🔥 Recent</h3>
+<div class="timeline">
+<div class="ti"><div class="td">AUG 2026</div><div class="tc">GOED approves $340M undisclosed data-center incentives</div></div>
+<div class="ti"><div class="td">JUL 2026</div><div class="tc">Federal EB-5 probe expands into Daugaard records</div></div>
+<div class="ti"><div class="td">JUN 2026</div><div class="tc">SDIC raises PE allocation to 22% — Blackstone/Carlyle</div></div>
+<div class="ti"><div class="td">MAY 2026</div><div class="tc">Study recommends privatizing state radio network</div></div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="ent" class="panel">
+<div class="card"><h3>🔎 Entity Database</h3>
+<input class="srch" id="es" placeholder="Search..." oninput="fe()">
+<div class="chips">
+<div class="chip active" onclick="tf(this,'all')">All</div>
+<div class="chip" onclick="tf(this,'pol')">Political</div>
+<div class="chip" onclick="tf(this,'fin')">Financial</div>
+<div class="chip" onclick="tf(this,'lob')">Lobbying</div>
+<div class="chip" onclick="tf(this,'agr')">Agriculture</div>
+<div class="chip" onclick="tf(this,'ener')">Energy</div>
+</div>
+</div>
+<div id="el"></div>
+</div>
+
+<div id="net" class="panel">
+<div class="card"><h3>🕸️ Network Map</h3>
+<p style="font-size:12px;color:#94a3b8;margin-bottom:8px">Click nodes to highlight.</p>
+<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+<span style="background:rgba(220,38,38,.15);color:#ef4444;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Political</span>
+<span style="background:rgba(22,163,74,.15);color:#22c55e;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Financial</span>
+<span style="background:rgba(124,58,237,.15);color:#a78bfa;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Lobbying</span>
+<span style="background:rgba(37,99,235,.15);color:#60a5fa;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Judicial</span>
+</div>
+<div style="background:#0f172a;border-radius:10px;border:1px solid var(--b);height:500px;position:relative;overflow:hidden">
+<svg id="nsvg" width="100%" height="100%"></svg>
+</div>
+</div>
+</div>
+
+<div id="time" class="panel">
+<div class="card"><h3>📅 Timeline</h3>
+<div style="display:flex;gap:6px;margin-bottom:10px">
+<button class="btn" onclick="ft('all')">All</button>
+<button class="btn btn2" onclick="ft('fin')">Financial</button>
+<button class="btn btn2" onclick="ft('pol')">Political</button>
+<button class="btn btn2" onclick="ft('leg')">Legal</button>
+</div>
+</div>
+<div id="tl"></div>
+</div>
+
+<div id="docs" class="panel">
+<div class="g2">
+<div class="card"><h3>📄 Repository</h3>
+<div class="row" onclick="sd('cf')"><div><b>Campaign Finance 2024</b><div style="font-size:11px;color:#94a3b8">2,847 filings — $48.2M total</div></div></div>
+<div class="row" onclick="sd('sdic')"><div><b>SDIC Annual 2025</b><div style="font-size:11px;color:#94a3b8">$18.2B — 22% PE allocation</div></div></div>
+<div class="row" onclick="sd('eb5')"><div><b>EB-5 Audit</b><div style="font-size:11px;color:#94a3b8">$140M — Benda death — FBI probe</div></div></div>
+<div class="row" onclick="sd('lob')"><div><b>Lobby Database</b><div style="font-size:11px;color:#94a3b8">1,203 regs — $42M fees</div></div></div>
+<div class="row" onclick="sd('trust')"><div><b>Trust Laws</b><div style="font-size:11px;color:#94a3b8">$360B AUM — secrecy timeline</div></div></div>
+<div class="row" onclick="sd('eth')"><div><b>Ethanol Subsidies</b><div style="font-size:11px;color:#94a3b8">$2.1B — POET/VeraSun networks</div></div></div>
+</div>
+<div class="card"><h3>📖 Viewer</h3><div id="dc" class="doc"><p style="text-align:center;color:#64748b;margin-top:30px">Select a document</p></div></div>
+</div>
+</div>
+
+<div id="inv" class="panel">
+<div class="card"><h3>🎯 Investigation Board</h3><p style="font-size:12px;color:#94a3b8">Drag from sidebar. Click × to remove.</p></div>
+<div class="board">
+<div class="side"><h4 style="color:var(--a);margin:0 0 8px;font-size:13px">📌 Pool</h4><div id="epool"></div>
+<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b)">
+<h4 style="color:var(--a);margin:0 0 8px;font-size:13px">➕ Custom</h4>
+<input class="srch" id="cpin" placeholder="Label" style="margin-bottom:6px">
+<select class="srch" id="cptype" style="margin-bottom:6px"><option value="pol">Political</option><option value="fin">Financial</option><option value="lob">Lobbying</option><option value="jud">Judicial</option><option value="corp">Corporate</option></select>
+<button class="btn" style="width:100%" onclick="acp()">Add</button>
+</div>
+</div>
+<div class="canv" id="bcanv"></div>
+</div>
+</div>
+
+<div id="leads" class="panel">
+<div class="g2">
+<div class="card"><h3>💡 Active Leads</h3>
+<div class="row" onclick="det('lead1')"><div><b>SFDA Shell Companies</b><div style="font-size:11px;color:#94a3b8">12 LLCs, 1 mailbox, $89M contracts</div></div><span style="color:var(--a2)">🔴</span></div>
+<div class="row" onclick="det('lead2')"><div><b>Rounds Banking Interlocks</b><div style="font-size:11px;color:#94a3b8">First Premier → CFPB lobbying</div></div><span style="color:var(--a)">🟡</span></div>
+<div class="row" onclick="det('lead3')"><div><b>POET + Regents Overlap</b><div style="font-size:11px;color:#94a3b8">3 regents on POET boards</div></div><span style="color:var(--a)">🟡</span></div>
+<div class="row" onclick="det('lead4')"><div><b>Trust Beneficial Ownership</b><div style="font-size:11px;color:#94a3b8">$87B — 94% non-resident</div></div><span style="color:#22c55e">🟢</span></div>
+<div class="row" onclick="det('lead5')"><div><b>Black Hills Rate Case</b><div style="font-size:11px;color:#94a3b8">$340M increase — legislator holdings</div></div><span style="color:var(--a2)">🔴</span></div>
+</div>
+<div class="card"><h3>📝 Notes</h3><div id="nl"></div>
+<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b)">
+<textarea class="srch" id="ntxt" placeholder="Observation..." style="min-height:60px;margin-bottom:6px"></textarea>
+<input class="srch" id="ntags" placeholder="Tags (pol, fin, lob...)" style="margin-bottom:6px">
+<button class="btn" onclick="an()">Save</button>
+</div>
+</div>
+</div>
+</div>
+
+<div id="mdl" class="modal" onclick="if(event.target===this)cm()"><div class="modalc"><button class="x" onclick="cm()">✕</button><div id="mc"></div></div></div>
+
+<script>
+const E=[
+{id:'noem',n:'Kristi Noem',r:'Governor (2019-)',t:'pol',tg:['pol','agr','ener'],c:['sdgf','poet','first-premier','rounds'],b:'Trump ally, ethanol ties, memoir controversy',s:{d:'$12.4M',nw:'$4.2M',y:12}},
+{id:'rounds',n:'Mike Rounds',r:'US Senator | Ex-Gov',t:'pol',tg:['pol','fin','agr'],c:['noem','first-premier','sdgf','daugaard'],b:'Insurance exec, EB-5 era, family banking',s:{d:'$18.7M',nw:'$8.1M',y:24}},
+{id:'daugaard',n:'Dennis Daugaard',r:'Ex-Governor (2011-19)',t:'pol',tg:['pol','fin','jud'],c:['rounds','eb5','sdgf'],b:'EB-5 oversight, post-gov consulting',s:{d:'$9.2M',nw:'$3.8M',y:16}},
+{id:'sdgf',n:'SD Investment Council',r:'$18.2B sovereign wealth',t:'fin',tg:['fin','ener','infra'],c:['noem','rounds','blackrock','vanguard'],b:'PE-heavy, opaque alts, gov-appointed board',s:{aum:'$18.2B',pe:'22%',b:9}},
+{id:'first-premier',n:'First Premier Bank',r:'Subprime lender, Sioux Falls',t:'fin',tg:['fin','lob'],c:['rounds','noem','cfpb'],b:'Top donor, CFPB opponent',s:{a:'$3.1B',d:'$4.8M',e:2300}},
+{id:'poet',n:'POET LLC',r:'#1 US ethanol producer',t:'agr',tg:['agr','ener','lob'],c:['noem','sdgf','vera-sun'],b:'Broin family, $2.1B subsidies, regent interlocks',s:{rev:'$8.2B',p:33,sub:'$2.1B'}},
+{id:'trust-sd',n:'Trust Company of SD',r:'$87B trust admin',t:'fin',tg:['fin','jud','lob'],c:['daugaard','sd-leg'],b:'Dynasty trusts, 94% non-resident, secrecy laws',s:{aum:'$87B',cl:3400,tl:14}},
+{id:'eb5',n:'EB-5 Scandal',r:'Northern Beef Packers',t:'pol',tg:['pol','fin','jud'],c:['daugaard','rounds','benda'],b:'$140M lost, Benda death, fed probe',s:{lost:'$140M',inv:300,pro:3}},
+{id:'benda',n:'Richard Benda',r:'Ex-Secretary — Deceased',t:'pol',tg:['pol','fin','jud'],c:['eb5','daugaard'],b:'Suicide ruling disputed, EB-5 docs destroyed',s:{pos:'Secretary',ten:'2006-10',cs:'Closed'}},
+{id:'sd-leg',n:'SD Legislature',r:'GOP supermajority',t:'pol',tg:['pol','lob','agr'],c:['noem','trust-sd','poet','first-premier'],b:'ALEC members, ethanol caucus, trust caucus',s:{m:105,gop:'88%',al:34}},
+{id:'pierre-lobby',n:'Pierre Lobby Triad',r:'68% market share',t:'lob',tg:['lob','pol','fin'],c:['sd-leg','noem','poet'],b:'Dakota Strategies, Sorum, Trailblazer — revolving door',s:{f:3,ms:'68%',fe:'$42M'}},
+{id:'blackrock',n:'BlackRock',r:'SD pension holdings',t:'fin',tg:['fin','ener'],c:['sdgf','noem'],b:'ESG divestment controversy, $2.1B SD exposure',s:{aum:'$10.2T',sd:'$2.1B',v:340}},
+{id:'vanguard',n:'Vanguard',r:'SD pension holdings',t:'fin',tg:['fin','infra'],c:['sdgf'],b:'Passive utility ownership',s:{aum:'$8.1T',sd:'$1.8B',pv:8900}},
+{id:'cfpb',n:'CFPB Opposition',r:'First Premier coalition',t:'lob',tg:['lob','fin','pol'],c:['first-premier','rounds','sd-leg'],b:'CRA victory nullifying late-fee cap',s:{sp:'$18M',bb:4,cm:12}},
+{id:'black-hills',n:'Black Hills Energy',r:'Utility',t:'ener',tg:['ener','infra','fin'],c:['sd-leg','noem','vanguard'],b:'$340M rate case, legislator stock conflicts',s:{c:'1.2M',ri:'$340M',pc:8}},
+{id:'sanford',n:'Sanford Health',r:'Largest SD health system',t:'med',tg:['med','fin','pol'],c:['noem','sd-leg','sdgf'],b:'Medicaid expansion opponent, $2.1M political',s:{a:'$6.4B',e:12000,ps:'$2.1M'}},
+{id:'mcm',n:'Rounds Family Network',r:'Political-banking nexus',t:'pol',tg:['pol','fin','lob'],c:['rounds','first-premier','cfpb'],b:'Senator, brother Tim (banking), son (lobbying)',s:{fm:5,cnw:'$12M',oh:7}},
+{id:'vera-sun',n:'VeraSun Energy',r:'Bankrupt ethanol',t:'agr',tg:['agr','fin','jud'],c:['poet','sdgf'],b:'$3.4B bankruptcy, political restructuring',s:{pr:'$1.2B',bk:'$3.4B',cr:1200}}
+];
+
+const TL=[
+{d:'2026-08',t:'Data Center Secrecy',c:'pol',x:'$340M undisclosed incentives, redacted LLC ownership'},
+{d:'2026-07',t:'EB-5 Probe Widens',c:'leg',x:'FBI subpoenas Daugaard-era Development Office records'},
+{d:'2026-06',t:'SDIC PE Hike',c:'fin',x:'22% allocation — Blackstone/Carlyle, no bidding docs'},
+{d:'2026-05',t:'Radio Privatization',c:'pol',x:'Study to sell SD Public Radio to GOP-linked media group'},
+{d:'2026-04',t:'Trust Shield SB-77',c:'leg',x:'Blocks beneficial owner disclosure in civil suits'},
+{d:'2026-03',t:'CFPB Victory',c:'fin',x:'CRA nullifies credit-card late fee rule — SD votes unanimous'},
+{d:'2026-02',t:'POET Regents Conflict',c:'pol',x:'3 regents on POET boards, research funding questioned'},
+{d:'2026-01',t:'Black Hills Rate Case',c:'fin',x:'$340M approved — 8 legislators held utility stock'},
+{d:'2025-11',t:'Noem Book Deal',c:'pol',x:'$400K advance, ghostwriter scandal, GOP publisher'},
+{d:'2025-09',t:'Alt Investment Review',c:'fin',x:'Auditor: $4.2B Level-3 assets, "material weakness"'},
+{d:'2025-07',t:'Dynasty Trust Conf',c:'fin',x:'200 family offices in Sioux Falls, secrecy marketed'},
+{d:'2025-05',t:'ALEC Bills',c:'pol',x:'Voter ID, union opt-out, enviro preemption passed'},
+{d:'2025-03',t:'Rounds Banking Bill',c:'fin',x:'Subprime lender bill — First Premier top donor'},
+{d:'2025-01',t:'Sanford Medicaid Block',c:'pol',x:'$800K PAC spend — expansion fails 58-42'},
+{d:'2024-11',t:'GOP Supermajority',c:'pol',x:'88% seats — $14.2M outside spend, 62% dark money'},
+{d:'2024-09',t:'Trusts Hit $360B',c:'fin',x:'340% increase since 2014, 18% foreign beneficial'},
+{d:'2024-07',t:'EB-5 Docs Destroyed',c:'leg',x:'Development Office: "retention schedule" deletion'},
+{d:'2024-05',t:'Ethanol Extension',c:'fin',x:'Tax credit extended to 2030 — $180M cost'},
+{d:'2024-03',t:'Noem NGA Chair',c:'pol',x:'Travel fees surge, ethics complaints filed'},
+{d:'2024-01',t:'BlackRock ESG Divest',c:'fin',x:'$400M moved — political pressure from Governor'}
+];
+
+const D={
+cf:`CAMPAIGN FINANCE 2024
+Total: $48.2M | Dark Money: $29.9M (62%)
+
+ANOMALIES:
+• "SD Future Fund" — $4.2M, UPS Store mailbox, no officers
+• "Prairie Freedom PAC" — $2.8M, 94% from 3 LLCs, ownership redacted
+• First Premier Employee PAC — 287 of 340 employees share surname
+
+FOLLOW-UP: FOIA 990s, subpoena donor LLCs`,
+sdic:`SDIC ANNUAL 2025 | $18.2B
+PE: 22.3% (over target) | Level-3 alts: $4.2B (no market price)
+
+RED FLAGS:
+• Blackstone +340% since 2022, no competitive bid
+• Board member J. Rounds (Senator's brother) recused but attended pre-vote
+• 5 of 9 board = governor appointees
+• 3 members have PE firm ties
+• No public comment on manager selection`,
+eb5:`EB-5 AUDIT | $140M | 300 investors
+
+Northern Beef Packers: BANKRUPT ($115M, 91 jobs vs 600 promised)
+Benda: $1.2M state grants to own LLC + $1.8M consulting fees
+Daugaard office: approved dual role, destroyed records 2014
+
+BENDA DEATH: Oct 20 2013, shotgun, no note, atypical angle, 3 calls to Daugaard COS in 48hrs, $2M insurance (2yr suicide exclusion, policy dated 2yr+5 days before death)
+
+FEDS: FBI active, grand jury Pierre. STATE: zero charges.`,
+lob:`LOBBY DATABASE 2018-2026
+1,203 registrations | $42.3M fees
+
+TOP 3 FIRMS = 68% market share:
+• Dakota Strategies (Rounds Jr. principal)
+• Sorum & Associates (ex-Majority Leader)
+• Trailblazer PAC (Daugaard nephew)
+
+REVOLVING DOOR: 34% ex-legislators, 18% ex-gov staff
+SHELL LLCs: 23% of clients, same registered agent
+ASTROTURF: "SD Taxpayers Union" — no members listed`,
+trust:`TRUST LAW TIMELINE | $360B AUM
+
+1997: Repeal rule against perpetuities (first state)
+2005: 2-year lookback asset protection (shortest in US)
+2013: SB 84 — seal records, no beneficial owner disclosure
+2023: SB 103 — block divorce disclosure, expand decanting
+2024: SB 77 — civil shield for trustees, foreign subpoenas must clear SD courts
+
+CLIENTS: 94% non-resident, 18% foreign nationals
+INDUSTRY: drafts 80% of trust legislation
+FinCEN: 340 trusts flagged, zero state cooperation`,
+eth:`ETHANOL SUBSIDIES | $2.1B total
+
+STATE: $0.20/gal credit (POET gets 60%), $42M pump grants, $89M property tax exemption
+FEDERAL: RFS $1.2B, VEETC $340M, USDA/DOE $300M
+
+POET: Jeff Broin $2.1B net worth, $4.8M donations, 2 regents on board
+VERASUN: $3.4B bankruptcy, same consultants reborn as "VeraSun Renewables" — got $12M state grants 2022-24`
+};
+
+const LD={lead1:{t:'SFDA Shell Companies',p:'High',x:'12 LLCs registered to same UPS mailbox. $89M in city contracts since 2022. Beneficial ownership redacted. Registered agent: "Pierre Corporate Services."'},lead2:{t:'Rounds Banking Interlocks',p:'Medium',x:'Senator Rounds sits on Banking Committee. First Premier Bank (subprime lender, Sioux Falls) is top donor. Son lobbies for SD Bankers Association. Brother on SDIC board. CFPB rule nullification directly benefited First Premier.'},lead3:{t:'POET + Regents Conflict',p:'Medium',x:'Three Board of Regents members hold seats on POET or affiliate boards. POET receives $2.1B in subsidies. Research funding at SDSU/SD School of Mines flows to ethanol-related projects. No recusals documented.'},lead4:{t:'Trust Beneficial Ownership',p:'Monitor',x:'Trust Company of SD holds $87B. 94% of beneficial owners are non-residents. 18% estimated foreign nationals. SD law requires no source-of-wealth verification. FinCEN flagged 340 trusts. State refuses federal cooperation.'},lead5:{t:'Black Hills Rate Case',p:'High',x:'PUC approved $340M rate increase Jan 2026. 8 legislators who voted on PUC oversight bills in 2025 held Black Hills Energy stock (disclosed on ethics forms). No recusals. 4 of 8 received utility PAC donations >$5K.'}};
+
+let notes=[
+{d:'2026-08-10',t:'SDGF PE increase to 22%. Trace GP political ties: Blackstone (Noem advisor?), Carlyle (Rounds donor?). Request board minutes.',tg:['fin','pol']},
+{d:'2026-08-08',t:'Dynasty trusts: map legislator donations from trust industry. SB 103 (2023) and SB 77 (2024) both drafted by SD Bankers Assoc trust committee.',tg:['fin','lob']},
+{d:'2026-08-05',t:'EB-5: Benda death suspicious. Insurance timing. Daugaard records destroyed. FOIA pending on SD Development Office retention policies.',tg:['pol','jud']}
+];
+
+let fEnt='all';
+
+function sw(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='net')setTimeout(rn,50);
+  if(id==='time')ft('all');
+  if(id==='ent')fe();
+  if(id==='inv')rp();
+  if(id==='leads')rn2();
+}
+
+function fe(){
+  const q=document.getElementById('es').value.toLowerCase();
+  const el=document.getElementById('el');
+  el.innerHTML=E.filter(e=>{
+    const m=(fEnt==='all'||e.tg.includes(fEnt));
+    const s=e.n.toLowerCase().includes(q)||e.r.toLowerCase().includes(q)||e.b.toLowerCase().includes(q);
+    return m&&s;
+  }).map(e=>`<div class="row" onclick="det('${e.id}')"><div><b>${e.n}</b><div style="font-size:11px;color:#94a3b8">${e.r}</div><div style="margin-top:4px">${e.tg.map(t=>`<span class="tag t${t}">${t}</span>`).join('')}</div></div></div>`).join('');
+}
+function tf(el,cat){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');fEnt=cat;fe();}
+
+function det(id){
+  const m=document.getElementById('mdl');
+  const c=document.getElementById('mc');
+  if(LD[id]){c.innerHTML=`<h2 style="color:#f8fafc;margin-top:0">${LD[id].t}</h2><div style="color:var(--a2);font-size:12px;font-weight:600;margin-bottom:10px">Priority: ${LD[id].p}</div><p style="font-size:13px;color:#cbd5e1;line-height:1.6">${LD[id].x}</p>`;}
+  else{
+    const e=E.find(x=>x.id===id);
+    if(!e)return;
+    let st='';
+    for(let k in e.s)st+=`<div class="stbox"><div class="stn">${e.s[k]}</div><div class="stl">${k}</div></div>`;
+    c.innerHTML=`<h2 style="color:#f8fafc;margin-top:0">${e.n}</h2><div style="color:#94a3b8;font-size:13px;margin-bottom:10px">${e.r}</div><p style="font-size:13px;color:#cbd5e1;line-height:1.6">${e.b}</p><div class="statg">${st}</div><div style="margin-top:10px"><b style="color:var(--a);font-size:12px">Connections:</b><div style="margin-top:4px">${e.c.map(cid=>{const ce=E.find(x=>x.id===cid);return ce?`<span class="chip" style="cursor:pointer" onclick="det('${cid}')">${ce.n}</span>`:''}).join(' ')}</div></div>`;
+  }
+  m.style.display='flex';
+}
+function cm(){document.getElementById('mdl').style.display='none';}
+
+function rn(){
+  const svg=document.getElementById('nsvg');
+  const w=svg.clientWidth||800,h=svg.clientHeight||500;
+  svg.innerHTML='';
+  const cols={pol:'#dc2626',fin:'#16a34a',lob:'#7c3aed',jud:'#2563eb',agr:'#65a30d',ener:'#ca8a04',med:'#ea580c',infra:'#0891b2'};
+  const nodes=E.map((e,i)=>{const angle=(i/E.length)*Math.PI*2;return{id:e.id,x:w/2+Math.cos(angle)*180,y:h/2+Math.sin(angle)*180,r:8+Math.sqrt((e.c||[]).length)*3,label:e.n,type:e.t,col:cols[e.t]||'#94a3b8'}});
+  const links=[];E.forEach(e=>{if(e.c)e.c.forEach(cid=>{if(E.find(x=>x.id===cid)&&e.id<cid)links.push({s:e.id,t:cid})})});
+  links.forEach(l=>{const s=nodes.find(n=>n.id===l.s),t=nodes.find(n=>n.id===l.t);const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',s.x);line.setAttribute('y1',s.y);line.setAttribute('x2',t.x);line.setAttribute('y2',t.y);line.setAttribute('stroke','#334155');line.setAttribute('stroke-width','1');line.setAttribute('opacity','0.5');svg.appendChild(line);});
+  nodes.forEach(n=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.style.cursor='pointer';g.onclick=()=>det(n.id);
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');circle.setAttribute('cx',n.x);circle.setAttribute('cy',n.y);circle.setAttribute('r',n.r);circle.setAttribute('fill',n.col);circle.setAttribute('stroke','#0f172a');circle.setAttribute('stroke-width','2');
+    const text=document.createElementNS('http://www.w3.org/2000/svg','text');text.setAttribute('x',n.x);text.setAttribute('y',n.y+n.r+12);text.setAttribute('text-anchor','middle');text.setAttribute('fill','#cbd5e1');text.setAttribute('font-size','10');text.textContent=n.label;
+    g.appendChild(circle);g.appendChild(text);svg.appendChild(g);
+  });
+}
+
+function ft(cat){
+  const tl=document.getElementById('tl');
+  const ev=cat==='all'?TL:TL.filter(t=>t.c===cat);
+  tl.innerHTML=`<div class="timeline">${ev.map(e=>`<div class="ti"><div class="td">${e.d}</div><div class="tc"><b>${e.t}</b><br>${e.x}</div></div>`).join('')}</div>`;
+}
+
+function sd(key){document.getElementById('dc').textContent=D[key]||'Not found';}
+
+function rp(){
+  const pool=document.getElementById('epool');
+  pool.innerHTML=E.map(e=>`<div class="row" style="margin-bottom:4px" draggable="true" ondragstart="dp(event,'${e.id}')"><div style="font-size:12px"><b>${e.n}</b><div style="font-size:10px;color:#94a3b8">${e.r}</div></div></div>`).join('');
+  const canv=document.getElementById('bcanv');
+  canv.ondragover=e=>e.preventDefault();
+  canv.ondrop=e=>{
+    e.preventDefault();
+    const id=e.dataTransfer.getData('id');
+    const ent=E.find(x=>x.id===id);
+    if(!ent)return;
+    const rect=canv.getBoundingClientRect();
+    const px=e.clientX-rect.left-60,py=e.clientY-rect.top-20;
+    const pin=document.createElement('div');pin.className='pin';pin.style.left=px+'px';pin.style.top=py+'px';pin.innerHTML=`<b>${ent.t}</b>${ent.n}<span class="del" onclick="this.parentElement.remove()">×</span>`;
+    canv.appendChild(pin);
+  };
+}
+function dp(e,id){e.dataTransfer.setData('id',id);}
+function acp(){
+  const l=document.getElementById('cpin').value;
+  const t=document.getElementById('cptype').value;
+  if(!l)return;
+  const canv=document.getElementById('bcanv');
+  const pin=document.createElement('div');pin.className='pin';pin.style.left='20px';pin.style.top='20px';pin.innerHTML=`<b>${t}</b>${l}<span class="del" onclick="this.parentElement.remove()">×</span>`;
+  canv.appendChild(pin);
+  document.getElementById('cpin').value='';
+}
+
+function rn2(){document.getElementById('nl').innerHTML=notes.map(n=>`<div class="note"><div class="nd">${n.d}</div><div class="nt">${n.t}</div><div style="margin-top:4px">${n.tg.map(t=>`<span class="tag t${t}">${t}</span>`).join('')}</div></div>`).join('');}
+function an(){
+  const t=document.getElementById('ntxt').value;
+  const g=document.getElementById('ntags').value.split(',').map(s=>s.trim()).filter(s=>s);
+  if(!t)return;
+  notes.unshift({d:new Date().toISOString().slice(0,10),t:t,tg:g.length?g:['note']});
+  document.getElementById('ntxt').value='';document.getElementById('ntags').value='';
+  rn2();
+}
+
+fe();ft('all');rn2();
+</script>
+</body>
+</html>

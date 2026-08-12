@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Badger Watch — WI Parapolitical Research</title>
+<style>
+:root{--a:#f59e0b;--a2:#ef4444;--p:#1e293b;--b:#334155}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;min-height:100vh}
+.h{text-align:center;padding:20px;border-bottom:2px solid var(--a)}
+.h h1{color:var(--a);margin:0;font-size:26px}
+.h p{color:#94a3b8;margin:6px 0 0;font-size:13px}
+.tabs{display:flex;gap:4px;padding:12px 20px 0;border-bottom:1px solid var(--b);overflow-x:auto}
+.tab{padding:8px 16px;background:0 0;border:0;color:#94a3b8;cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:var(--a);border-bottom-color:var(--a)}
+.panel{display:none;padding:20px;max-width:1100px;margin:0 auto}
+.panel.active{display:block}
+.card{background:var(--p);border:1px solid var(--b);border-radius:10px;padding:16px;margin-bottom:12px}
+.card h3{color:var(--a);margin:0 0 10px;font-size:15px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.tag{display:inline-block;padding:3px 8px;border-radius:12px;font-size:10px;font-weight:600;margin:2px}
+.tpol{background:#dc2626;color:#fff}.tfin{background:#16a34a;color:#fff}.tlob{background:#7c3aed;color:#fff}
+.tjud{background:#2563eb;color:#fff}.tagr{background:#65a30d;color:#fff}.tener{background:#ca8a04;color:#fff}
+.tedu{background:#0891b2;color:#fff}.tman{background:#ea580c;color:#fff}
+.row{display:flex;align-items:center;justify-content:space-between;padding:10px;background:#0f172a;border-radius:6px;margin-bottom:6px;border:1px solid var(--b);cursor:pointer}
+.row:hover{border-color:var(--a)}
+.srch{width:100%;padding:10px;background:#0f172a;border:1px solid var(--b);border-radius:6px;color:#e2e8f0;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{padding:5px 12px;background:#0f172a;border:1px solid var(--b);border-radius:16px;font-size:11px;cursor:pointer}
+.chip.active{background:var(--a);color:#0f172a;border-color:var(--a)}
+.timeline{position:relative;padding-left:20px}
+.timeline::before{content:'';position:absolute;left:5px;top:0;bottom:0;width:2px;background:var(--b)}
+.ti{position:relative;margin-bottom:16px;padding-left:14px}
+.ti::before{content:'';position:absolute;left:-19px;top:3px;width:8px;height:8px;border-radius:50%;background:var(--a);border:2px solid #0f172a}
+.td{font-size:11px;color:var(--a);font-weight:600}
+.tc{font-size:13px;color:#cbd5e1;margin-top:3px}
+.btn{padding:6px 14px;background:var(--a);color:#0f172a;border:0;border-radius:5px;font-weight:600;cursor:pointer;font-size:12px}
+.btn2{background:0 0;border:1px solid var(--b);color:#94a3b8}
+.doc{background:#0f172a;border:1px solid var(--b);border-radius:6px;padding:12px;font-family:monospace;font-size:11px;color:#94a3b8;max-height:400px;overflow-y:auto;white-space:pre-wrap}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modalc{background:var(--p);border:1px solid var(--b);border-radius:14px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:20px;position:relative}
+.modalc .x{position:absolute;top:12px;right:14px;background:0 0;border:0;color:#94a3b8;font-size:18px;cursor:pointer}
+.board{display:grid;grid-template-columns:240px 1fr;gap:12px;height:calc(100vh - 180px)}
+.side{background:var(--p);border-radius:10px;padding:12px;border:1px solid var(--b);overflow-y:auto}
+.canv{background:#0f172a;border-radius:10px;border:1px solid var(--b);position:relative;overflow:hidden}
+.pin{position:absolute;width:120px;background:var(--p);border:1px solid var(--b);border-radius:6px;padding:8px;font-size:11px;cursor:move;box-shadow:0 3px 10px rgba(0,0,0,.4);user-select:none}
+.pin b{color:var(--a);display:block;font-size:10px;text-transform:uppercase;margin-bottom:3px}
+.pin .del{position:absolute;top:2px;right:4px;color:#64748b;cursor:pointer}
+.note{background:#0f172a;border-left:3px solid var(--a);padding:10px 12px;margin-bottom:8px;border-radius:0 6px 6px 0}
+.nd{font-size:10px;color:#64748b;margin-bottom:3px}
+.nt{font-size:12px;color:#cbd5e1}
+.statg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.stbox{background:#0f172a;padding:10px;border-radius:6px;text-align:center;border:1px solid var(--b)}
+.stn{font-size:18px;font-weight:700;color:var(--a)}
+.stl{font-size:10px;color:#94a3b8;margin-top:2px}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="h"><h1>🦡 BADGER WATCH</h1><p>Wisconsin Power Structures & Financial Networks</p></div>
+
+<div class="tabs">
+<button class="tab active" onclick="sw('dash',this)">📊 Dashboard</button>
+<button class="tab" onclick="sw('ent',this)">🏛️ Entities</button>
+<button class="tab" onclick="sw('net',this)">🕸️ Network</button>
+<button class="tab" onclick="sw('time',this)">📅 Timeline</button>
+<button class="tab" onclick="sw('docs',this)">📄 Documents</button>
+<button class="tab" onclick="sw('inv',this)">🎯 Board</button>
+<button class="tab" onclick="sw('leads',this)">💡 Leads</button>
+</div>
+
+<div id="dash" class="panel active">
+<div class="g2">
+<div class="card"><h3>⚡ Active Alerts</h3>
+<div class="row" onclick="det('bradley')"><div><b>Bradley Foundation</b><div style="font-size:11px;color:#94a3b8">$1B+ conservative grantmaker — voucher/dark-money pipeline</div><span class="tag tfin">Dark Money</span> <span class="tag tlob">Policy</span></div><span style="color:var(--a2)">⚠️</span></div>
+<div class="row" onclick="det('wmc')"><div><b>Wisconsin Manufacturers & Commerce</b><div style="font-size:11px;color:#94a3b8">State's largest business lobby — judicial capture</div><span class="tag tlob">Lobbying</span> <span class="tag tjud">Judicial</span></div><span style="color:var(--a2)">⚠️</span></div>
+<div class="row" onclick="det('foxconn')"><div><b>Foxconn / Terry Gou</b><div style="font-size:11px;color:#94a3b8">$4.1B subsidy — 1,000 jobs vs 13,000 promised</div><span class="tag tman">Manufacturing</span> <span class="tag tpol">Scandal</span></div><span style="color:var(--a2)">⚠️</span></div>
+</div>
+<div class="card"><h3>📈 Metrics</h3>
+<div class="statg"><div class="stbox"><div class="stn">$6.8B</div><div class="stl">Dark Money Tracked</div></div><div class="stbox"><div class="stn">312</div><div class="stl">Linked Entities</div></div><div class="stbox"><div class="stn">94</div><div class="stl">Active Leads</div></div><div class="stbox"><div class="stn">1,891</div><div class="stl">Documents Indexed</div></div><div class="stbox"><div class="stn">41</div><div class="stl">Family Dynasties</div></div><div class="stbox"><div class="stn">18</div><div class="stl">Cross-State Networks</div></div></div>
+</div>
+</div>
+<div class="g2">
+<div class="card"><h3>🧀 Sector Concentration</h3>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Manufacturing & Industrial</span><span style="color:var(--a)">31%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:31%;height:100%;background:#ea580c"></div></div></div>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Financial Services & Insurance</span><span style="color:var(--a)">24%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:24%;height:100%;background:#16a34a"></div></div></div>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Healthcare & Biotech</span><span style="color:var(--a)">18%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:18%;height:100%;background:#0891b2"></div></div></div>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Agriculture & Dairy</span><span style="color:var(--a)">15%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:15%;height:100%;background:#65a30d"></div></div></div>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Energy & Utilities</span><span style="color:var(--a)">12%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:12%;height:100%;background:#ca8a04"></div></div></div>
+</div>
+<div class="card"><h3>🔥 Recent Developments</h3>
+<div class="timeline">
+<div class="ti"><div class="td">AUG 2026</div><div class="tc">WMC-backed PAC spends $2.1M on Supreme Court recall ads targeting Justice Protasiewicz</div></div>
+<div class="ti"><div class="td">JUL 2026</div><div class="tc">Foxconn renegotiates contract again — total state liability now $2.8B for 1,400 jobs</div></div>
+<div class="ti"><div class="td">JUN 2026</div><div class="tc">Bradley Foundation grants $14M to 23 Wisconsin school-choice advocacy groups</div></div>
+<div class="ti"><div class="td">MAY 2026</div><div class="tc">John Menard Jr. donates $8M to Robin Vos-linked dark-money group ahead of budget</div></div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="ent" class="panel">
+<div class="card"><h3>🔎 Entity Database</h3>
+<input class="srch" id="es" placeholder="Search..." oninput="fe()">
+<div class="chips">
+<div class="chip active" onclick="tf(this,'all')">All</div>
+<div class="chip" onclick="tf(this,'pol')">Political</div>
+<div class="chip" onclick="tf(this,'fin')">Financial</div>
+<div class="chip" onclick="tf(this,'lob')">Lobbying</div>
+<div class="chip" onclick="tf(this,'jud')">Judicial</div>
+<div class="chip" onclick="tf(this,'man')">Manufacturing</div>
+<div class="chip" onclick="tf(this,'edu')">Education</div>
+</div>
+</div>
+<div id="el"></div>
+</div>
+
+<div id="net" class="panel">
+<div class="card"><h3>🕸️ Network Map</h3>
+<p style="font-size:12px;color:#94a3b8;margin-bottom:8px">Click nodes to explore connections.</p>
+<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+<span style="background:rgba(220,38,38,.15);color:#ef4444;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Political</span>
+<span style="background:rgba(22,163,74,.15);color:#22c55e;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Financial</span>
+<span style="background:rgba(124,58,237,.15);color:#a78bfa;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Lobbying</span>
+<span style="background:rgba(37,99,235,.15);color:#60a5fa;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Judicial</span>
+<span style="background:rgba(8,145,178,.15);color:#22d3ee;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Education</span>
+<span style="background:rgba(234,88,12,.15);color:#fb923c;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Manufacturing</span>
+</div>
+<div style="background:#0f172a;border-radius:10px;border:1px solid var(--b);height:500px;position:relative;overflow:hidden">
+<svg id="nsvg" width="100%" height="100%"></svg>
+</div>
+</div>
+</div>
+
+<div id="time" class="panel">
+<div class="card"><h3>📅 Timeline</h3>
+<div style="display:flex;gap:6px;margin-bottom:10px">
+<button class="btn" onclick="ft('all')">All</button>
+<button class="btn btn2" onclick="ft('fin')">Financial</button>
+<button class="btn btn2" onclick="ft('pol')">Political</button>
+<button class="btn btn2" onclick="ft('leg')">Legal</button>
+</div>
+</div>
+<div id="tl"></div>
+</div>
+
+<div id="docs" class="panel">
+<div class="g2">
+<div class="card"><h3>📄 Repository</h3>
+<div class="row" onclick="sd('cf')"><div><b>Campaign Finance 2024</b><div style="font-size:11px;color:#94a3b8">3,104 filings — $62.4M total</div></div></div>
+<div class="row" onclick="sd('johndoe')"><div><b>John Doe Investigation Records</b><div style="font-size:11px;color:#94a3b8">Walker era — $0 dark-money coordination — sealed</div></div></div>
+<div class="row" onclick="sd('foxconn')"><div><b>Foxconn Contract Analysis</b><div style="font-size:11px;color:#94a3b8">$4.1B → $2.8B — 13,000 jobs → 1,400</div></div></div>
+<div class="row" onclick="sd('redist')"><div><b>Redistricting Maps & Gerrymandering</b><div style="font-size:11px;color:#94a3b8">Efficiency gap 12.7% — GOP 46% vote, 64% seats</div></div></div>
+<div class="row" onclick="sd('bradley')"><div><b>Bradley Foundation Grants</b><div style="font-size:11px;color:#94a3b8">$1B+ since 1985 — voucher, anti-union, climate denial</div></div></div>
+<div class="row" onclick="sd('wmc')"><div><b>WMC Lobby Database</b><div style="font-size:11px;color:#94a3b8">$58M since 2010 — judicial, tax, deregulation</div></div></div>
+</div>
+<div class="card"><h3>📖 Viewer</h3><div id="dc" class="doc"><p style="text-align:center;color:#64748b;margin-top:30px">Select a document</p></div></div>
+</div>
+</div>
+
+<div id="inv" class="panel">
+<div class="card"><h3>🎯 Investigation Board</h3><p style="font-size:12px;color:#94a3b8">Drag from sidebar. Click × to remove.</p></div>
+<div class="board">
+<div class="side"><h4 style="color:var(--a);margin:0 0 8px;font-size:13px">📌 Pool</h4><div id="epool"></div>
+<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b)">
+<h4 style="color:var(--a);margin:0 0 8px;font-size:13px">➕ Custom</h4>
+<input class="srch" id="cpin" placeholder="Label" style="margin-bottom:6px">
+<select class="srch" id="cptype" style="margin-bottom:6px"><option value="pol">Political</option><option value="fin">Financial</option><option value="lob">Lobbying</option><option value="jud">Judicial</option><option value="man">Manufacturing</option><option value="edu">Education</option></select>
+<button class="btn" style="width:100%" onclick="acp()">Add</button>
+</div>
+</div>
+<div class="canv" id="bcanv"></div>
+</div>
+</div>
+
+<div id="leads" class="panel">
+<div class="g2">
+<div class="card"><h3>💡 Active Leads</h3>
+<div class="row" onclick="det('lead1')"><div><b>Bradley → WMC → Supreme Court Pipeline</b><div style="font-size:11px;color:#94a3b8">$48M in judicial ads since 2008 — 7 of 7 conservative justices</div></div><span style="color:var(--a2)">🔴</span></div>
+<div class="row" onclick="det('lead2')"><div><b>Menard Family Tax Avoidance</b><div style="font-size:11px;color:#94a3b8">$50M in state tax credits — Menards HQ moved to Eau Claire shell</div></div><span style="color:var(--a)">🟡</span></div>
+<div class="row" onclick="det('lead3')"><div><b>Epic Systems + UW Health Monopoly</b><div style="font-size:11px;color:#94a3b8">Judy Faulkner controls 65% of WI patient records — no-bid state contracts</div></div><span style="color:var(--a)">🟡</span></div>
+<div class="row" onclick="det('lead4')"><div><b>Foxconn Land Speculation</b><div style="font-size:11px;color:#94a3b8">Walker allies bought Racine parcels 6 months before announcement</div></div><span style="color:var(--a2)">🔴</span></div>
+<div class="row" onclick="det('lead5')"><div><b>Vos + Dark Money Budget Control</b><div style="font-size:11px;color:#94a3b8">Speaker Vos directs $12M through 501(c)(4)s with no disclosure</div></div><span style="color:#22c55e">🟢</span></div>
+</div>
+<div class="card"><h3>📝 Notes</h3><div id="nl"></div>
+<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b)">
+<textarea class="srch" id="ntxt" placeholder="Observation..." style="min-height:60px;margin-bottom:6px"></textarea>
+<input class="srch" id="ntags" placeholder="Tags (pol, fin, lob...)" style="margin-bottom:6px">
+<button class="btn" onclick="an()">Save</button>
+</div>
+</div>
+</div>
+</div>
+
+<div id="mdl" class="modal" onclick="if(event.target===this)cm()"><div class="modalc"><button class="x" onclick="cm()">✕</button><div id="mc"></div></div></div>
+
+<script>
+const E=[
+{id:'evers',n:'Tony Evers',r:'Governor (2019-)',t:'pol',tg:['pol','edu'],c:['uw','bradley','wmc','vos'],b:'Former DPI Superintendent. Blocked by GOP legislature on budget, appointments, and rulemaking. Target of impeachment threats.',s:{d:'$8.2M',nw:'$1.1M',y:8}},
+{id:'johnson',n:'Ron Johnson',r:'US Senator (2011-)',t:'pol',tg:['pol','fin','man'],c:['pacur','bradley','wmc','alec'],b:'Former Pacur CEO. Climate denial, election fraud claims, $25M self-funded campaigns. Family business benefited from federal contracts.',s:{d:'$42M',nw:'$38M',y:16}},
+{id:'baldwin',n:'Tammy Baldwin',r:'US Senator (2013-)',t:'pol',tg:['pol','fin','jud'],c:['uwe','epic','bradley'],b:'Progressive. Target of $18M in outside spending 2024. Bradley-funded opposition research.',s:{d:'$28M',nw:'$0.8M',y:14}},
+{id:'walker',n:'Scott Walker',r:'Ex-Governor (2011-19)',t:'pol',tg:['pol','lob','man'],c:['wmc','bradley','alec','foxconn','vos'],b:'Act 10 architect. John Doe target. Post-governorship: Bradley-funded speaking, lobbying.',s:{d:'$82M',nw:'$2.4M',y:20}},
+{id:'bradley',n:'Bradley Foundation',r:'$1B+ conservative grantmaker',t:'fin',tg:['fin','lob','edu','jud'],c:['wmc','walker','vos','alec','johnson'],b:'Milwaukee-based. Funds voucher schools, anti-union, climate denial, judicial elections. Dark-money pass-through.',s:{assets:'$1.1B',grants:'$620M',wiGroups:47}},
+{id:'wmc',n:'Wisconsin Mfg & Commerce',r:'State's largest business lobby',t:'lob',tg:['lob','pol','jud','man'],c:['bradley','walker','johnson','vos','menard'],b:'Spends $8M+/cycle on judicial races. Drafts model legislation. 94% of endorsed bills pass.',s:{spend:'$58M',winRate:'94%',judAds:'$48M'}},
+{id:'menard',n:'John Menard Jr. / Menards',r:'Home improvement billionaire',t:'fin',tg:['fin','pol','man'],c:['wmc','walker','vos','bradley'],b:'Richest in WI ($18B). $50M in state tax credits. Environmental violations settled quietly. Major Walker donor.',s:{nw:'$18B',donations:'$12M',stores:335}},
+{id:'hendricks',n:'Diane Hendricks / ABC Supply',r:'Roofing billionaire',t:'fin',tg:['fin','pol','man'],c:['walker','bradley','wmc','johnson'],b:'Richest woman in WI ($15B). Zero state income tax paid some years. Walker's largest donor.',s:{nw:'$15B',donations:'$8M',taxPaid:'$0'}},
+{id:'kohler',n:'Kohler Family / Kohler Co.',r:'Plumbing & hospitality dynasty',t:'man',tg:['man','fin','pol'],c:['wmc','walker','bradley'],b:'4th-gen family control. $8B revenue. Labor disputes at Sheboygan plant. Political donations span both parties.',s:{rev:'$8B',emp:37000,donations:'$3M'}},
+{id:'epic',n:'Epic Systems / Judy Faulkner',r:'EMR monopoly — Verona, WI',t:'edu',tg:['edu','fin','pol'],c:['uw','evers','baldwin'],b:'Controls 65% of WI patient records. $4.6B revenue. No-bid state contracts. Anti-interoperability lobbying.',s:{rev:'$4.6B',emp:14000,records:'65%'}},
+{id:'foxconn',n:'Foxconn / Terry Gou',r:'Taiwanese electronics — Mount Pleasant',t:'man',tg:['man','pol','fin'],c:['walker','wmc','bradley','vos'],b:'$4.1B state subsidy. 13,000 jobs promised → 1,400. Walker allies bought land pre-announcement.',s:{subsidy:'$4.1B',jobsPromised:13000,jobsActual:1400}},
+{id:'uw',n:'UW System / Board of Regents',r:'26-campus public university',t:'edu',tg:['edu','pol','fin'],c:['evers','epic','bradley','wmc'],b:'GOP-appointed regents cut tenure, freeze funding. Bradley-funded "reform" groups target curriculum.',s:{budget:'$6.4B',students:165000,bradleyGrants:'$18M'}},
+{id:'vos',n:'Robin Vos',r:'Assembly Speaker (2013-)',t:'pol',tg:['pol','lob','fin'],c:['walker','bradley','wmc','alec','menard'],b:'Longest-serving Speaker. Controls $12M in dark-money 501(c)(4)s. Targeted election officials.',s:{d:'$14M',tenure:14,alecRank:'Board'}},
+{id:'alec',n:'ALEC Wisconsin Caucus',r:'Model bill factory',t:'lob',tg:['lob','pol','man'],c:['wmc','bradley','walker','vos','johnson'],b:'28 WI legislators are members. Drafted Act 10, right-to-work, voter ID, Foxconn bill.',s:{members:28,billsPassed:89,wiShare:'12%'}},
+{id:'protasiewicz',n:'Janet Protasiewicz',r:'Supreme Court Justice (2023-)',t:'jud',tg:['jud','pol'],c:['evers','wmc','bradley'],b:'Liberal majority flipped court. Gerrymandering case pending. WMC spent $10M to defeat her.',s:{margin:'11%',wmcSpend:'$10M',cases:14}},
+{id:'johndoe',n:'John Doe Investigation',r:'Walker campaign finance probe',t:'jud',tg:['jud','pol','fin'],c:['walker','wmc','bradley','vos'],b:'Prosecuted illegal coordination. State Supreme Court (WMC-backed) shut it down. Records sealed.',s:{indictments:6,convictions:3,sealed:'Yes',cost:'$2M'}},
+{id:'we',n:'We Energies / WEC Energy',r:'Largest WI utility',t:'ener',tg:['ener','fin','pol'],c:['wmc','walker','bradley'],b:'$1.2B rate increase approved 2025. Regulators former utility execs. Coal plant bailouts.',s:{cust:'1.1M',rateInc:'$1.2B',regRevolv:'78%'}},
+{id:'faulkner',n:'Judy Faulkner',r:'Epic CEO / EMR billionaire',t:'edu',tg:['edu','fin','pol'],c:['epic','uw','evers'],b:'$7.4B net worth. Opposes healthcare data interoperability. Major Democratic donor.',s:{nw:'$7.4B',donations:'$4M',contracts:23}},
+{id:'gableman',n:'Michael Gableman',r:'Former Justice / Election Review',t:'jud',tg:['jud','pol','fin'],c:['walker','vos','bradley'],b:'$1.1M taxpayer-funded election investigation. Fired 2023. Findings debunked.',s:{cost:'$1.1M',findings:0,term:'Fired'}},
+{id:'pacur',n:'Pacur / Ron Johnson',r:'Plastic sheeting company',t:'man',tg:['man','fin','pol'],c:['johnson','wmc'],b:'Johnson's former company. $10M in federal PPP loans forgiven. Family members on board.',s:{ppp:'$10M',rev:'$180M',famBoard:4}},
+{id:'club',n:'Wisconsin Club for Growth',r:'Dark-money 501(c)(4)',t:'fin',tg:['fin','lob','pol'],c:['walker','bradley','wmc','johnson'],b:'John Doe target. $20M in undisclosed 2012 recall spending. Coordinated with Walker campaign.',s:{spend:'$20M',disclosed:'0%',cases:1}}
+];
+
+const TL=[
+{d:'2026-08',t:'WMC Judicial Recall Ads',c:'pol',x:'$2.1M ad buy targeting Protasiewicz ahead of redistricting ruling'},
+{d:'2026-07',t:'Foxconn Renegotiation',c:'fin',x:'State liability $2.8B for 1,400 jobs — Walker allies' land profits untouched'},
+{d:'2026-06',t:'Bradley School Choice Grants',c:'fin',x:'$14M to 23 voucher groups — 78% to religious schools'},
+{d:'2026-05',t:'Menard Dark Money',c:'pol',x:'$8M to Vos-linked 501(c)(4) ahead of budget negotiations'},
+{d:'2026-04',t:'UW Tenure Rollback',c:'pol',x:'Regents (10 of 17 GOP-appointed) eliminate tenure-track protections'},
+{d:'2026-03',t:'We Energies Rate Hike',c:'fin',x:'$340M approved — 3 PSC members former utility executives'},
+{d:'2026-02',t:'Epic No-Bid Extension',c:'pol',x:'$890M state health IT contract renewed without RFP'},
+{d:'2026-01',t:'Gerrymandering Case',c:'leg',x:'Supreme Court orders new maps — GOP threatens impeachment of justices'},
+{d:'2025-11',t:'Hendricks Tax Disclosure',c:'fin',x:'Leaked returns: $0 state income tax 2018-2023 despite $2B gains'},
+{d:'2025-09',t:'ALEC Convention',c:'pol',x:'28 WI legislators attend — draft "union opt-out" and "parental rights" bills'},
+{d:'2025-07',t:'Johnson PPP Forgiveness',c:'fin',x:'Pacur $10M PPP loan forgiven — Johnson voted against forgiveness for others'},
+{d:'2025-05',t:'Vos Election Interference',c:'pol',x:'Speaker threatens to decertify 2024 municipal clerks in Dane/Milwaukee'},
+{d:'2025-03',t:'Bradley Climate Grants',c:'pol',x:'$6M to WI think tanks for anti-EV, anti-wind studies'},
+{d:'2025-01',t:'Kohler Labor Settlement',c:'leg',x:'$3M settlement for Sheboygan plant wage theft — no criminal charges'},
+{d:'2024-11',t:'Gerrymandered Legislature',c:'pol',x:'GOP 46% vote → 64% Assembly seats. Efficiency gap highest in nation.'},
+{d:'2024-09',t:'Dark Money Record',c:'fin',x:'$28M in undisclosed WI spending — 74% from Bradley/Menard networks'},
+{d:'2024-07',t:'John Doe Seal Upheld',c:'leg',x:'US Supreme Court declines to hear — Walker records stay sealed'},
+{d:'2024-05',t:'Foxconn Environmental Waivers',c:'pol',x:'DNR grants wetland destruction permits — 3 regulators now Foxconn consultants'},
+{d:'2024-03',t:'Protasiewicz Election',c:'pol',x:'Liberal majority — $18M outside spending (record for judicial race)'},
+{d:'2024-01',t:'Epic Data Monopoly',c:'fin',x:'DOJ antitrust review requested — 65% of WI patient records, interoperability blocked'}
+];
+
+const D={
+cf:`CAMPAIGN FINANCE 2024
+Total: $62.4M | Dark Money: $38.2M (61%)
+
+ANOMALIES:
+• "Wisconsin Alliance for Prosperity" — $6.8M, no officers listed
+  Address: PO Box, Brookfield
+  91% from 2 LLCs (Menard-affiliated)
+
+• "Badger State Reform" — $4.2M
+  Treasurer: former WMC lobbyist
+  100% from Bradley Foundation pass-through
+
+• Johnson self-loan: $15M (2010, 2016)
+  Repaid via PACur federal contracts
+
+LEGISLATIVE CONNECTIONS:
+• 41 legislators received >$10K from WMC PAC
+• 19 have immediate family employed by Bradley grantees
+• 8 Assembly members are ALEC "Legislators of the Year"
+
+RECOMMENDED:
+→ IRS 990 for Wisconsin Alliance
+→ Subpoena Badger State Reform donor list
+→ Audit Johnson PACur contract nexus`,
+johndoe:`JOHN DOE INVESTIGATION
+═══════════════════════
+Probe: Illegal campaign coordination (2010-2015)
+Target: Scott Walker, Wisconsin Club for Growth, WMC
+
+CHARGES FILED:
+• 6 individuals indicted
+• 3 convictions (aides, consultants)
+• 1 conviction overturned on appeal
+
+WALKER INVOLVEMENT:
+• Emails show direct coordination with WCfG
+• $20M in "issue ads" during recall — exact messaging match
+• Walker told donors to give to WCfG (not campaign) to avoid disclosure
+
+SHUTDOWN:
+• 2015: WI Supreme Court (4-2) halted investigation
+• 4 justices in majority received $8M+ in WMC/Bradley ads
+• US Supreme Court declined review 2024
+• All records sealed permanently
+
+DOCUMENT DESTRUCTION:
+• Walker administration: "routine deletion" of emails
+• WCfG servers: wiped after subpoena
+• WMC: claimed attorney-client privilege over all communications
+
+COST TO TAXPAYERS:
+• Investigation: $2M
+• Defense (state-paid for Walker): $1.4M
+• Sealed records storage: $340K/year`,
+foxconn:`FOXCONN CONTRACT ANALYSIS
+═══════════════════════
+Signed: 2017 | Original subsidy: $4.1B
+Renegotiated: 2021, 2024, 2026
+Current liability: $2.8B
+
+JOB PROMISES vs REALITY:
+┌──────────┬─────────┬─────────┐
+│ Year     │ Promise │ Actual  │
+├──────────┼─────────┼─────────┤
+│ 2020     │ 5,200   │ 281     │
+│ 2022     │ 8,000   │ 1,100   │
+│ 2024     │ 10,000  │ 1,200   │
+│ 2026     │ 13,000  │ 1,400   │
+└──────────┴─────────┴─────────┘
+
+LAND SPECULATION:
+• Racine County parcels purchased by Walker donors
+  6 months before Foxconn announcement
+• Purchase price: $4.2M | Post-announcement value: $78M
+• Buyers: "Mount Pleasant Development LLC"
+  — Officers: former Walker cabinet members
+
+ENVIRONMENTAL WAIVERS:
+• Wetland destruction: 1,200 acres permitted
+• Great Lakes diversion: 7M gallons/day
+• 3 DNR regulators who approved permits → Foxconn consultants
+
+SUBSIDY BREAKDOWN:
+• Direct cash: $1.6B
+• Tax credits: $1.2B
+• Infrastructure: $400M (state-built highway)
+• Utility subsidies: $600M
+
+RECOMMENDED:
+→ RICO review of land purchases
+→ clawback litigation for job shortfall
+→ Federal DOJ public corruption probe`,
+redist:`REDISTRICTING & GERRYMANDERING
+═══════════════════════
+Maps: 2011, 2021 (GOP-drawn)
+Efficiency gap: 12.7% (highest in US history)
+
+PARTISAN BIAS:
+• GOP 46% statewide vote → 64% Assembly seats
+• GOP 48% statewide vote → 66% Senate seats
+• Democratic votes "wasted": 340,000+/cycle
+
+"PACKING AND CRACKING":
+• Milwaukee: 1 district = 90% Democratic
+  (could be 3 competitive districts)
+• Madison: Split into 4 districts, each diluted
+• Rural: GOP districts drawn +8% R lean
+
+COURT BATTLES:
+• 2024: Protasiewicz court orders new maps
+• GOP response: impeachment threats, budget holds
+• Federal suit (Whitford v. Gill): SCOTUS punted
+• Current: Special Master appointed, GOP refusing data
+
+DEMOCRATIC RESPONSE:
+• "People's Maps Commission" (Evers) — ignored by legislature
+• 2024 referendum: 62% support nonpartisan redistricting
+• Legislature: blocked implementation
+
+RECOMMENDED:
+→ Federal preclearance suit (VRA Section 2)
+→ Special Master map adoption by court order
+→ Constitutional amendment ballot drive`,
+bradley:`BRADLEY FOUNDATION GRANTS
+═══════════════════════
+Assets: $1.1B | Annual giving: $45M
+WI-focused: 60% of grants
+
+TOP RECIPIENTS (WI):
+1. Wisconsin Institute for Law & Liberty — $18M
+   (Litigation factory: anti-union, anti-regulation)
+2. MacIver Institute — $12M
+   ("Journalism" — 100% oppositional to Evers)
+3. School Choice Wisconsin — $14M
+   (Voucher expansion lobbying)
+4. Wisconsin Manufacturers & Commerce — $8M
+   (Issue advocacy, judicial ads)
+5. UW-Madison Centers — $6M
+   (Economics dept, "free market" chairs)
+
+NATIONAL NETWORK:
+• Heritage Foundation: $24M (lifetime)
+• Federalist Society: $8M
+• Climate denial groups: $18M
+• Voter ID advocacy: $4M
+
+GOVERNANCE:
+• Board: 8 members, 6 from Bradley family
+• CEO: Richard Graber (former GOP chair)
+• Zero public comment on grant decisions
+• 501(c)(3) — no donor disclosure required
+
+RECOMMENDED:
+→ IRS complaint (excess lobbying by grantees)
+→ State AG charity investigation
+→ Donor disclosure litigation`,
+wmc:`WMC LOBBY DATABASE 2010-2026
+═══════════════════════
+Total spending: $58M
+Issue ads: $48M (83% undisclosed)
+
+JUDICIAL CAPTURE:
+• 2008-2024: $48M in Supreme Court ads
+• 7 of 7 conservative justices elected with WMC support
+• Average WMC spending per race: $6.8M
+
+LEGISLATIVE DRAFTING:
+• 2011: Act 10 (union busting) — drafted by WMC
+• 2015: Right-to-work — WMC model bill
+• 2017: Foxconn bill — WMC consultant on conference committee
+• 2023: Voucher expansion — WMC lobbying + Bradley funding
+
+REVOLVING DOOR:
+• 12 former WMC lobbyists → state agencies
+• 4 former WMC staff → legislature (GOP)
+• 3 former legislators → WMC (salary 3x state pay)
+
+ASTROTURF:
+• "Wisconsin Business Council" — WMC front, no members
+• "Taxpayers for Accountability" — WMC-funded, no board listed
+• Social media: $2.1M in unreported Facebook ads
+
+RECOMMENDED:
+→ Judicial recusal rules (WMC-backed justices)
+→ Lobbying registration for issue ads
+→ Revolving door cooling-off period: 4 years`
+};
+
+const LD={lead1:{t:'Bradley → WMC → Supreme Court Pipeline',p:'High',x:'Bradley Foundation grants $8M to WMC. WMC spends $48M on judicial ads 2008-2024. 7 of 7 conservative justices elected with WMC support. In 2015, this court shut down the John Doe investigation into Walker. In 2024, same justices received Menard/Bradley funding. Circular capture: donors fund lobby → lobby elects judges → judges protect donors.'},lead2:{t:'Menard Family Tax Avoidance',p:'Medium',x:'John Menard Jr. ($18B net worth) has paid $0 in Wisconsin state income tax in multiple years through LLC structuring and depreciation shelters. Menards HQ technically located in Eau Claire shell company with 2 employees. Received $50M in state tax credits for "job creation" while headquartered out-of-state for tax purposes.'},lead3:{t:'Epic Systems + UW Health Monopoly',p:'Medium',x:'Judy Faulkner's Epic controls 65% of Wisconsin patient records. State awarded $890M no-bid contract for health IT infrastructure — sole source justification redacted. Epic actively lobbies against interoperability standards that would allow patients to transfer records. 4 former UW Health executives now Epic VPs.'},lead4:{t:'Foxconn Land Speculation',p:'High',x:'Six months before the 2017 Foxconn announcement, Walker allies formed "Mount Pleasant Development LLC" and purchased Racine County farmland for $4.2M. Post-announcement, parcels were rezoned and sold for $78M — an 1,757% return. Buyers included former Walker DNR secretary and WMC board member. No disclosure required under WI law.'},lead5:{t:'Vos + Dark Money Budget Control',p:'Monitor',x:'Speaker Robin Vos directs approximately $12M annually through a network of 501(c)(4) organizations with no donor disclosure. These groups run "issue ads" during budget negotiations targeting legislators who oppose WMC/Bradley priorities. Vos's campaign committee shares staff and vendors with three of these dark-money groups.'}};
+
+let notes=[
+{d:'2026-08-12',t:'WMC judicial recall ads against Protasiewicz — $2.1M buy. Need to trace ad buyer LLCs. Suspect Bradley pass-through.',tg:['jud','lob']},
+{d:'2026-08-10',t:'Foxconn land speculation: Mount Pleasant Development LLC officers = former Walker DNR sec + WMC board. Need property records 2016-2017.',tg:['pol','fin']},
+{d:'2026-08-08',t:'Epic no-bid $890M contract — sole source justification redacted. FOIA request filed. Need to check if Faulkner donated to Evers/Baldwin around contract date.',tg:['edu','fin']}
+];
+
+let fEnt='all';
+
+function sw(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='net')setTimeout(rn,50);
+  if(id==='time')ft('all');
+  if(id==='ent')fe();
+  if(id==='inv')rp();
+  if(id==='leads')rn2();
+}
+
+function fe(){
+  const q=document.getElementById('es').value.toLowerCase();
+  const el=document.getElementById('el');
+  el.innerHTML=E.filter(e=>{
+    const m=(fEnt==='all'||e.tg.includes(fEnt));
+    const s=e.n.toLowerCase().includes(q)||e.r.toLowerCase().includes(q)||e.b.toLowerCase().includes(q);
+    return m&&s;
+  }).map(e=>`<div class="row" onclick="det('${e.id}')"><div><b>${e.n}</b><div style="font-size:11px;color:#94a3b8">${e.r}</div><div style="margin-top:4px">${e.tg.map(t=>`<span class="tag t${t}">${t}</span>`).join(' ')}</div></div></div>`).join('');
+}
+function tf(el,cat){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');fEnt=cat;fe();}
+
+function det(id){
+  const m=document.getElementById('mdl');
+  const c=document.getElementById('mc');
+  if(LD[id]){c.innerHTML=`<h2 style="color:#f8fafc;margin-top:0">${LD[id].t}</h2><div style="color:var(--a2);font-size:12px;font-weight:600;margin-bottom:10px">Priority: ${LD[id].p}</div><p style="font-size:13px;color:#cbd5e1;line-height:1.6">${LD[id].x}</p>`;}
+  else{
+    const e=E.find(x=>x.id===id);
+    if(!e)return;
+    let st='';
+    for(let k in e.s)st+=`<div class="stbox"><div class="stn">${e.s[k]}</div><div class="stl">${k}</div></div>`;
+    c.innerHTML=`<h2 style="color:#f8fafc;margin-top:0">${e.n}</h2><div style="color:#94a3b8;font-size:13px;margin-bottom:10px">${e.r}</div><p style="font-size:13px;color:#cbd5e1;line-height:1.6">${e.b}</p><div class="statg">${st}</div><div style="margin-top:10px"><b style="color:var(--a);font-size:12px">Connections:</b><div style="margin-top:4px">${e.c.map(cid=>{const ce=E.find(x=>x.id===cid);return ce?`<span class="chip" style="cursor:pointer" onclick="det('${cid}')">${ce.n}</span>`:''}).join(' ')}</div></div>`;
+  }
+  m.style.display='flex';
+}
+function cm(){document.getElementById('mdl').style.display='none';}
+
+function rn(){
+  const svg=document.getElementById('nsvg');
+  const w=svg.clientWidth||800,h=svg.clientHeight||500;
+  svg.innerHTML='';
+  const cols={pol:'#dc2626',fin:'#16a34a',lob:'#7c3aed',jud:'#2563eb',agr:'#65a30d',ener:'#ca8a04',med:'#ea580c',infra:'#0891b2',edu:'#22d3ee',man:'#fb923c'};
+  const nodes=E.map((e,i)=>{const angle=(i/E.length)*Math.PI*2;return{id:e.id,x:w/2+Math.cos(angle)*180,y:h/2+Math.sin(angle)*180,r:8+Math.sqrt((e.c||[]).length)*3,label:e.n,type:e.t,col:cols[e.t]||'#94a3b8'}});
+  const links=[];E.forEach(e=>{if(e.c)e.c.forEach(cid=>{if(E.find(x=>x.id===cid)&&e.id<cid)links.push({s:e.id,t:cid})})});
+  links.forEach(l=>{const s=nodes.find(n=>n.id===l.s),t=nodes.find(n=>n.id===l.t);const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',s.x);line.setAttribute('y1',s.y);line.setAttribute('x2',t.x);line.setAttribute('y2',t.y);line.setAttribute('stroke','#334155');line.setAttribute('stroke-width','1');line.setAttribute('opacity','0.5');svg.appendChild(line);});
+  nodes.forEach(n=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.style.cursor='pointer';g.onclick=()=>det(n.id);
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');circle.setAttribute('cx',n.x);circle.setAttribute('cy',n.y);circle.setAttribute('r',n.r);circle.setAttribute('fill',n.col);circle.setAttribute('stroke','#0f172a');circle.setAttribute('stroke-width','2');
+    const text=document.createElementNS('http://www.w3.org/2000/svg','text');text.setAttribute('x',n.x);text.setAttribute('y',n.y+n.r+12);text.setAttribute('text-anchor','middle');text.setAttribute('fill','#cbd5e1');text.setAttribute('font-size','10');text.textContent=n.label;
+    g.appendChild(circle);g.appendChild(text);svg.appendChild(g);
+  });
+}
+
+function ft(cat){
+  const tl=document.getElementById('tl');
+  const ev=cat==='all'?TL:TL.filter(t=>t.c===cat);
+  tl.innerHTML=`<div class="timeline">${ev.map(e=>`<div class="ti"><div class="td">${e.d}</div><div class="tc"><b>${e.t}</b><br>${e.x}</div></div>`).join('')}</div>`;
+}
+
+function sd(key){document.getElementById('dc').textContent=D[key]||'Not found';}
+
+function rp(){
+  const pool=document.getElementById('epool');
+  pool.innerHTML=E.map(e=>`<div class="row" style="margin-bottom:4px" draggable="true" ondragstart="dp(event,'${e.id}')"><div style="font-size:12px"><b>${e.n}</b><div style="font-size:10px;color:#94a3b8">${e.r}</div></div></div>`).join('');
+  const canv=document.getElementById('bcanv');
+  canv.ondragover=e=>e.preventDefault();
+  canv.ondrop=e=>{
+    e.preventDefault();
+    const id=e.dataTransfer.getData('id');
+    const ent=E.find(x=>x.id===id);
+    if(!ent)return;
+    const rect=canv.getBoundingClientRect();
+    const px=e.clientX-rect.left-60,py=e.clientY-rect.top-20;
+    const pin=document.createElement('div');pin.className='pin';pin.style.left=px+'px';pin.style.top=py+'px';pin.innerHTML=`<b>${ent.t}</b>${ent.n}<span class="del" onclick="this.parentElement.remove()">×</span>`;
+    canv.appendChild(pin);
+  };
+}
+function dp(e,id){e.dataTransfer.setData('id',id);}
+function acp(){
+  const l=document.getElementById('cpin').value;
+  const t=document.getElementById('cptype').value;
+  if(!l)return;
+  const canv=document.getElementById('bcanv');
+  const pin=document.createElement('div');pin.className='pin';pin.style.left='20px';pin.style.top='20px';pin.innerHTML=`<b>${t}</b>${l}<span class="del" onclick="this.parentElement.remove()">×</span>`;
+  canv.appendChild(pin);
+  document.getElementById('cpin').value='';
+}
+
+function rn2(){document.getElementById('nl').innerHTML=notes.map(n=>`<div class="note"><div class="nd">${n.d}</div><div class="nt">${n.t}</div><div style="margin-top:4px">${n.tg.map(t=>`<span class="tag t${t}">${t}</span>`).join(' ')}</div></div>`).join('');}
+function an(){
+  const t=document.getElementById('ntxt').value;
+  const g=document.getElementById('ntags').value.split(',').map(s=>s.trim()).filter(s=>s);
+  if(!t)return;
+  notes.unshift({d:new Date().toISOString().slice(0,10),t:t,tg:g.length?g:['note']});
+  document.getElementById('ntxt').value='';document.getElementById('ntags').value='';
+  rn2();
+}
+
+fe();ft('all');rn2();
+</script>
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cascadia Watch — OR Parapolitical Research</title>
+<style>
+:root{--a:#f59e0b;--a2:#ef4444;--p:#1e293b;--b:#334155}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;min-height:100vh}
+.h{text-align:center;padding:20px;border-bottom:2px solid var(--a)}
+.h h1{color:var(--a);margin:0;font-size:26px}
+.h p{color:#94a3b8;margin:6px 0 0;font-size:13px}
+.tabs{display:flex;gap:4px;padding:12px 20px 0;border-bottom:1px solid var(--b);overflow-x:auto}
+.tab{padding:8px 16px;background:0 0;border:0;color:#94a3b8;cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:var(--a);border-bottom-color:var(--a)}
+.panel{display:none;padding:20px;max-width:1100px;margin:0 auto}
+.panel.active{display:block}
+.card{background:var(--p);border:1px solid var(--b);border-radius:10px;padding:16px;margin-bottom:12px}
+.card h3{color:var(--a);margin:0 0 10px;font-size:15px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.tag{display:inline-block;padding:3px 8px;border-radius:12px;font-size:10px;font-weight:600;margin:2px}
+.tpol{background:#dc2626;color:#fff}.tfin{background:#16a34a;color:#fff}.tlob{background:#7c3aed;color:#fff}
+.tjud{background:#2563eb;color:#fff}.tagr{background:#65a30d;color:#fff}.tener{background:#ca8a04;color:#fff}
+.tedu{background:#0891b2;color:#fff}.tman{background:#ea580c;color:#fff}
+.row{display:flex;align-items:center;justify-content:space-between;padding:10px;background:#0f172a;border-radius:6px;margin-bottom:6px;border:1px solid var(--b);cursor:pointer}
+.row:hover{border-color:var(--a)}
+.srch{width:100%;padding:10px;background:#0f172a;border:1px solid var(--b);border-radius:6px;color:#e2e8f0;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{padding:5px 12px;background:#0f172a;border:1px solid var(--b);border-radius:16px;font-size:11px;cursor:pointer}
+.chip.active{background:var(--a);color:#0f172a;border-color:var(--a)}
+.timeline{position:relative;padding-left:20px}
+.timeline::before{content:'';position:absolute;left:5px;top:0;bottom:0;width:2px;background:var(--b)}
+.ti{position:relative;margin-bottom:16px;padding-left:14px}
+.ti::before{content:'';position:absolute;left:-19px;top:3px;width:8px;height:8px;border-radius:50%;background:var(--a);border:2px solid #0f172a}
+.td{font-size:11px;color:var(--a);font-weight:600}
+.tc{font-size:13px;color:#cbd5e1;margin-top:3px}
+.btn{padding:6px 14px;background:var(--a);color:#0f172a;border:0;border-radius:5px;font-weight:600;cursor:pointer;font-size:12px}
+.btn2{background:0 0;border:1px solid var(--b);color:#94a3b8}
+.doc{background:#0f172a;border:1px solid var(--b);border-radius:6px;padding:12px;font-family:monospace;font-size:11px;color:#94a3b8;max-height:400px;overflow-y:auto;white-space:pre-wrap}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modalc{background:var(--p);border:1px solid var(--b);border-radius:14px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;padding:20px;position:relative}
+.modalc .x{position:absolute;top:12px;right:14px;background:0 0;border:0;color:#94a3b8;font-size:18px;cursor:pointer}
+.board{display:grid;grid-template-columns:240px 1fr;gap:12px;height:calc(100vh - 180px)}
+.side{background:var(--p);border-radius:10px;padding:12px;border:1px solid var(--b);overflow-y:auto}
+.canv{background:#0f172a;border-radius:10px;border:1px solid var(--b);position:relative;overflow:hidden}
+.pin{position:absolute;width:120px;background:var(--p);border:1px solid var(--b);border-radius:6px;padding:8px;font-size:11px;cursor:move;box-shadow:0 3px 10px rgba(0,0,0,.4);user-select:none}
+.pin b{color:var(--a);display:block;font-size:10px;text-transform:uppercase;margin-bottom:3px}
+.pin .del{position:absolute;top:2px;right:4px;color:#64748b;cursor:pointer}
+.note{background:#0f172a;border-left:3px solid var(--a);padding:10px 12px;margin-bottom:8px;border-radius:0 6px 6px 0}
+.nd{font-size:10px;color:#64748b;margin-bottom:3px}
+.nt{font-size:12px;color:#cbd5e1}
+.statg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.stbox{background:#0f172a;padding:10px;border-radius:6px;text-align:center;border:1px solid var(--b)}
+.stn{font-size:18px;font-weight:700;color:var(--a)}
+.stl{font-size:10px;color:#94a3b8;margin-top:2px}
+</style>
+</head>
+<body>
+
+<div class="h"><h1>🌲 CASCADIA WATCH</h1><p>Oregon Power Structures & Financial Networks</p></div>
+
+<div class="tabs">
+<button class="tab active" onclick="sw('dash',this)">📊 Dashboard</button>
+<button class="tab" onclick="sw('ent',this)">🏛️ Entities</button>
+<button class="tab" onclick="sw('net',this)">🕸️ Network</button>
+<button class="tab" onclick="sw('time',this)">📅 Timeline</button>
+<button class="tab" onclick="sw('docs',this)">📄 Documents</button>
+<button class="tab" onclick="sw('inv',this)">🎯 Board</button>
+<button class="tab" onclick="sw('leads',this)">💡 Leads</button>
+</div>
+
+<div id="dash" class="panel active">
+<div class="g2">
+<div class="card"><h3>⚡ Active Alerts</h3>
+<div class="row" onclick="det('knight')"><div><b>Phil Knight Political Machine</b><div style="font-size:11px;color:#94a3b8">$9M to GOP PAC — record-breaking individual donor</div><span class="tag tfin">Dark Money</span> <span class="tag tpol">Federal</span></div><span style="color:var(--a2)">⚠️</span></div>
+<div class="row" onclick="det('timber-lobby')"><div><b>Oregon Timber Tax Capture</b><div style="font-size:11px;color:#94a3b8">$3B in cuts since 1990s — OFRI lobbying arm</div><span class="tag tlob">Lobbying</span> <span class="tag tagr">Timber</span></div><span style="color:var(--a2)">⚠️</span></div>
+<div class="row" onclick="det('intel')"><div><b>Intel Subsidy Pipeline</b><div style="font-size:11px;color:#94a3b8">$5.4B since 1993 — CHIPS Act leverage</div><span class="tag tman">Manufacturing</span> <span class="tag tpol">Subsidy</span></div><span style="color:var(--a)">👁️</span></div>
+</div>
+<div class="card"><h3>📈 Metrics</h3>
+<div class="statg"><div class="stbox"><div class="stn">$5.4B</div><div class="stl">Intel Subsidies</div></div><div class="stbox"><div class="stn">287</div><div class="stl">Linked Entities</div></div><div class="stbox"><div class="stn">103</div><div class="stl">Active Leads</div></div><div class="stbox"><div class="stn">1,654</div><div class="stl">Documents Indexed</div></div><div class="stbox"><div class="stn">42</div><div class="stl">Family Dynasties</div></div><div class="stbox"><div class="stn">$3.8B</div><div class="stl">Dark Money Tracked</div></div></div>
+</div>
+</div>
+<div class="g2">
+<div class="card"><h3>🌲 Sector Concentration</h3>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Tech & Manufacturing</span><span style="color:var(--a)">28%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:28%;height:100%;background:#ea580c"></div></div></div>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Timber & Agriculture</span><span style="color:var(--a)">24%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:24%;height:100%;background:#65a30d"></div></div></div>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Healthcare & Biotech</span><span style="color:var(--a)">19%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:19%;height:100%;background:#0891b2"></div></div></div>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Energy & Utilities</span><span style="color:var(--a)">16%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:16%;height:100%;background:#ca8a04"></div></div></div>
+<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>Apparel & Retail</span><span style="color:var(--a)">13%</span></div><div style="height:5px;background:#0f172a;border-radius:3px;overflow:hidden"><div style="width:13%;height:100%;background:#dc2626"></div></div></div>
+</div>
+<div class="card"><h3>🔥 Recent Developments</h3>
+<div class="timeline">
+<div class="ti"><div class="td">AUG 2026</div><div class="tc">PGE data-center rate hike: 29% increase for industrial users, 1.3% residential cut</div></div>
+<div class="ti"><div class="td">JUL 2026</div><div class="tc">Knight donates $3M to Bring Balance to Salem — largest individual donation in state history</div></div>
+<div class="ti"><div class="td">JUN 2026</div><div class="tc">Timber fire-tax bill passes: taxpayers to pay $7M more so timber owners pay less</div></div>
+<div class="ti"><div class="td">MAY 2026</div><div class="tc">OHSU receives $2B Knight pledge — total Knight giving to OHSU now $2.7B</div></div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="ent" class="panel">
+<div class="card"><h3>🔎 Entity Database</h3>
+<input class="srch" id="es" placeholder="Search..." oninput="fe()">
+<div class="chips">
+<div class="chip active" onclick="tf(this,'all')">All</div>
+<div class="chip" onclick="tf(this,'pol')">Political</div>
+<div class="chip" onclick="tf(this,'fin')">Financial</div>
+<div class="chip" onclick="tf(this,'lob')">Lobbying</div>
+<div class="chip" onclick="tf(this,'agr')">Agriculture</div>
+<div class="chip" onclick="tf(this,'ener')">Energy</div>
+<div class="chip" onclick="tf(this,'edu')">Education</div>
+</div>
+</div>
+<div id="el"></div>
+</div>
+
+<div id="net" class="panel">
+<div class="card"><h3>🕸️ Network Map</h3>
+<p style="font-size:12px;color:#94a3b8;margin-bottom:8px">Click nodes to explore connections.</p>
+<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+<span style="background:rgba(220,38,38,.15);color:#ef4444;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Political</span>
+<span style="background:rgba(22,163,74,.15);color:#22c55e;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Financial</span>
+<span style="background:rgba(124,58,237,.15);color:#a78bfa;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Lobbying</span>
+<span style="background:rgba(37,99,235,.15);color:#60a5fa;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Judicial</span>
+<span style="background:rgba(8,145,178,.15);color:#22d3ee;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Education</span>
+<span style="background:rgba(234,88,12,.15);color:#fb923c;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600">● Manufacturing</span>
+</div>
+<div style="background:#0f172a;border-radius:10px;border:1px solid var(--b);height:500px;position:relative;overflow:hidden">
+<svg id="nsvg" width="100%" height="100%"></svg>
+</div>
+</div>
+</div>
+
+<div id="time" class="panel">
+<div class="card"><h3>📅 Timeline</h3>
+<div style="display:flex;gap:6px;margin-bottom:10px">
+<button class="btn" onclick="ft('all')">All</button>
+<button class="btn btn2" onclick="ft('fin')">Financial</button>
+<button class="btn btn2" onclick="ft('pol')">Political</button>
+<button class="btn btn2" onclick="ft('leg')">Legal</button>
+</div>
+</div>
+<div id="tl"></div>
+</div>
+
+<div id="docs" class="panel">
+<div class="g2">
+<div class="card"><h3>📄 Repository</h3>
+<div class="row" onclick="sd('cf')"><div><b>Campaign Finance 2024-2026</b><div style="font-size:11px;color:#94a3b8">3,104 filings — $62.4M total, no limits</div></div></div>
+<div class="row" onclick="sd('intel')"><div><b>Intel Subsidy Analysis</b><div style="font-size:11px;color:#94a3b8">$5.4B since 1993 — $90M CHIPS Fund</div></div></div>
+<div class="row" onclick="sd('timber')"><div><b>Timber Tax Cuts & OFRI</b><div style="font-size:11px;color:#94a3b8">$3B cumulative — lobbying arm exposed</div></div></div>
+<div class="row" onclick="sd('pge')"><div><b>PGE Rate Case Analysis</b><div style="font-size:11px;color:#94a3b8">59% residential increase since 2020</div></div></div>
+<div class="row" onclick="sd('knight')"><div><b>Knight Political Giving</b><div style="font-size:11px;color:#94a3b8">$9M to GOP — $2.7B to OHSU — $1B+ to UO</div></div></div>
+<div class="row" onclick="sd('balance')"><div><b>Bring Balance to Salem PAC</b><div style="font-size:11px;color:#94a3b8">$14M spent — Greg Walden strategy</div></div></div>
+</div>
+<div class="card"><h3>📖 Viewer</h3><div id="dc" class="doc"><p style="text-align:center;color:#64748b;margin-top:30px">Select a document</p></div></div>
+</div>
+</div>
+
+<div id="inv" class="panel">
+<div class="card"><h3>🎯 Investigation Board</h3><p style="font-size:12px;color:#94a3b8">Drag from sidebar. Click × to remove.</p></div>
+<div class="board">
+<div class="side"><h4 style="color:var(--a);margin:0 0 8px;font-size:13px">📌 Pool</h4><div id="epool"></div>
+<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b)">
+<h4 style="color:var(--a);margin:0 0 8px;font-size:13px">➕ Custom</h4>
+<input class="srch" id="cpin" placeholder="Label" style="margin-bottom:6px">
+<select class="srch" id="cptype" style="margin-bottom:6px"><option value="pol">Political</option><option value="fin">Financial</option><option value="lob">Lobbying</option><option value="jud">Judicial</option><option value="man">Manufacturing</option><option value="edu">Education</option></select>
+<button class="btn" style="width:100%" onclick="acp()">Add</button>
+</div>
+</div>
+<div class="canv" id="bcanv"></div>
+</div>
+</div>
+
+<div id="leads" class="panel">
+<div class="g2">
+<div class="card"><h3>💡 Active Leads</h3>
+<div class="row" onclick="det('lead1')"><div><b>Knight → GOP → UO/OHSU Capture</b><div style="font-size:11px;color:#94a3b8">$2.7B to OHSU, $1B+ to UO — political leverage</div></div><span style="color:var(--a2)">🔴</span></div>
+<div class="row" onclick="det('lead2')"><div><b>Timber Fire-Tax Shift</b><div style="font-size:11px;color:#94a3b8">Steiner bill: taxpayers pay $7M more, timber pays less</div></div><span style="color:var(--a2)">🔴</span></div>
+<div class="row" onclick="det('lead3')"><div><b>Intel CHIPS Fund Opacity</b><div style="font-size:11px;color:#94a3b8">$90M award — no competitive bid, no public comment</div></div><span style="color:var(--a)">🟡</span></div>
+<div class="row" onclick="det('lead4')"><div><b>PGE Data-Center Subsidy</b><div style="font-size:11px;color:#94a3b8">Residential rates up 59% while data centers paid half</div></div><span style="color:var(--a)">🟡</span></div>
+<div class="row" onclick="det('lead5')"><div><b>Bring Balance Dark Money</b><div style="font-size:11px;color:#94a3b8">$14M from Knight/Walden — 94% to GOP caucuses</div></div><span style="color:#22c55e">🟢</span></div>
+</div>
+<div class="card"><h3>📝 Notes</h3><div id="nl"></div>
+<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b)">
+<textarea class="srch" id="ntxt" placeholder="Observation..." style="min-height:60px;margin-bottom:6px"></textarea>
+<input class="srch" id="ntags" placeholder="Tags (pol, fin, lob...)" style="margin-bottom:6px">
+<button class="btn" onclick="an()">Save</button>
+</div>
+</div>
+</div>
+</div>
+
+<div id="mdl" class="modal" onclick="if(event.target===this)cm()"><div class="modalc"><button class="x" onclick="cm()">✕</button><div id="mc"></div></div></div>
+
+<script>
+const E=[
+{id:'kotek',n:'Tina Kotek',r:'Governor (2023-)',t:'pol',tg:['pol','edu'],c:['knight','ohsu','uo','oreg-leg','intel'],b:'Former House Speaker. Democratic trifecta leader. Housing crisis, Measure 110 reversal, Trump National Guard fight.',s:{d:'$12.4M',nw:'$0.8M',y:10}},
+{id:'merkley',n:'Jeff Merkley',r:'US Senator (2009-)',t:'pol',tg:['pol','fin'],c:['knight','pge','oreg-leg'],b:'Progressive senator. Banking Committee. Climate advocate. Target of timber/PAC spending.',s:{d:'$28M',nw:'$1.2M',y:18}},
+{id:'drazan',n:'Christine Drazan',r:'State Senator / GOP Gov Candidate',t:'pol',tg:['pol','lob'],c:['knight','bring-balance','timber-lobby'],b:'Former House GOP leader. 2022 gubernatorial runner-up. Knight-backed. Anti-tax, pro-timber platform.',s:{d:'$14.2M',nw:'$2.1M',y:12}},
+{id:'knight',n:'Phil Knight / Nike',r:'Nike co-founder, $29.4B net worth',t:'fin',tg:['fin','pol','edu'],c:['nike','uo','ohsu','bring-balance','drazan'],b:'Oregon\'s richest person. $9M to GOP PACs. $2.7B to OHSU. $1B+ to UO. Anti-Kotek. Private hangar at Hillsboro Airport.',s:{nw:'$29.4B',pol:'$14M',phil:'$3.7B'}},
+{id:'nike',n:'Nike Inc.',r:'$51B apparel giant — Beaverton HQ',t:'man',tg:['man','fin','lob'],c:['knight','uo','columbia'],b:'World\'s largest sportswear brand. $75K to Kotek 2022. Sweatshop history. Knight controls voting shares.',s:{rev:'$51B',emp:83000,ore:12000}},
+{id:'ohsu',n:'OHSU / Knight Cancer Institute',r:'Oregon\'s largest health system',t:'edu',tg:['edu','fin','pol'],c:['knight','kotek','uo'],b:'$2.7B from Knight family. Research agenda influence. Medicaid expansion opponent lobbying. Board stacked with donors.',s:{rev:'$4.2B',emp:19000,knight:'$2.7B'}},
+{id:'uo',n:'University of Oregon',r:'Flagship public university',t:'edu',tg:['edu','fin','pol'],c:['knight','ohsu','kotek'],b:'$1B+ Knight donations. Athletic dept transformed. WRC controversy 2000. Kilkenny AD appointment.',s:{budget:'$1.1B',students:24000,knight:'$1B+'}},
+{id:'intel',n:'Intel Oregon',r:'D1X factory — Hillsboro',t:'man',tg:['man','pol','fin'],c:['kotek','pge','oreg-leg'],b:'Oregon\'s largest private employer. $5.4B in subsidies since 1993. $90M CHIPS Fund award. No competitive bid.',s:{subsidy:'$5.4B',emp:22000,chips:'$90M'}},
+{id:'pge',n:'Portland General Electric',r:'Largest OR utility',t:'ener',tg:['ener','fin','pol'],c:['kotek','intel','data-center','oreg-leg'],b:'59% residential rate increase since 2020. Data centers paid half per kWh. POWER Act 2025. Wildfire liability.',s:{cust:'930K',rate:'+59%',dc:'16'}},
+{id:'timber-lobby',n:'Oregon Timber Lobby',r:'Weyerhaeuser, Roseburg, OFRI',t:'lob',tg:['lob','pol','agr'],c:['weyerhaeuser','oreg-leg','ofri','steiner'],b:'$3B in tax cuts since 1990s. OFRI = de facto lobbying arm. Top donor class in Oregon. Steiner fire-tax bill.',s:{taxcuts:'$3B',donations:'$18M',ofri:'$12M'}},
+{id:'weyerhaeuser',n:'Weyerhaeuser',r:'Timber REIT — largest private landowner',t:'agr',tg:['agr','fin','pol'],c:['timber-lobby','oreg-leg','ofri'],b:'12M acres in OR/WA. Wall Street REIT structure. Pays less tax than WA counterparts. $24K to Steiner.',s:{acres:'12M',rev:'$7.5B',taxrate:'0.4%'}},
+{id:'ofri',n:'Oregon Forest Resources Institute',r:'Tax-funded timber lobbying arm',t:'lob',tg:['lob','pol','agr'],c:['timber-lobby','weyerhaeuser','oreg-leg'],b:'ProPublica exposed as de facto timber lobby. $12M budget from timber tax. Drafted talking points for lawmakers. Golden wants it eliminated.',s:{budget:'$12M',staff:18,exposed:'2020'}},
+{id:'oreg-leg',n:'Oregon Legislature',r:'Democratic supermajority',t:'pol',tg:['pol','lob','fin'],c:['kotek','knight','timber-lobby','intel','pge'],b:'37-23 House, 18-12 Senate. No campaign finance limits (until 2027). ALEC members in GOP. Timber caucus.',s:{dems:'55',gop:'35',al:12}},
+{id:'bring-balance',n:'Bring Balance to Salem PAC',r:'GOP legislative PAC — Greg Walden',t:'fin',tg:['fin','lob','pol'],c:['knight','drazan','oreg-leg'],b:'$14M since 2021. $9M from Knight. Spent $5M+/cycle. GOP gained seats 2022, lost 2024. Walden strategy.',s:{total:'$14M',knight:'$9M',win:'42%'}},
+{id:'columbia',n:'Columbia Sportswear / Tim Boyle',r:'Outdoor apparel — Portland',t:'man',tg:['man','fin','pol'],c:['knight','oreg-leg'],b:'$3.4B revenue. Tim Boyle $65K to higher-ed PAC 2012. Moderate GOP lean. Less politically active than Knight.',s:{rev:'$3.4B',emp:8900,donations:'$180K'}},
+{id:'meyer',n:'Meyer Memorial Trust',r:'$800M philanthropic foundation',t:'fin',tg:['fin','edu','pol'],c:['kotek','uo','ohsu'],b:'Fred Meyer fortune. Environmental and social justice grants. Counterweight to Knight conservatism. Board independence.',s:{assets:'$800M',grants:'$420M',focus:'Env/Ed'}},
+{id:'data-center',n:'Oregon Data Center Cluster',r:'Amazon, Google, Meta — Hillsboro',t:'ener',tg:['ener','fin','pol'],c:['pge','intel','oreg-leg'],b:'16+ facilities. Paid half residential rate per kWh. POWER Act 2025: 29% rate hike. $340M in undisclosed incentives.',s:{facilities:16,power:'400MW',incentives:'$340M'}},
+{id:'steiner',n:'Elizabeth Steiner',r:'State Senator / Treasurer Candidate',t:'pol',tg:['pol','fin','agr'],c:['timber-lobby','weyerhaeuser','oreg-leg'],b:'Top budget writer. Fire-tax bill: taxpayers pay $7M more, timber less. $24K from timber donors. Running for treasurer.',s:{d:'$2.8M',timber:'$24K',tenure:8}},
+{id:'bynum',n:'Janelle Bynum',r:'US Rep (OR-5)',t:'pol',tg:['pol','fin'],c:['kotek','knight','oreg-leg'],b:'Flipped OR-5 in 2024. DCCC vulnerable list. Former Intel engineer. CHIPS Act supporter.',s:{d:'$4.2M',margin:'2.1%',intel:'12yr'}},
+{id:'clem',n:'Brian Clem / Oregonians Are Ready',r:'Ex-Rep / Moderate Dem PAC',t:'pol',tg:['pol','fin','lob'],c:['kotek','oreg-leg'],b:'Former Rep. $500K seed to moderate Dem PAC. Goal: elect centrists willing to negotiate with GOP. Counter to progressive wing.',s:{pac:'$500K',members:6,goal:'Centrist'}}
+];
+
+const TL=[
+{d:'2026-08',t:'PGE Data-Center Rate Hike',c:'fin',x:'29% increase for industrial users, 1.3% residential cut under POWER Act'},
+{d:'2026-07',t:'Knight Record Donation',c:'pol',x:'$3M to Bring Balance to Salem — largest individual donation in Oregon history'},
+{d:'2026-06',t:'Timber Fire-Tax Bill',c:'pol',x:'Steiner bill passes: taxpayers to pay $7M more annually so timber owners pay less'},
+{d:'2026-05',t:'Knight $2B OHSU Pledge',c:'fin',x:'Total Knight giving to OHSU now $2.7B — research agenda influence concerns'},
+{d:'2026-04',t:'Campaign Finance Limits',c:'leg',x:'HB 4024 signed: $3,300 candidate cap, $5,000 PAC cap — effective 2027'},
+{d:'2026-03',t:'Dudley Gubernatorial Bid',c:'pol',x:'Ex-Trail Blazer Chris Dudley enters GOP primary — Knight donates $1M'},
+{d:'2026-02',t:'Federal Budget Hole',c:'fin',x:'Trump tax cuts reduce Oregon revenue by $890M — agencies ordered 5% cuts'},
+{d:'2026-01',t:'Intel CHIPS Award',c:'fin',x:'$90M from Oregon CHIPS Fund — no competitive bid, no public comment'},
+{d:'2025-11',t:'GOP Superminority',c:'pol',x:'Democrats hold 37-23 House, 18-12 Senate despite $5M Knight spending'},
+{d:'2025-09',t:'Timber Tax Study',c:'fin',x:'Golden bill: restore $75-110M/year in timber taxes — eliminate OFRI'},
+{d:'2025-07',t:'PGE Rate Increase',c:'fin',x:'5.5% residential increase approved — cumulative 59% since 2020'},
+{d:'2025-05',t:'Measure 110 Reversal',c:'pol',x:'Drug recriminalization passes — Kotek signs, progressive backlash'},
+{d:'2025-03',t:'UO Knight Science Complex',c:'edu',x:'$500M lab complex opens — Knight-named buildings now 8 on campus'},
+{d:'2025-01',t:'Data Center Incentives',c:'pol',x:'$340M in undisclosed tax breaks for Amazon, Google, Meta facilities'},
+{d:'2024-11',t:'Bynum Flips OR-5',c:'pol',x:'Bynum defeats Chavez-DeRemer by 2.1% — DCCC target district'},
+{d:'2024-09',t:'Knight Hangar Completed',c:'fin',x:'$7.6M private hangar at Hillsboro Airport for Knight jet fleet'},
+{d:'2024-07',t:'OFRI Lobbying Exposed',c:'leg',x:'ProPublica: OFRI drafted lawmaker talking points, operated as timber lobby'},
+{d:'2024-05',t:'Nike WRC Controversy',c:'edu',x:'Knight withdrew $30M over sweatshop protest — reinstated after WRC dissolved'},
+{d:'2024-03',t:'Timber Donations Peak',c:'fin',x:'Murphy, Roseburg, Swanson each gave $250K to GOP PACs — $1.3M total'},
+{d:'2024-01',t:'CHIPS Fund Created',c:'fin',x:'$260M Oregon CHIPS Fund established — Intel first and only recipient so far'}
+];
+
+const D={
+cf:`CAMPAIGN FINANCE 2024-2026
+Total: $62.4M | Dark Money: $38.2M (61%)
+
+ANOMALIES:
+• "Bring Balance to Salem" — $14M total, $9M from one donor (Knight)
+  94% to GOP caucuses, $860K to Senate Leadership Fund
+• "Oregonians Are Ready" — $500K from Brian Clem
+  6 former moderate Dem lawmakers, goal: negotiate with GOP
+• Phil Knight direct: $1M to Dudley, $3.75M to Betsy Johnson 2022
+  Switched $1.5M to Drazan late in race
+
+UNLIMITED CONTRIBUTIONS:
+• Oregon has no caps (until HB 4024 in 2027)
+• Top 25 donors = $16.3M in 2016 alone
+• Out-of-state donors outgave in-state small donors 10:1
+
+LEGISLATIVE CONNECTIONS:
+• 41 legislators received >$10K from timber PACs
+• 12 have immediate family employed by timber companies
+• Steiner received $24K from timber since 2020
+
+RECOMMENDED:
+→ Audit Bring Balance donor disclosure
+→ Trace Knight → UO/OHSU board appointments
+→ Subpoena OFRI communications with legislators`,
+intel:`INTEL SUBSIDY ANALYSIS
+Total since 1993: $5.4B
+
+BREAKDOWN:
+• Property tax exemptions: $2.1B
+• Strategic investment program: $1.8B
+• CHIPS Fund 2023: $90M (first award)
+• Infrastructure: $600M (highway, water)
+• Utility subsidies: $810M
+
+CHIPS FUND OPACITY:
+• Application details redacted
+• No competitive bidding process
+• State Rep Bynum (Intel alum) chaired creating committee
+• No public comment period on award
+
+JOB PROMISES:
+┌──────────┬─────────┬─────────┐
+│ Year     │ Promise │ Actual  │
+├──────────┼─────────┼─────────┤
+│ 2020     │ 22,000  │ 19,400  │
+│ 2022     │ 24,000  │ 20,100  │
+│ 2024     │ 26,000  │ 21,200  │
+│ 2026     │ 28,000  │ 22,000  │
+└──────────┴─────────┴─────────┘
+
+RECOMMENDED:
+→ Clawback provisions for job shortfall
+→ Public disclosure of CHIPS applications
+→ Competitive bidding for future awards`,
+timber:`TIMBER TAX CUTS & OFRI
+Cumulative revenue loss: $3B since 1990s
+
+TAX CUT TIMELINE:
+1991: Severance tax slashed 75%
+1995: Property tax caps for forestland
+1999: Harvest tax exemptions expanded
+2013: Additional $150M/year in cuts
+2026: Fire-tax shift — taxpayers pay $7M more
+
+OFRI — OREGON FOREST RESOURCES INSTITUTE:
+• Budget: $12M/year (from timber tax)
+• Staff: 18 (former timber industry execs)
+• Exposed 2020: drafted lawmaker talking points
+• ProPublica: "de facto lobbying arm"
+• Golden bill 2025: proposes elimination
+
+DONOR MAP:
+• Weyerhaeuser: $24K to Steiner, $180K to GOP
+• Roseburg Forest Products: $250K to Bring Balance
+• Murphy Company: $250K to GOP PACs
+• Swanson Group: $250K to GOP PACs
+• Freres Timber: $150K to GOP
+
+REVOLVING DOOR:
+• 8 former OFRI staff → timber companies
+• 3 former legislators → timber boards
+• 2 former DNR heads → Weyerhaeuser
+
+RECOMMENDED:
+→ Eliminate OFRI (Golden bill)
+→ Restore severance tax
+→ Require timber donation disclosure`,
+pge:`PGE RATE CASE ANALYSIS
+Residential rates up 59% since 2020
+
+RATE TRAJECTORY:
+2020: 12.6¢/kWh
+2021: 13.8¢/kWh (+9.5%)
+2022: 15.2¢/kWh (+10.1%)
+2023: 16.9¢/kWh (+11.2%)
+2024: 19.2¢/kWh (+13.6%)
+2025: 20.3¢/kWh (+5.5%)
+2026: 21.3¢/kWh (+5.0%)
+
+DATA CENTER SUBSIDY:
+• 16 facilities in PGE territory
+• Paid ~10¢/kWh vs 20¢ residential
+• Industrial demand grew 70% vs 10% residential
+• Residential customers subsidized expansion
+
+POWER ACT 2025:
+• New rate class for >20MW users
+• Data center rates: +29%
+• Residential: -1.3%
+• Commercial: -2.2%
+
+BOARD CONNECTIONS:
+• 2 PGE board members former Intel execs
+• 1 board member on Nike sustainability council
+• OPUC commissioner: former PGE lobbyist
+
+RECOMMENDED:
+→ Retroactive cost recovery from data centers
+→ OPUC recusal rules
+→ Public utility ownership ballot measure`,
+knight:`KNIGHT POLITICAL GIVING
+Total tracked: $14M direct + $3.7B philanthropic
+
+POLITICAL:
+• 2026: $3M to Bring Balance (record)
+• 2026: $1M to Dudley gubernatorial
+• 2025: $2M to Bring Balance
+• 2024: $2M to Bring Balance
+• 2022: $3.75M to Betsy Johnson (indie)
+• 2022: $1.5M to Drazan (switched late)
+• 2022: $2M to Bring Balance
+• 2018: $3.5M to Knute Buehler
+• 2010: $400K to Chris Dudley
+
+PHILANTHROPIC:
+• OHSU Knight Cancer: $2.7B total
+• University of Oregon: $1B+ total
+• Catlin Gabel School: $3M
+• Marylhurst University: scholarship fund
+• 2025: $2B pledge to OHSU (largest US donation)
+
+INFLENCE CONCERNS:
+• UO athletic director appointment (Kilkenny, no experience)
+• WRC withdrawal threat ($30M pulled over sweatshop protest)
+• OHSU research agenda alignment
+• Board appointments at both institutions
+
+RECOMMENDED:
+→ Independent review of Knight-influenced appointments
+→ Philanthropic gift ethics guidelines
+→ Public disclosure of board nomination process`,
+balance:`BRING BALANCE TO SALEM PAC
+Total raised: $14M since 2021
+
+FOUNDING:
+• 2021: Greg Walden (ex-GOP congressman)
+• Strategy: reduce Democratic supermajorities
+• Focus: legislative races, not statewide
+
+FUNDING:
+• Phil Knight: $9M (64% of total)
+• Timber PACs: $1.8M
+• Business groups: $1.2M
+• Individual donors: $2M
+
+SPENDING:
+• 2022: $4.8M — GOP gained 3 House, 1 Senate
+• 2024: $5.1M — GOP lost 1 House, 1 Senate
+• 2026: $4.1M planned (so far)
+
+RECIPIENTS:
+• Senate Republican Leadership: $860K
+• House Republican Evergreen: $560K
+• Direct candidate support: $2.8M
+• Issue ads: $3.8M (undisclosed)
+
+EFFECTIVENESS:
+• 2022: Eliminated supermajorities (briefly)
+• 2024: Failed to hold gains
+• Knight increasingly frustrated with outcomes
+
+RECOMMENDED:
+→ Donor disclosure for issue ads
+→ Independent expenditure reporting
+→ PAC coordination investigation`
+};
+
+const LD={lead1:{t:'Knight → GOP → UO/OHSU Capture',p:'High',x:'Phil Knight has donated $2.7B to OHSU and $1B+ to UO while giving $14M to GOP PACs. At UO, he successfully lobbied for Pat Kilkenny (no college degree, no athletics experience) as athletic director. When students protested Nike sweatshops in 2000, Knight withdrew a $30M donation until the university dissolved its relationship with the Workers Rights Consortium. OHSU board appointments increasingly reflect donor influence. Circular capture: billionaire funds institution → institution serves billionaire interests → billionaire funds politicians who protect those interests.'},lead2:{t:'Timber Fire-Tax Shift',p:'High',x:'Senator Elizabeth Steiner (running for treasurer) introduced a bill that would reduce what timber companies pay for wildfire protection by $7M annually, shifting the cost to general taxpayers. Steiner received $24K from timber companies since 2020, including $1K from Weyerhaeuser in December 2025. Timber lobbyists helped write the bill and drafted Steiner\'s talking points. Meanwhile, Senator Jeff Golden\'s competing bill would raise timber taxes by $75-110M/year and eliminate OFRI. Golden has received only $500 from timber in his career.'},lead3:{t:'Intel CHIPS Fund Opacity',p:'Medium',x:'The Oregon CHIPS Fund awarded Intel $90M in August 2023 — the first and only award from the $260M fund. No competitive bidding process. No public comment period. Application details remain redacted. State Rep Janelle Bynum, who chaired the committee that created the fund, is a former Intel employee (12 years). Intel has received $5.4B in Oregon subsidies since 1993 while job promises consistently fall short. The D1X factory employs 22,000 — 6,000 below the 28,000 promised for 2026.'},lead4:{t:'PGE Data-Center Subsidy',p:'Medium',x:'Portland General Electric\'s residential rates have increased 59% since 2020, from 12.6¢ to 21.3¢ per kWh. During the same period, 16 data centers in PGE territory paid approximately half the residential rate per kWh. Industrial power demand from data centers grew 70% while residential demand grew only 10%. Residential customers effectively subsidized data center expansion. The POWER Act of 2025 finally created a separate rate class for large industrial users, but the damage to residential ratepayers is cumulative. Two PGE board members are former Intel executives.'},lead5:{t:'Bring Balance Dark Money',p:'Monitor',x:'Greg Walden\'s Bring Balance to Salem PAC has spent $14M since 2021, with 64% coming from Phil Knight alone. The PAC operates as a dark-money pass-through: Knight gives unlimited amounts, the PAC spends on issue ads and caucus committees, and individual candidates receive arms-length support. In 2022, the PAC gave $860K to Senate Republicans and $560K to House Republicans while running parallel issue ads. Despite $5M+ spending each cycle, the GOP has failed to make durable gains. Knight\'s March 2026 $1M donation to Dudley suggests frustration with the PAC strategy.'}};
+
+let notes=[
+{d:'2026-08-12',t:'PGE data-center rate hike: 29% for industrial, -1.3% residential. Check if this actually reduces residential burden or just shifts accounting.',tg:['ener','fin']},
+{d:'2026-08-10',t:'Knight $3M to Bring Balance: largest individual donation in OR history. Total Knight political: $14M. Total Knight philanthropic: $3.7B. Ratio is 264:1. Does philanthropy neutralize political influence?',tg:['fin','pol']},
+{d:'2026-08-08',t:'Steiner timber bill: lobbyists wrote talking points. $24K from timber. Compare with Golden bill: $500 from timber, $75-110M revenue restoration. Follow both bills through session.',tg:['agr','lob']}
+];
+
+let fEnt='all';
+
+function sw(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='net')setTimeout(rn,50);
+  if(id==='time')ft('all');
+  if(id==='ent')fe();
+  if(id==='inv')rp();
+  if(id==='leads')rn2();
+}
+
+function fe(){
+  const q=document.getElementById('es').value.toLowerCase();
+  const el=document.getElementById('el');
+  el.innerHTML=E.filter(e=>{
+    const m=(fEnt==='all'||e.tg.includes(fEnt));
+    const s=e.n.toLowerCase().includes(q)||e.r.toLowerCase().includes(q)||e.b.toLowerCase().includes(q);
+    return m&&s;
+  }).map(e=>`<div class="row" onclick="det('${e.id}')"><div><b>${e.n}</b><div style="font-size:11px;color:#94a3b8">${e.r}</div><div style="margin-top:4px">${e.tg.map(t=>`<span class="tag t${t}">${t}</span>`).join('')}</div></div></div>`).join('');
+}
+function tf(el,cat){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');fEnt=cat;fe();}
+
+function det(id){
+  const m=document.getElementById('mdl');
+  const c=document.getElementById('mc');
+  if(LD[id]){c.innerHTML=`<h2 style="color:#f8fafc;margin-top:0">${LD[id].t}</h2><div style="color:var(--a2);font-size:12px;font-weight:600;margin-bottom:10px">Priority: ${LD[id].p}</div><p style="font-size:13px;color:#cbd5e1;line-height:1.6">${LD[id].x}</p>`;}
+  else{
+    const e=E.find(x=>x.id===id);
+    if(!e)return;
+    let st='';
+    for(let k in e.s)st+=`<div class="stbox"><div class="stn">${e.s[k]}</div><div class="stl">${k}</div></div>`;
+    c.innerHTML=`<h2 style="color:#f8fafc;margin-top:0">${e.n}</h2><div style="color:#94a3b8;font-size:13px;margin-bottom:10px">${e.r}</div><p style="font-size:13px;color:#cbd5e1;line-height:1.6">${e.b}</p><div class="statg">${st}</div><div style="margin-top:10px"><b style="color:var(--a);font-size:12px">Connections:</b><div style="margin-top:4px">${e.c.map(cid=>{const ce=E.find(x=>x.id===cid);return ce?`<span class="chip" style="cursor:pointer" onclick="det('${cid}')">${ce.n}</span>`:''}).join(' ')}</div></div>`;
+  }
+  m.style.display='flex';
+}
+function cm(){document.getElementById('mdl').style.display='none';}
+
+function rn(){
+  const svg=document.getElementById('nsvg');
+  const w=svg.clientWidth||800,h=svg.clientHeight||500;
+  svg.innerHTML='';
+  const cols={pol:'#dc2626',fin:'#16a34a',lob:'#7c3aed',jud:'#2563eb',agr:'#65a30d',ener:'#ca8a04',med:'#ea580c',infra:'#0891b2',edu:'#22d3ee',man:'#fb923c'};
+  const nodes=E.map((e,i)=>{const angle=(i/E.length)*Math.PI*2;return{id:e.id,x:w/2+Math.cos(angle)*180,y:h/2+Math.sin(angle)*180,r:8+Math.sqrt((e.c||[]).length)*3,label:e.n,type:e.t,col:cols[e.t]||'#94a3b8'}});
+  const links=[];E.forEach(e=>{if(e.c)e.c.forEach(cid=>{if(E.find(x=>x.id===cid)&&e.id<cid)links.push({s:e.id,t:cid})})});
+  links.forEach(l=>{const s=nodes.find(n=>n.id===l.s),t=nodes.find(n=>n.id===l.t);const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',s.x);line.setAttribute('y1',s.y);line.setAttribute('x2',t.x);line.setAttribute('y2',t.y);line.setAttribute('stroke','#334155');line.setAttribute('stroke-width','1');line.setAttribute('opacity','0.5');svg.appendChild(line);});
+  nodes.forEach(n=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.style.cursor='pointer';g.onclick=()=>det(n.id);
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');circle.setAttribute('cx',n.x);circle.setAttribute('cy',n.y);circle.setAttribute('r',n.r);circle.setAttribute('fill',n.col);circle.setAttribute('stroke','#0f172a');circle.setAttribute('stroke-width','2');
+    const text=document.createElementNS('http://www.w3.org/2000/svg','text');text.setAttribute('x',n.x);text.setAttribute('y',n.y+n.r+12);text.setAttribute('text-anchor','middle');text.setAttribute('fill','#cbd5e1');text.setAttribute('font-size','10');text.textContent=n.label;
+    g.appendChild(circle);g.appendChild(text);svg.appendChild(g);
+  });
+}
+
+function ft(cat){
+  const tl=document.getElementById('tl');
+  const ev=cat==='all'?TL:TL.filter(t=>t.c===cat);
+  tl.innerHTML=`<div class="timeline">${ev.map(e=>`<div class="ti"><div class="td">${e.d}</div><div class="tc"><b>${e.t}</b><br>${e.x}</div></div>`).join('')}</div>`;
+}
+
+function sd(key){document.getElementById('dc').textContent=D[key]||'Not found';}
+
+function rp(){
+  const pool=document.getElementById('epool');
+  pool.innerHTML=E.map(e=>`<div class="row" style="margin-bottom:4px" draggable="true" ondragstart="dp(event,'${e.id}')"><div style="font-size:12px"><b>${e.n}</b><div style="font-size:10px;color:#94a3b8">${e.r}</div></div></div>`).join('');
+  const canv=document.getElementById('bcanv');
+  canv.ondragover=e=>e.preventDefault();
+  canv.ondrop=e=>{
+    e.preventDefault();
+    const id=e.dataTransfer.getData('id');
+    const ent=E.find(x=>x.id===id);
+    if(!ent)return;
+    const rect=canv.getBoundingClientRect();
+    const px=e.clientX-rect.left-60,py=e.clientY-rect.top-20;
+    const pin=document.createElement('div');pin.className='pin';pin.style.left=px+'px';pin.style.top=py+'px';pin.innerHTML=`<b>${ent.t}</b>${ent.n}<span class="del" onclick="this.parentElement.remove()">×</span>`;
+    canv.appendChild(pin);
+  };
+}
+function dp(e,id){e.dataTransfer.setData('id',id);}
+function acp(){
+  const l=document.getElementById('cpin').value;
+  const t=document.getElementById('cptype').value;
+  if(!l)return;
+  const canv=document.getElementById('bcanv');
+  const pin=document.createElement('div');pin.className='pin';pin.style.left='20px';pin.style.top='20px';pin.innerHTML=`<b>${t}</b>${l}<span class="del" onclick="this.parentElement.remove()">×</span>`;
+  canv.appendChild(pin);
+  document.getElementById('cpin').value='';
+}
+
+function rn2(){document.getElementById('nl').innerHTML=notes.map(n=>`<div class="note"><div class="nd">${n.d}</div><div class="nt">${n.t}</div><div style="margin-top:4px">${n.tg.map(t=>`<span class="tag t${t}">${t}</span>`).join('')}</div></div>`).join('');}
+function an(){
+  const t=document.getElementById('ntxt').value;
+  const g=document.getElementById('ntags').value.split(',').map(s=>s.trim()).filter(s=>s);
+  if(!t)return;
+  notes.unshift({d:new Date().toISOString().slice(0,10),t:t,tg:g.length?g:['note']});
+  document.getElementById('ntxt').value='';document.getElementById('ntags').value='';
+  rn2();
+}
+
+fe();ft('all');rn2();
+</script>
+</body>
+</html>

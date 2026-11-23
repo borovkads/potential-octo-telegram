@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>amizong.com: The Equivalent: Volume I — Customer reviews</title>
+<style>
+  :root {
+    --nav: #131921;
+    --nav2: #232f3e;
+    --orange: #febd69;
+    --orange2: #f0c14b;
+    --link: #007185;
+    --star: #de7921;
+    --ink: #0f1111;
+    --grey: #565959;
+    --line: #d5d9d9;
+    --bg: #eaeded;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Amazon Ember", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: #fff;
+  }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { color: #c7511f; text-decoration: underline; }
+
+  /* ---------------- header */
+  .top {
+    background: var(--nav);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 6px 14px;
+    flex-wrap: wrap;
+  }
+  .logo {
+    font-family: Georgia, serif;
+    font-size: 27px;
+    letter-spacing: -0.5px;
+    color: #fff;
+    line-height: 1;
+    padding: 6px 4px 8px;
+  }
+  .logo b { color: var(--orange); font-weight: 700; }
+  .logo .tld { font-size: 12px; color: #ccc; }
+  .deliver { font-size: 12px; color: #ccc; line-height: 1.3; }
+  .deliver b { color: #fff; display: block; font-size: 13px; }
+  .search {
+    flex: 1 1 420px;
+    display: flex;
+    min-width: 280px;
+    height: 40px;
+  }
+  .search select {
+    background: #f3f3f3; border: none; border-radius: 4px 0 0 4px;
+    padding: 0 8px; font-size: 12px; color: #111; cursor: pointer;
+  }
+  .search input {
+    flex: 1; border: none; padding: 0 10px; font-size: 15px; outline: none;
+  }
+  .search button {
+    width: 45px; border: none; background: var(--orange); cursor: pointer;
+    border-radius: 0 4px 4px 0; font-size: 17px; color: #131921;
+  }
+  .hdr-right { display: flex; align-items: flex-end; gap: 18px; margin-left: auto; }
+  .hdr-item { font-size: 12px; color: #ccc; line-height: 1.2; }
+  .hdr-item b { display: block; font-size: 14px; color: #fff; }
+  .cart { display: flex; align-items: flex-end; gap: 4px; }
+  .cart .n { color: var(--orange); font-weight: 700; }
+  .nav2 {
+    background: var(--nav2);
+    color: #fff;
+    display: flex; gap: 22px; align-items: center;
+    padding: 6px 16px; font-size: 13px;
+  }
+  .nav2 a { color: #fff; }
+  .nav2 .all { font-weight: 700; }
+
+  /* ---------------- breadcrumb + layout */
+  .crumb { font-size: 12px; color: var(--grey); padding: 8px 18px; }
+  .wrap {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr) 300px;
+    gap: 28px;
+    padding: 6px 18px 40px;
+    max-width: 1500px;
+    margin: 0 auto;
+    align-items: start;
+  }
+  @media (max-width: 1100px) {
+    .wrap { grid-template-columns: 220px minmax(0, 1fr); }
+    .buybox { grid-column: 1 / -1; }
+  }
+
+  /* ---------------- cover */
+  .cover {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    background: #1b2b24;
+    color: #e8dfc8;
+    border: 1px solid #c7bfae;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 26px 20px 30px;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  }
+  .cover .t { font-family: Georgia, serif; font-size: 25px; line-height: 1.15; letter-spacing: .01em; }
+  .cover .rule { border-top: 1px solid rgba(232,223,200,.5); margin: 10px 22px; }
+  .cover .v { font-family: Georgia, serif; font-size: 12px; letter-spacing: .34em; text-transform: uppercase; }
+  .cover .num { font-family: Georgia, serif; font-size: 60px; line-height: 1; opacity: .5; }
+  .cover .foot { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; opacity: .65; }
+
+  /* ---------------- centre column */
+  h1.title { font-size: 24px; font-weight: 400; line-height: 1.3; margin: 0 0 4px; }
+  .byline { font-size: 14px; margin: 0 0 4px; }
+  .byline a { color: var(--link); }
+  .stars { color: var(--star); letter-spacing: 1px; font-size: 17px; vertical-align: -1px; }
+  .ratingsline { display: flex; align-items: center; gap: 8px; padding: 4px 0 8px; }
+  .ratingsline .count { color: var(--link); font-size: 13px; }
+  .hr { border-top: 1px solid var(--line); margin: 12px 0; }
+  .price { font-size: 26px; margin: 6px 0 2px; }
+  .price small { font-size: 13px; }
+  .fmt { font-size: 13px; color: var(--grey); margin-bottom: 10px; }
+
+  .insight {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 14px 0;
+    background: #fbfbfb;
+  }
+  .insight h3 { margin: 0 0 6px; font-size: 15px; }
+  .insight p { margin: 6px 0; font-size: 13px; color: #333; }
+  .insight .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tag { border: 1px solid var(--line); border-radius: 12px; padding: 2px 9px; font-size: 12px; background: #fff; }
+  .tag.pos { border-color: #cfe3d0; background: #f2f8f2; }
+  .tag.neg { border-color: #f0d3d3; background: #fbf3f3; }
+
+  .histogram { margin: 10px 0 4px; }
+  .hrow { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .hrow .lbl { color: var(--link); width: 34px; }
+  .bar { flex: 1; height: 20px; background: #f0f2f2; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
+  .bar span { display: block; height: 100%; background: #ffa41c; }
+  .hrow .pct { width: 34px; text-align: right; color: var(--grey); }
+
+  h2.sec { font-size: 20px; font-weight: 400; margin: 22px 0 4px; }
+
+  .review {
+    border-top: 1px solid var(--line);
+    padding: 16px 0 6px;
+    display: flex; gap: 14px;
+  }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #e7e9ec; color: #444;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex: 0 0 auto;
+  }
+  .rbody { min-width: 0; }
+  .rname { font-size: 13px; font-weight: 700; }
+  .rmeta { font-size: 12px; color: var(--grey); display: flex; align-items: center; gap: 8px; margin: 2px 0 6px; flex-wrap: wrap; }
+  .rhead { font-size: 15px; font-weight: 700; margin: 2px 0 6px; }
+  .rtext { font-size: 14px; line-height: 1.5; white-space: pre-line; }
+  .rtext p { margin: 0 0 10px; }
+  .helpful { font-size: 12px; color: var(--grey); margin: 10px 0 6px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .hbtn {
+    border: 1px solid var(--line); background: #fff; border-radius: 8px;
+    padding: 5px 11px; font-size: 12px; cursor: pointer; color: #0f1111;
+  }
+  .hbtn:hover { background: #f7fafa; }
+  .verified { color: var(--link); font-size: 11px; font-weight: 700; }
+  .wasHelpful { color: #565959; font-size: 12px; }
+
+  /* ---------------- buy box */
+  .buybox {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+    position: sticky; top: 12px;
+  }
+  .buybox .p { font-size: 22px; margin-bottom: 4px; }
+  .buybox .deliv { font-size: 12px; color: var(--grey); margin: 6px 0 12px; }
+  .buybox .deliv b { color: var(--ink); }
+  .stock { color: #007600; font-size: 17px; margin: 8px 0 12px; }
+  select.qty, select.format {
+    width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px;
+    background: #f0f2f2; font-size: 13px; margin-bottom: 10px;
+  }
+  .btn {
+    display: block; width: 100%; border: none; border-radius: 20px;
+    padding: 9px 12px; font-size: 14px; cursor: pointer; margin-bottom: 8px;
+    color: #0f1111;
+  }
+  .btn.cart { background: var(--orange2); }
+  .btn.buy { background: #ffa41c; }
+  .btn:hover { filter: brightness(.96); }
+  .ships { font-size: 12px; color: var(--grey); line-height: 1.6; margin-top: 10px; }
+  .ships b { color: var(--ink); }
+
+  footer.parody {
+    border-top: 1px solid var(--line);
+    background: #f7f8f8;
+    color: var(--grey);
+    font-size: 12px;
+    padding: 16px 18px 26px;
+    text-align: center;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <span class="logo">amiz<b>ong</b> <span class="tld">.com</span></span>
+
+  <div class="deliver">
+    Deliver to
+    <b>Dundee DD1 ▾</b>
+  </div>
+
+  <form class="search" onsubmit="return false">
+    <select aria-label="Search in">
+      <option>All</option>
+      <option selected>Books</option>
+      <option>Kindle Store</option>
+    </select>
+    <input value="the equivalent volume i" aria-label="Search amizong"/>
+    <button type="submit" aria-label="Go">🔍</button>
+  </form>
+
+  <div class="hdr-right">
+    <div class="hdr-item">Hello, sign in<b>Account &amp; Lists ▾</b></div>
+    <div class="hdr-item"><b>Returns</b>&amp; Orders</div>
+    <div class="cart hdr-item"><b>🛒 <span class="n">0</span></b>Cart</div>
+  </div>
+</header>
+
+<nav class="nav2">
+  <a class="all" href="#">☰ All</a>
+  <a href="#">Today's Deals</a>
+  <a href="#">Books</a>
+  <a href="#">Kindle eBooks</a>
+  <a href="#">Literature &amp; Fiction</a>
+  <a href="#">New Releases</a>
+  <a href="#">Best Sellers</a>
+</nav>
+
+<div class="crumb">
+  <a href="#">Books</a> › <a href="#">Literature &amp; Fiction</a> › <a href="#">Historical</a>
+</div>
+
+<div class="wrap">
+
+  <!-- cover -->
+  <div>
+    <div class="cover" role="img" aria-label="Cover: The Equivalent, Volume I">
+      <div>
+        <div class="t">The<br/>Equivalent</div>
+        <div class="rule"></div>
+        <div class="v">Volume I</div>
+      </div>
+      <div class="num">I</div>
+      <div class="foot">A novel in twenty-eight chapters</div>
+    </div>
+    <p style="font-size:12px;color:#565959;text-align:center;margin:10px 0 0">
+      Click to look inside
+    </p>
+  </div>
+
+  <!-- centre -->
+  <div>
+    <h1 class="title">The Equivalent: Volume I</h1>
+    <p class="byline">by <a href="#">F. Calder</a></p>
+
+    <div class="ratingsline">
+      <span class="stars" aria-label="2.0 out of 5 stars">★★☆☆☆</span>
+      <a class="count" href="#reviews">2.0 out of 5</a>
+      <a class="count" href="#reviews">· 3 global ratings</a>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="price">£9<small>.99</small></div>
+    <div class="fmt">Kindle Edition · Paperback £16.99 · 307 pages · 73,427 words</div>
+
+    <div class="insight">
+      <h3>Customers say</h3>
+      <p>
+        Readers are split. The prose and the procedural detail draw praise — “documents do the work
+        that other novels give to dialogue” — while the ledger-driven chapters and the withholding
+        narrators put others off entirely: “I wanted a novel, I got an audit.”
+      </p>
+      <div class="tags">
+        <span class="tag pos">Well-researched</span>
+        <span class="tag pos">Atmospheric</span>
+        <span class="tag neg">Slow</span>
+        <span class="tag neg">Too much paperwork</span>
+        <span class="tag neg">No plot</span>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <h2 class="sec">Customer reviews</h2>
+    <div class="ratingsline">
+      <span class="stars" aria-label="2.0 out of 5 stars">★★☆☆☆</span>
+      <b style="font-size:16px">2.0</b>
+      <span class="count" style="color:#565959">out of 5</span>
+    </div>
+    <div class="count" style="color:#565959;font-size:13px;margin-bottom:8px">3 global ratings</div>
+
+    <div class="histogram" aria-label="Rating distribution">
+      <div class="hrow"><span class="lbl">5 star</span><span class="bar"><span style="width:0"></span></span><span class="pct">0%</span></div>
+      <div class="hrow"><span class="lbl">4 star</span><span class="bar"><span style="width:33%"></span></span><span class="pct">33%</span></div>
+      <div class="hrow"><span class="lbl">3 star</span><span class="bar"><span style="width:0"></span></span><span class="pct">0%</span></div>
+      <div class="hrow"><span class="lbl">2 star</span><span class="bar"><span style="width:0"></span></span><span class="pct">0%</span></div>
+      <div class="hrow"><span class="lbl">1 star</span><span class="bar"><span style="width:67%"></span></span><span class="pct">67%</span></div>
+    </div>
+
+    <div class="hr"></div>
+
+    <h3 style="font-size:16px;margin:14px 0 0">Top reviews from the United Kingdom</h3>
+
+    <!-- review 1 -->
+    <article class="review" id="reviews">
+      <div class="avatar" aria-hidden="true">ER</div>
+      <div class="rbody">
+        <div class="rname">Eleanor R.</div>
+        <div class="rmeta">
+          <span class="stars" aria-label="4.0 out of 5 stars">★★★★☆</span>
+          <span>Patient, exact, and it earns its withholding</span>
+        </div>
+        <div class="rmeta"><span class="verified">✔ Verified Purchase</span><span>Reviewed in the United Kingdom on 12 March</span></div>
+        <div class="rtext">
+          <p>This is not a book that hurries. It opens with an inventory — a house in Broughty Ferry, six hundred and forty shares, “a charitable trust, the Cargill Bequest, whose purpose was the relief of deserving persons of the City of Dundee” — and the whole novel keeps that temperature.</p>
+          <p>Two strands: a Dundee estate room in 1976, and interludes in Amsterdam, Paris, Genoa and Port Tobacco where documents do the work that other novels give to dialogue. A receipt for one hundred and twelve barrels of salt beef tells you more about the Company of Scotland than a chapter of exposition would.</p>
+          <p>What makes it four rather than five: a few interludes read like briefings rather than scenes, and the seventeenth-century chapters are over almost as soon as they begin. The modern strand is the heart, and it is superb. Bring on Volume II.</p>
+        </div>
+        <div class="helpful">
+          <span class="wasHelpful">31 people found this helpful</span>
+          <button class="hbtn">Helpful</button>
+          <a href="#">Report</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- review 2 -->
+    <article class="review">
+      <div class="avatar" aria-hidden="true">MH</div>
+      <div class="rbody">
+        <div class="rname">Martin H.</div>
+        <div class="rmeta">
+          <span class="stars" aria-label="1.0 out of 5 stars">★☆☆☆☆</span>
+          <span>An audit, not a novel</span>
+        </div>
+        <div class="rmeta"><span class="verified">✔ Verified Purchase</span><span>Reviewed in the United Kingdom on 9 March</span></div>
+        <div class="rtext">
+          <p>I bought this expecting a Scottish family saga and got eleven documents in eighty years, plus a man counting barrels. Page after page is ledgers: “the warehouse book was ruled in two columns, and the columns were headed <i>in</i> and <i>out</i>.” Interesting once. By the fourth era I could not tell you a single thing about Maggie except that she has files on a long table and puts them there by half past nine.</p>
+          <p>The historical chapters are lectures with dates on top — Genoa 1557, Paris 1688 — and then they stop, sixty pages short of anything happening. Nobody in this book says what they want. It ends by promising Volume II, which annoyed me more than the ending itself.</p>
+          <p>Beautiful sentences, genuinely. But I read novels for people, and this one has decided people are paperwork. Two hundred pages of my life I'd like graded back.</p>
+        </div>
+        <div class="helpful">
+          <span class="wasHelpful">48 people found this helpful</span>
+          <button class="hbtn">Helpful</button>
+          <a href="#">Report</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- review 3 -->
+    <article class="review">
+      <div class="avatar" aria-hidden="true">W</div>
+      <div class="rbody">
+        <div class="rname">Wullie1696</div>
+        <div class="rmeta">
+          <span class="stars" aria-label="1.0 out of 5 stars">★☆☆☆☆</span>
+          <span>WASTE OF 9.99</span>
+        </div>
+        <div class="rmeta"><span>Reviewed in the United Kingdom on 11 March</span></div>
+        <div class="rtext">
+          <p>rite so a bought this becuase the cover looks like a proper book. wher to start.</p>
+          <p>chapter one is a man deid and a list of his stuff. a hoose in broughty ferry, some shares, and a fund for “deserving persons of the city of dundee.” fine. thats a chapter.</p>
+          <p>then chapter two is a dutchman counting barrels and the coopers at veere. thats the whole chapter. barrels. a work in a warehouse maself so a ken whit a barrel looks like, and a widnae read aboot one.</p>
+          <p>and chapter three is a wuman on a train to edinburgh wi a photostat. she reads it 4 times. the windae doesnt open. thats it. thats the chapter.</p>
+          <p>wheres the highlands?? theres nae highlands. nae sword. nae fighting. a grew up on highlander — christopher lambert, the quickening, THERE CAN BE ONLY ONE, you can shout that in the bowlin club and every man knows it. this book says “the equivalent” and its a fella comparing two columns. is that ment to be the joke.</p>
+          <p>and there is wee grey writin under the numbers. chapter 1 says DUNDEE 1976, chapter 2 says VEERE 1594, chapter 3 has nuthin at aw under it. is that a mistake or is the book that clever. a ken fine which a'd put ma money on.</p>
+          <p>my mrs says am no allowed to review books a havnt finished. a finished this yin. 1 star and thats generous.</p>
+        </div>
+        <div class="helpful">
+          <span class="wasHelpful">12 people found this helpful</span>
+          <button class="hbtn">Helpful</button>
+          <a href="#">Report</a>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- buy box -->
+  <aside class="buybox">
+    <div class="p">£9.99</div>
+    <div style="font-size:12px;color:#565959">Kindle price</div>
+    <div class="deliv">FREE delivery <b>Tuesday, 24 March</b> on your first order</div>
+    <select class="format" aria-label="Format">
+      <option>Kindle Edition £9.99</option>
+      <option>Paperback £16.99</option>
+      <option>Hardcover £22.00</option>
+    </select>
+    <div class="stock">In stock</div>
+    <select class="qty" aria-label="Quantity">
+      <option>Qty: 1</option>
+      <option>Qty: 2</option>
+      <option>Qty: 3</option>
+    </select>
+    <button class="btn cart">Add to Basket</button>
+    <button class="btn buy">Buy Now</button>
+    <div class="ships">
+      <b>Ships from</b> amizong<br/>
+      <b>Sold by</b> Calder &amp; Lyle<br/>
+      <b>Returns</b> 30-day refund
+    </div>
+    <div class="hr"></div>
+    <div style="font-size:12px;color:#565959;line-height:1.7">
+      <b style="color:#0f1111">Length:</b> 307 pages<br/>
+      <b style="color:#0f1111">Language:</b> English<br/>
+      <b style="color:#0f1111">Publication date:</b> 1 March<br/>
+      <b style="color:#0f1111">Volume:</b> I of II
+    </div>
+  </aside>
+
+</div>
+
+<footer class="parody">
+  A parody page, made for the author. Not affiliated with, endorsed by, or connected to Amazon.
+  “amizong.com” is a joke, the reviews are invented, and nobody is selling anything.<br/>
+  <a href="#">Conditions of Use</a> · <a href="#">Privacy Notice</a> · <a href="#">Interest-Based Ads</a>
+  · © 1996–2026, amizong.com, Inc. or its non-existent affiliates
+</footer>
+
+<script>
+  // the two "Helpful" buttons count up, the way they do everywhere
+  document.querySelectorAll('.hbtn').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var label = button.parentElement.querySelector('.wasHelpful');
+      var match = /^(\d+)/.exec(label.textContent || '');
+      var n = match ? Number(match[1]) + 1 : 1;
+      label.textContent = n + (n === 1 ? ' person found this helpful' : ' people found this helpful');
+      button.disabled = true;
+      button.textContent = 'Helpful ✓';
+      button.style.opacity = '.6';
+    });
+  });
+</script>
+</body>
+</html>
